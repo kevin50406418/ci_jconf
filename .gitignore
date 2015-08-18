@@ -41,3 +41,7 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+application/config/database.php
+sftp-config.json
+.remote-sync.json
