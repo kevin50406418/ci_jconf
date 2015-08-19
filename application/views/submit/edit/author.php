@@ -42,7 +42,7 @@
 <div class="form-group">
 	<label class="col-sm-2 control-label">國別</label>
 	<div class="col-sm-10">
-		<?php echo form_dropdown('user_country[]', $country_list, $author->user_country, 'class="form-control"');?>
+		<?php echo form_dropdown('user_country[]', $country_list, $author->user_country, 'class="form-control chosen-select" data-placeholder="請選擇國家..."');?>
 	</div>
 </div>
 <?php }?>

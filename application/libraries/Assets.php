@@ -99,14 +99,5 @@ class Assets
     	}
     }
 
-    public function global_header(){
-    	$this->add_css(asset_url().'style/bootstrap.min.css');
-		$this->add_css(asset_url().'style/label.min.css');
-		$this->add_css(asset_url().'style/segment.min.css');
-		$this->add_css(asset_url().'style/menu.min.css');
-		$this->add_css(asset_url().'style/message.min.css');
-		$this->add_css(asset_url().'style/button.min.css');
-		$this->add_css(asset_url().'style/font-awesome.min.css');
-		$this->add_css(asset_url().'style/style.css');
-    }
+   
 }

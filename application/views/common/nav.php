@@ -27,7 +27,7 @@
 			<?php }else{?>
 			<ul class="nav navbar-nav navbar-right">
 				<li><a href="<?php echo base_url('user/login');?>">登入</a></li>
-				<li><a href="<?php echo base_url();?>">註冊</a></li>
+				<li><a href="<?php echo base_url('user/signup');?>">註冊</a></li>
 			</ul>
 			<?php }?>
 		</div>

@@ -129,6 +129,7 @@ class Conf_model extends CI_Model {
 		$query = $this->db->get();
 		return $query->result();
 	}
+
 	function update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_desc){
 		$paper = array(
             "name"   =>$conf_name,
@@ -145,5 +146,58 @@ class Conf_model extends CI_Model {
         }else{
             return false;
         }
+	}
+
+	function get_paperdir($conf_id){
+		return './upload/paper/'.$conf_id.'/';
+	}
+
+	function get_regdir($conf_id){
+		return './upload/registration/'.$conf_id.'/';
+	}
+
+	function mkconf_dir($conf_id){
+		$return = array(
+			"status" => false,
+			"error" => ""
+		);
+		$data = "<!DOCTYPE html><html><head><title>403 Forbidden</title></head><body><p>Directory access is forbidden.</p></body></html>";
+
+		if( !file_exists ( $this->get_paperdir($conf_id) ) ){
+			mkdir($this->get_paperdir($conf_id), 0755);
+			write_file($this->get_paperdir($conf_id), $data);
+		}else{
+			$return = array(
+				"status" => false,
+				"error" => "Directory '".$this->get_paperdir($conf_id)."' exists."
+			);
+		}
+		
+		if( !file_exists ( $this->get_regdir($conf_id) ) ){
+			mkdir($this->get_regdir($conf_id), 0755);
+			write_file($this->get_regdir($conf_id), $data);
+		}else{
+			$return = array(
+				"status" => false,
+				"error" => "Directory '".$this->get_regdir($conf_id)."' exists."
+			);
+		}
+		$return['status'] = true;
+		return $return;
+	}
+
+	function lang(){
+		if( !$this->session->has_userdata('lang') ){
+			$languages = $this->agent->languages();
+			switch($languages[0]){
+				case "zh":
+					$lang = "zhtw";
+				break;
+				case "en":
+					$lang = "en";
+				break;
+			}
+			$this->session->set_userdata('lang', $lang);
+		}		
 	}
 }

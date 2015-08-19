@@ -67,8 +67,10 @@ class Submit extends MY_Conference {
 						$data['step_class']=array(1=>"completed",2=>"active",3=>"disabled",4=>"disabled",5=>"disabled",6=>"disabled");
 						$num = $this->conf->get_filter_count($conf_id);
 						if(count($this->input->post('list')) == ($num+2) ){
+							$this->assets->add_css(asset_url().'style/chosen.css');
 							$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
 							$this->assets->add_js(asset_url().'js/repeatable.js',true);
+							$this->assets->add_js(asset_url().'js/chosen.jquery.js');
 							$country_list = config_item('country_list');
 							$data['user'] =  $this->user->get_user_info($user_login);
 							$data['country_list'] = $country_list['zhtw'];
@@ -143,7 +145,7 @@ class Submit extends MY_Conference {
 								$data['paper_id'] = $paper_id;
 								$this->Submit->add_time($conf_id,$paper_id);
 							}
-	                		$config['upload_path']= './paper/'.$conf_id.'/';
+	                		$config['upload_path']= $this->conf->get_paperdir($conf_id);
 			                $config['allowed_types']= 'pdf';
 			                $config['encrypt_name']= true;
 
@@ -160,9 +162,8 @@ class Submit extends MY_Conference {
 		                       		$this->Submit->add_file($conf_id,$paper_id,$upload_data['client_name'],$upload_data['file_name'],"F");
 		                    	}else{
 		                    		$fid = $this->session->userdata($conf_id.'_file_id');
-		                    		$this->load->helper('file');
 		                    		$del_file = $this->Submit->get_otherfile($paper_id);
-		                    		delete_files('./paper/'.$conf_id.'/'.$del_file->file_system);
+		                    		delete_files($this->conf->get_paperdir($conf_id).$del_file->file_system);
 		                    		$this->Submit->update_file($conf_id,$paper_id,$fid,$upload_data['client_name'],$upload_data['file_name']);
 		                    	}
 			                	$data['show_file'] = true;
@@ -184,7 +185,7 @@ class Submit extends MY_Conference {
 						if(is_null($this->input->get("upload"))){
 
 						}else{
-							$config['upload_path']= './paper/'.$conf_id.'/';
+							$config['upload_path']= $this->conf->get_paperdir($conf_id);
 			                $config['allowed_types']= 'pdf';
 			                $config['encrypt_name']= true;
 
@@ -270,8 +271,10 @@ class Submit extends MY_Conference {
 						$this->load->view('submit/edit/step1',$data);
 					break;
 					case 2:
+						$this->assets->add_css(asset_url().'style/chosen.css');
 						$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
 						$this->assets->add_js(asset_url().'js/repeatable.js',true);
+						$this->assets->add_js(asset_url().'js/chosen.jquery.js');
 						$country_list = config_item('country_list');
 						$data['paper'] = $this->Submit->get_paperinfo($paper_id, $user_login);
 						$data['country_list'] = $country_list['zhtw'];
@@ -335,7 +338,7 @@ class Submit extends MY_Conference {
                 			}
                 		}
                 		if(!is_null($this->input->get("upload"))){
-                			$config['upload_path']= './paper/'.$conf_id.'/';
+                			$config['upload_path']= $this->conf->get_paperdir($conf_id);
 			                $config['allowed_types']= 'pdf';
 			                $config['encrypt_name']= true;
 
@@ -352,9 +355,8 @@ class Submit extends MY_Conference {
 		                       		$this->Submit->add_file($conf_id,$paper_id,$upload_data['client_name'],$upload_data['file_name'],"F");
 		                    	}else{
 		                    		$fid = $this->session->userdata($conf_id.'_file_id');
-		                    		$this->load->helper('file');
 		                    		$del_file = $this->Submit->get_otherfile($paper_id);
-		                    		delete_files('./paper/'.$conf_id.'/'.$del_file->file_system);
+		                    		delete_files($this->conf->get_paperdir($conf_id).$del_file->file_system);
 		                    		$this->Submit->update_file($conf_id,$paper_id,$fid,$upload_data['client_name'],$upload_data['file_name']);
 		                    	}
 			                	$data['otherfile'] = $this->Submit->get_otherfile($paper_id);
@@ -368,7 +370,7 @@ class Submit extends MY_Conference {
 					break;
 					case 4:		                
 						if(!is_null($this->input->get("upload"))){
-							$config['upload_path']= './paper/'.$conf_id.'/';
+							$config['upload_path']= $this->conf->get_paperdir($conf_id);
 			                $config['allowed_types']= 'pdf';
 			                $config['encrypt_name']= true;
 
@@ -430,19 +432,18 @@ class Submit extends MY_Conference {
 					js_alert("查無稿件檔案",get_url("submit",$conf_id));
 					exit;
 				}
-				$this->load->helper('file');
 				$this->load->helper('download');
 				$do = $this->input->get("do");
 				switch($do){
 					case "download":
-						force_download($file->file_name,file_get_contents('./paper/'.$conf_id.'/'.$file->file_system));
+						force_download($file->file_name,file_get_contents($this->conf->get_paperdir($conf_id).$file->file_system));
 					break;
 					default:
 					case "view":
 						$this->output
 							->set_content_type('pdf')
 							->set_header("Content-Disposition: inline; filename=\"".$paper_id."-".$file->fid."-".$file->file_name."\"")
-							->set_output(file_get_contents('./paper/'.$conf_id.'/'.$file->file_system));
+							->set_output(file_get_contents($this->conf->get_paperdir($conf_id).$file->file_system));
 					break;
 				}
 			}
