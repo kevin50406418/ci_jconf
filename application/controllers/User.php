@@ -92,6 +92,14 @@ class User extends MY_Controller {
 		    $this->form_validation->set_rules('user_country', '國別', 'required');
 		    $this->form_validation->set_rules('user_lang', '語言', 'required');
 		    $this->form_validation->set_rules('user_title', '研究領域', 'required|min_length[1]');
+		    /*
+		    $this->email->from('ccs@asia.edu.tw', '亞大研討會系統');
+			$this->email->to('kevin50406418@gmail.com');
+			$this->email->subject('Email Test');
+			$this->email->message('Testing the email class.');
+			if ( ! $this->email->send()){
+				echo $this->email->print_debugger();
+			}*/
 
 		    if ($this->form_validation->run() === FALSE){
 
@@ -119,11 +127,14 @@ class User extends MY_Controller {
 		    	$user_research = $this->input->post('user_research', TRUE);
 
 		    	$user_phone_o = $user_phoneO_1.",".$user_phoneO_2.",".$user_phoneO_3;
+		    	$user_postaddr = $user_addcounty.",".$user_area.",".$user_postaddr;
 		    	$res = $this->user->adduser($user_login,$user_pass,$user_title,$user_email,$user_firstname,$user_lastname,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research);
 		    	if( $res['status'] ){
+		    		js_alert("Signup Success");
 		    		$this->form_validation->set_message('signup_success', 'Signup Success');
 		    		//redirect($redirect, 'refresh');
 		    	}else{
+		    		js_alert($res['error']);
 		    		$this->form_validation->set_message('signup_error', $res['error']);
 		    	}
 		    }

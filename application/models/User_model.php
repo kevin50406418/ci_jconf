@@ -47,6 +47,10 @@ class User_model extends CI_Model {
 		}
 	}
 
+	function is_sysoplogin(){
+		
+	}
+
 	function is_conf(){
 		return false;
 	}
