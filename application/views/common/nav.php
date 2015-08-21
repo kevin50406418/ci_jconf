@@ -9,7 +9,7 @@
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<?php if($this->cinfo['show_confinfo']){?>
 			<ul class="nav navbar-nav">
-				<li><a href="#"><?php echo $conf_config['name']?></a></li>
+				<li class="active"><a href="#"><?php echo $conf_config['name']?></a></li>
 			</ul>
 			<?php }?>
 			<?php if($this->user->is_login()){?>
@@ -24,6 +24,11 @@
 					</ul>
 				</li>
 			</ul>
+			<?php if($this->user->is_sysop()){?>
+			<ul class="nav navbar-nav navbar-right">
+				<li><a href="<?php echo base_url("sysop");?>">系統管理</a></li>
+			</ul>
+			<?php }?>
 			<?php }else{?>
 			<ul class="nav navbar-nav navbar-right">
 				<li><a href="<?php echo base_url('user/login');?>">登入</a></li>

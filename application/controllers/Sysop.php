@@ -6,10 +6,15 @@ class Sysop extends MY_Sysop {
 	}
 
 	public function index(){
-
+		if( !$this->sysop->is_sysop_login() ){
+			redirect(base_url("user/login"), 'location', 301);
+		}
 	}
 
 	public function conf($type="all",$conf_id=""){
+		if( !$this->sysop->is_sysop_login() ){
+			redirect(base_url("user/login"), 'location', 301);
+		}
 		if( !empty($conf_id) ){
 			switch($type){
 				default:
@@ -37,6 +42,9 @@ class Sysop extends MY_Sysop {
 	}
 
 	public function user($do="all",$user_login=""){
+		if( !$this->sysop->is_sysop_login() ){
+			redirect(base_url("user/login"), 'location', 301);
+		}
 		if( !empty($user_login) ){
 			switch($do){
 				default:
@@ -64,6 +72,19 @@ class Sysop extends MY_Sysop {
 	}
 
 	public function login(){
-		
+		$this->assets->add_css(asset_url().'style/sysop_login.css');
+		$this->form_validation->set_rules('user_pass', '密碼', 'required');
+		if ($this->form_validation->run() == TRUE){
+			$user_pwd = $this->input->post('user_pass', TRUE);
+			if( $this->sysop->sysop_login($user_pwd) ){
+				js_alert("Login Success",base_url("sysop"));
+			}else{
+				js_alert("Login Error");
+			}
+		}
+		$this->load->view('common/header');
+		$this->load->view('common/nav');
+		$this->load->view('sysop/login');
+		$this->load->view('common/footer');
 	}
 }
