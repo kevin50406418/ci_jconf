@@ -76,6 +76,9 @@ class User extends MY_Controller {
 			$this->assets->add_js(asset_url().'js/jquery.twzipcode.min.js');
 			$this->assets->add_js(asset_url().'js/chosen.jquery.js');
 
+			$this->load->view('common/header');
+			$this->load->view('common/nav');
+			$this->load->view('js/signup');
 			$this->form_validation->set_rules('user_id', '帳號', 'required');
 		    $this->form_validation->set_rules('user_pw', '密碼', 'required|min_length[6]');
 		    $this->form_validation->set_rules('user_pw2', '重覆輸入密碼', 'required|matches[user_pw]|min_length[6]');
@@ -130,18 +133,16 @@ class User extends MY_Controller {
 		    	$user_postaddr = $user_addcounty.",".$user_area.",".$user_postaddr;
 		    	$res = $this->user->adduser($user_login,$user_pass,$user_title,$user_email,$user_firstname,$user_lastname,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research);
 		    	if( $res['status'] ){
-		    		js_alert("Signup Success");
+		    		$this->alert->js("Signup Success");
 		    		$this->form_validation->set_message('signup_success', 'Signup Success');
 		    		//redirect($redirect, 'refresh');
 		    	}else{
-		    		js_alert($res['error']);
+		    		$this->alert->js($res['error']);
 		    		$this->form_validation->set_message('signup_error', $res['error']);
 		    	}
 		    }
 
-			$this->load->view('common/header');
-			$this->load->view('common/nav');
-			$this->load->view('js/signup');
+			
 			$this->load->view('user/signup',$data);
 			$this->load->view('common/footer');
 		}else{

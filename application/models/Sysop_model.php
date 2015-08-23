@@ -34,4 +34,9 @@ class Sysop_model extends CI_Model {
     function add_sysop_time(){
     	$this->session->set_tempdata('sysop_login', time(), 900);
     }
+
+    function logout(){
+    	$this->session->set_tempdata('sysop_login', time()-900, 0);
+    	$this->session->unset_tempdata('sysop_login');
+    }
 }

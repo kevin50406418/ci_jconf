@@ -27,6 +27,7 @@
 						<li><a href="#">新增使用者</a></li>
 					</ul>
 				</li>
+				<li><a href="<?php echo base_url("sysop/logout");?>"><i class="fa fa-sign-out pull-right"></i> 登出</a></li>
 			</ul>
 		</div><!-- /.navbar-collapse -->
 	</div><!-- /.container-fluid -->

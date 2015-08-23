@@ -43,7 +43,7 @@ class Dashboard extends MY_Conference {
 							$conf_address = $this->input->post('conf_address');
 							$conf_desc    = $this->input->post('conf_desc');
 							if( $this->conf->update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_desc) ){
-								js_alert("更新成功");
+								$this->alert->js("更新成功");
 							}
 						}
 					break;

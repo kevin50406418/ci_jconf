@@ -138,8 +138,9 @@ $autoload['language'] = array();
 */
 
 $autoload['model'] = array(
-							'user_model' => 'user',
-							'conf_model' => 'conf',
-							'submit_model' => 'Submit',
-							"sysop_model" =>"sysop"
-						);
+	'user_model'   => 'user',
+	'conf_model'   => 'conf',
+	'submit_model' => 'Submit',
+	'sysop_model'  => 'sysop',
+	'alert_model'  => 'alert'
+);

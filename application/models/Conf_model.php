@@ -5,6 +5,7 @@ class Conf_model extends CI_Model {
     }
 
     function confid_exists( $conf_id , $staus=0){
+    	// need fix error: when conf admin view, not only sysop
     	$this->db->select('*');
 		$this->db->from('conf');
 		$this->db->where('conf_id', $conf_id);
@@ -165,7 +166,7 @@ class Conf_model extends CI_Model {
 
 		if( !file_exists ( $this->get_paperdir($conf_id) ) ){
 			mkdir($this->get_paperdir($conf_id), 0755);
-			write_file($this->get_paperdir($conf_id), $data);
+			write_file($this->get_paperdir($conf_id)."index.html", $data);
 		}else{
 			$return = array(
 				"status" => false,
@@ -175,7 +176,7 @@ class Conf_model extends CI_Model {
 		
 		if( !file_exists ( $this->get_regdir($conf_id) ) ){
 			mkdir($this->get_regdir($conf_id), 0755);
-			write_file($this->get_regdir($conf_id), $data);
+			write_file($this->get_regdir($conf_id)."index.html", $data);
 		}else{
 			$return = array(
 				"status" => false,
@@ -199,5 +200,45 @@ class Conf_model extends CI_Model {
 			}
 			$this->session->set_userdata('lang', $lang);
 		}		
+	}
+
+	function add_conf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$default_lang,$conf_fax="",$conf_desc=""){
+		$return = array(
+			"status" => false,
+			"error" => ""
+		);
+		if( $this->confid_exists( $conf_id , 1) ){
+			$return["error"] = "研討會ID: '".$conf_id."' 已存在";
+		}else{
+			$mkdir = $this->mkconf_dir($conf_id);
+			if(!$mkdir['status']){
+				$return["error"] = $mkdir['error'];
+			}else{
+				$conf = array(
+					"conf_id" => $conf_id,
+					"conf_name" => $conf_name,
+					"conf_master" => $conf_master,
+					"conf_email" => $conf_email,
+					"conf_phone" => $conf_phone,
+					"conf_address" => $conf_address,
+					"conf_staus" => $conf_staus,
+					"default_lang" => $default_lang,
+					"conf_fax" => $conf_fax,
+					"conf_desc" => $conf_desc
+				);
+				if( $this->db->insert('conf', $conf) ){
+					$return = array(
+						"status" => true,
+						"error" => "Success Add New Conference"
+					);
+		        }else{
+		           $return = array(
+						"status" => false,
+						"error" => "Database error! Contact System Adminstritor."
+					);
+		        }
+			}
+		}
+		return $return;
 	}
 }

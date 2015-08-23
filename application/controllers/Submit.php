@@ -77,7 +77,7 @@ class Submit extends MY_Conference {
 							$data['topics'] = $this->conf->get_topic($conf_id);
 							$this->load->view('submit/add/step2',$data);
 						}else{
-							new_alert("d",'<p>尚未選擇分類</p><p><a href="javascript:history.back();">返回上一頁</a></p>');
+							$this->alert->show("d",'<p>尚未選擇分類</p><p><a href="javascript:history.back();">返回上一頁</a></p>');
 						}
 					break;
 					case 3:
@@ -138,7 +138,7 @@ class Submit extends MY_Conference {
 	                		}
                 		}else{
                 			if(!$this->session->has_userdata($conf_id.'_insert_id') ){
-								js_alert("請以正常方式投稿或投稿逾時。",get_url("submit",$conf_id,"add"));
+								$this->alert->js("請以正常方式投稿或投稿逾時。",get_url("submit",$conf_id,"add"));
 								exit;
 							}else{
 								$paper_id = $this->session->userdata($conf_id.'_insert_id');
@@ -156,7 +156,7 @@ class Submit extends MY_Conference {
 		                        $data['upload_data'] = $upload_data;
 		                        $arrayLevel = arrayLevel($upload_data);
 		                        if( $arrayLevel >1 ){
-		                        	alert_js("投稿檔案僅限一份",get_url("submit",$conf_id));
+									$this->alert->js("投稿檔案僅限一份");
 		                        }
 		                        if(!$this->session->has_userdata($conf_id.'_file_id')){
 		                       		$this->Submit->add_file($conf_id,$paper_id,$upload_data['client_name'],$upload_data['file_name'],"F");
@@ -174,7 +174,7 @@ class Submit extends MY_Conference {
 					break;
 					case 4:
 						if(!$this->session->has_userdata($conf_id.'_insert_id') ){
-							js_alert("請以正常方式投稿或投稿逾時。",get_url("submit",$conf_id,"add"));
+							$this->alert->js("請以正常方式投稿或投稿逾時。",get_url("submit",$conf_id,"add"));
 							exit;
 						}else{
 							$paper_id = $this->session->userdata($conf_id.'_insert_id');
@@ -207,7 +207,7 @@ class Submit extends MY_Conference {
 					break;
 					case 5:
 						if(!$this->session->has_userdata($conf_id.'_insert_id') ){
-							js_alert("請以正常方式投稿或投稿逾時。",get_url("submit",$conf_id,"add"));
+							$this->alert->js("請以正常方式投稿或投稿逾時。",get_url("submit",$conf_id,"add"));
 							exit;
 						}else{
 							$paper_id = $this->session->userdata($conf_id.'_insert_id');
@@ -227,20 +227,20 @@ class Submit extends MY_Conference {
 				//sp($this->session->all_userdata());
 				$this->load->view('common/footer');
 			}else{
-				js_alert("尚未建立研討會主題，請洽研討會會議管理人員",get_url("main",$conf_id));
+				$this->alert->js("尚未建立研討會主題，請洽研討會會議管理人員",get_url("main",$conf_id));
 			}
 		}
 	}
 	public function edit($conf_id='',$paper_id=''){
 		if( empty($conf_id) || empty($paper_id) ){
-			js_alert("查本篇稿件",get_url("submit",$conf_id));
+			$this->alert->js("查本篇稿件",get_url("submit",$conf_id));
 			exit;
 		}
 		$data['conf_id'] = $conf_id;
 		$data['paper_id'] = $paper_id;
 		$user_login = $this->session->userdata('user_login');
 		if( !$this->Submit->is_author($paper_id, $user_login) ){
-			js_alert("非本篇作者或查無稿件",get_url("submit",$conf_id));
+			$this->alert->js("非本篇作者或查無稿件",get_url("submit",$conf_id));
 			exit;
 		}
 		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
@@ -349,7 +349,7 @@ class Submit extends MY_Conference {
 		                        $data['upload_data'] = $upload_data;
 		                        $arrayLevel = arrayLevel($upload_data);
 		                        if( $arrayLevel >1 ){
-		                        	alert_js("投稿檔案僅限一份",get_url("submit",$conf_id));
+		                        	$this->alert->js("投稿檔案僅限一份",get_url("submit",$conf_id));
 		                        }
 		                        if(empty($data['otherfile'])){
 		                       		$this->Submit->add_file($conf_id,$paper_id,$upload_data['client_name'],$upload_data['file_name'],"F");
@@ -406,7 +406,7 @@ class Submit extends MY_Conference {
 	}
 	public function files($conf_id='',$paper_id=''){
 		if( empty($conf_id) || empty($paper_id) ){
-			js_alert("查無稿件檔案",get_url("submit",$conf_id));
+			$this->alert->js("查無稿件檔案",get_url("submit",$conf_id));
 		}
 		$data['conf_id'] = $conf_id;
 		$user_login = $this->session->userdata('user_login');
@@ -416,7 +416,7 @@ class Submit extends MY_Conference {
 			$this->conf->show_404conf();
 		}else{
 			if( is_null($this->input->get("fid") ) ){
-				js_alert("查無稿件檔案",get_url("submit",$conf_id));
+				$this->alert->js("查無稿件檔案",get_url("submit",$conf_id));
 				exit;
 			}else{
 				$fid = $this->input->get("fid");
@@ -429,7 +429,7 @@ class Submit extends MY_Conference {
 				$query = $this->db->get();
 				$file = $query->row();
 				if(empty($file)){
-					js_alert("查無稿件檔案",get_url("submit",$conf_id));
+					$this->alert->js("查無稿件檔案",get_url("submit",$conf_id));
 					exit;
 				}
 				$this->load->helper('download');
@@ -451,14 +451,14 @@ class Submit extends MY_Conference {
 	}
 	public function detail($conf_id='',$paper_id=''){
 		if( empty($conf_id) || empty($paper_id) ){
-			js_alert("查本篇稿件",get_url("submit",$conf_id));
+			$this->alert->js("查本篇稿件",get_url("submit",$conf_id));
 			exit;
 		}
 		$data['conf_id'] = $conf_id;
 		$data['paper_id'] = $paper_id;
 		$user_login = $this->session->userdata('user_login');
 		if( !$this->Submit->is_author($paper_id, $user_login) ){
-			js_alert("非本篇作者或查無稿件",get_url("submit",$conf_id));
+			$this->alert->js("非本篇作者或查無稿件",get_url("submit",$conf_id));
 			exit;
 		}
 		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
@@ -490,14 +490,14 @@ class Submit extends MY_Conference {
 	}
 	public function remove($conf_id='',$paper_id=''){
 		if( empty($conf_id) || empty($paper_id) ){
-			js_alert("查本篇稿件",get_url("submit",$conf_id));
+			$this->alert->js("查本篇稿件",get_url("submit",$conf_id));
 			exit;
 		}
 		$data['conf_id'] = $conf_id;
 		$data['paper_id'] = $paper_id;
 		$user_login = $this->session->userdata('user_login');
 		if( !$this->Submit->is_author($paper_id, $user_login) ){
-			js_alert("非本篇作者或查無稿件",get_url("submit",$conf_id));
+			$this->alert->js("非本篇作者或查無稿件",get_url("submit",$conf_id));
 			exit;
 		}
 		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;

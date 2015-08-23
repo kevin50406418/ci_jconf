@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 
+	</div>
 	<br>
-
 	<div class="text-right">
 		<div class="ui buttons">
 			<div class="ui button positive">中文</div>

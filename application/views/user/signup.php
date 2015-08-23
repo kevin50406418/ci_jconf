@@ -8,7 +8,7 @@
 		<div class="form-group">
 			<label for="user_id" class="col-sm-2 control-label">帳號</label>
 			<div class="col-sm-10">
-				<input name="user_id" type="text" required="required" id="user_id" size="20" maxlength="30" class="form-control" autocomplete="off">
+				<input name="user_id" type="text" required="required" id="user_id" size="20" maxlength="30" class="form-control" autocomplete="off" value="<?php echo set_value('user_id'); ?>">
 				<span class="help-block">使用者名稱僅能包含小寫字母、數字、和連字號/底線。</span>
 			</div>
 		</div>
@@ -30,7 +30,7 @@
 		<div class="form-group">
 			<label for="user_email" class="col-sm-2 control-label">電子信箱</label>
 			<div class="col-sm-10">
-				<input name="user_email" type="email" required="required" id="user_email" size="30" maxlength="50" class="form-control" autocomplete="off">
+				<input name="user_email" type="email" required="required" id="user_email" size="30" maxlength="50" class="form-control" autocomplete="off" value="<?php echo set_value('user_email'); ?>">
 			</div>
 		</div>
 		<div class="form-group">
@@ -47,13 +47,13 @@
 		<div class="form-group">
 			<label for="user_firstname" class="col-sm-2 control-label">名字</label>
 			<div class="col-sm-10">
-				<input name="user_firstname" type="text" id="user_firstname" size="20" maxlength="30" class="form-control" autocomplete="off">
+				<input name="user_firstname" type="text" id="user_firstname" size="20" maxlength="30" class="form-control" autocomplete="off" value="<?php echo set_value('user_firstname'); ?>">
 			</div>
 		</div>
 		<div class="form-group">
 			<label for="user_lastname" class="col-sm-2 control-label">姓氏</label>
 			<div class="col-sm-10">
-				<input name="user_lastname" type="text" required="required" id="user_lastname" size="20" maxlength="20" class="form-control" autocomplete="off">
+				<input name="user_lastname" type="text" required="required" id="user_lastname" size="20" maxlength="20" class="form-control" autocomplete="off" value="<?php echo set_value('user_lastname'); ?>">
 			</div>
 		</div>
 		<div class="form-group">
@@ -66,7 +66,7 @@
 		<div class="form-group">
 			<label for="user_org" class="col-sm-2 control-label">所屬機構</label>
 			<div class="col-sm-10">
-				<textarea name="user_org" rows="4" maxlength="40" required class="form-control" id="user_affiliation"></textarea>
+				<textarea name="user_org" rows="4" maxlength="40" required class="form-control" id="user_affiliation"><?php echo set_value('user_org'); ?></textarea>
 			</div>
 		</div>
 		
@@ -76,12 +76,12 @@
 				<div class="col-sm-10">
 					<div class="input-group">
 						<span class="input-group-addon">(</span>
-						<input name="user_phoneO_1" type="tel" required="required" id="user_phoneO_1" size="3" maxlength="5" class="form-control" autocomplete="off">
+						<input name="user_phoneO_1" type="tel" required="required" id="user_phoneO_1" size="3" maxlength="5" class="form-control" autocomplete="off" value="<?php echo set_value('user_phoneO_1'); ?>">
 						<span class="input-group-addon">)</span>
 						<span class="input-group-addon">-</span>
-						<input name="user_phoneO_2" type="tel" required="required" id="user_phoneO_2" size="15" maxlength="20" class="form-control" autocomplete="off">
+						<input name="user_phoneO_2" type="tel" required="required" id="user_phoneO_2" size="15" maxlength="20" class="form-control" autocomplete="off" value="<?php echo set_value('user_phoneO_2'); ?>">
 						<span class="input-group-addon">分機</span>
-						<input name="user_phoneO_3" type="tel" id="user_phoneO_3" size="6" maxlength="10" class="form-control" autocomplete="off">
+						<input name="user_phoneO_3" type="tel" id="user_phoneO_3" size="6" maxlength="10" class="form-control" autocomplete="off" value="<?php echo set_value('user_phoneO_3'); ?>">
 					</div>					
 				</div>
 			</div>
@@ -89,24 +89,26 @@
 		<div class="form-group">
 			<label for="user_cellphone" class="col-sm-2 control-label">手機</label>
 			<div class="col-sm-10">
-				<input name="user_cellphone" type="tel" required="required" id="user_cellphone" size="15" maxlength="15" class="form-control" autocomplete="off">
+				<input name="user_cellphone" type="tel" required="required" id="user_cellphone" size="15" maxlength="15" class="form-control" autocomplete="off" value="<?php echo set_value('user_cellphone'); ?>">
 			</div>
 		</div>
 		<div class="form-group">
 			<label for="user_fax" class="col-sm-2 control-label">傳真</label>
 			<div class="col-sm-10">
-				<input name="user_fax" type="text" id="user_fax" size="15" maxlength="15" class="form-control" autocomplete="off">
+				<input name="user_fax" type="text" id="user_fax" size="15" maxlength="15" class="form-control" autocomplete="off" value="<?php echo set_value('user_fax'); ?>">
 			</div>
 		</div>
 		<div class="form-group">
 			<label for="user_postadd" class="col-sm-2 control-label">聯絡地址</label>
 			<div class="col-sm-10">
 				<div id="addr_6" class="row form-inline">
-					<div data-role="zipcode" data-readonly="true" class="col-sm-3"></div>
+					<div data-role="zipcode" data-readonly="true" class="col-sm-3" data-value="<?php echo set_value('user_postcode'); ?>"></div>
 					<div data-role="county" class="col-sm-2"></div>
 					<div data-role="district" class="col-sm-2"></div>
 				</div>
-				<div class="help-block"><input name="user_postadd" type="text" required="required" id="user_postadd" size="20" maxlength="100" class="form-control col-sm-5" autocomplete="off"></div>
+				<div class="help-block">
+					<input name="user_postadd" type="text" required="required" id="user_postadd" size="20" maxlength="100" class="form-control col-sm-5" autocomplete="off" value="<?php echo set_value('user_postadd'); ?>">
+				</div>
 			</div>
 		</div>
 		<div class="form-group">
@@ -127,7 +129,7 @@
 		<div class="form-group">
 			<label for="user_research" class="col-sm-2 control-label">研究領域</label>
 			<div class="col-sm-10">
-				<textarea name="user_research" rows="5" required class="form-control" id="user_research"></textarea>
+				<textarea name="user_research" rows="5" required class="form-control" id="user_research"><?php echo set_value('user_research'); ?></textarea>
 			</div>
 		</div>
 		<div class="form-group">

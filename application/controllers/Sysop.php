@@ -8,7 +8,7 @@ class Sysop extends MY_Sysop {
 		$this->assets->add_css(asset_url().'style/sysop-style.css');
 		$this->col_nav = 3;
 		$this->col_right = 12-$this->col_nav;
-		//echo $this->router->method;
+		//$data['active'] = $this->router->method;
 	}
 
 	public function index(){
@@ -43,6 +43,40 @@ class Sysop extends MY_Sysop {
 
 				break;
 				case "add": // New Conference
+					$this->form_validation->set_rules('conf_id', '研討會ID', 'required');
+					$this->form_validation->set_rules('conf_name', '研討會名稱', 'required');
+					$this->form_validation->set_rules('conf_master', '主要聯絡人', 'required');
+					$this->form_validation->set_rules('conf_email', '聯絡信箱', 'required|valid_email');
+					$this->form_validation->set_rules('conf_phone', '聯絡電話', 'required');
+					$this->form_validation->set_rules('conf_address', '通訊地址', 'required');
+					$this->form_validation->set_rules('conf_staus', '顯示/隱藏', 'required');
+					$this->form_validation->set_rules('default_lang', '默認語言', 'required');
+					if ($this->form_validation->run() == TRUE){
+						$conf_id = $this->input->post('conf_id', TRUE);
+						$conf_name = $this->input->post('conf_name', TRUE);
+						$conf_master = $this->input->post('conf_master', TRUE);
+						$conf_email = $this->input->post('conf_email', TRUE);
+						$conf_phone = $this->input->post('conf_phone', TRUE);
+						$conf_address = $this->input->post('conf_address', TRUE);
+						$conf_staus = $this->input->post('conf_staus', TRUE);
+						$default_lang = $this->input->post('default_lang', TRUE);
+						$conf_fax = $this->input->post('conf_fax', TRUE);
+						$conf_desc = $this->input->post('conf_desc', TRUE);
+						$next = $this->input->post('next', TRUE);
+						
+						$add = $this->conf->add_conf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$default_lang,$conf_fax,$conf_desc);
+						if( !is_null($next) ){
+							if($add['status']){
+								$this->alert->js($add['error'],base_url("sysop/conf/edit/".$conf_id));
+							}else{
+								$this->alert->js($add['error']);
+							}
+						}else{
+							$this->alert->js($add['error']);
+						}
+						
+					}
+					$this->load->view('sysop/conf/add',$data);
 				break;
 			}
 		}else{
@@ -52,7 +86,11 @@ class Sysop extends MY_Sysop {
 
 				break;
 				case "edit": // Edit Conference information
-					
+					if( $this->conf->confid_exists( $conf_id , 1) ){
+						$conf_config = $this->conf->conf_config($conf_id);
+					}else{
+						$this->alert->js("研討會不存在");
+					}
 				break;
 				case "admin": // auth Conference administrator
 					
@@ -105,19 +143,27 @@ class Sysop extends MY_Sysop {
 			redirect(base_url("sysop"), 'location', 301);
 		}
 		$this->assets->add_css(asset_url().'style/sysop_login.css');
+
+		$this->load->view('common/header');
+		$this->load->view('common/nav');
 		$this->form_validation->set_rules('user_pass', '密碼', 'required');
 		if ($this->form_validation->run() == TRUE){
 			$user_pwd = $this->input->post('user_pass', TRUE);
 			if( $this->sysop->sysop_login($user_pwd) ){
-				js_alert("Login Success",base_url("sysop"));
+				$this->alert->show("i","Login Success",base_url("sysop"));
 			}else{
-				js_alert("Login Error");
+				$this->alert->show("d","Login Error");
 			}
 		}
+		$this->load->view('sysop/login');
+		$this->load->view('common/footer');
+	}
 
+	public function logout(){
+		$this->sysop->logout();
 		$this->load->view('common/header');
 		$this->load->view('common/nav');
-		$this->load->view('sysop/login');
+		$this->alert->show("i","Logout Success",base_url("sysop/login"));
 		$this->load->view('common/footer');
 	}
 }
