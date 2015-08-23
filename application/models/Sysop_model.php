@@ -5,29 +5,33 @@ class Sysop_model extends CI_Model {
     }
     function is_sysop_login(){
     	if($this->session->has_userdata('sysop_login')){
-			if( $this->session->sysop_login > 0 ){
+			if( $this->session->sysop_login+900 > time() ){
 				return true;
 			}else{
 				return false;
 			}
+		}else{
+			return false;
+		}
+    }
+
+    function sysop_login($user_pass){
+    	$user_login = $this->session->user_login;
+		$this->db->from('users');
+		$this->db->where('user_login', $user_login);
+		$this->db->where('user_pass', hash('sha256',$user_pass));
+		$this->db->where('user_sysop', 1);
+		$this->db->limit(1);
+		$query=$this->db->get();
+		if($query->num_rows() == 1){
+			$this->session->set_tempdata('sysop_login', time(), 900);
 			return true;
 		}else{
 			return false;
 		}
     }
-    function sysop_login($user_pass){
-    	$user_login = $this->session->user_login;
-		$this->db->from('users');
-		$this->db->where('user_login', $username);
-		$this->db->where('user_pass', hash('sha256',$password));
-		$this->db->where('user_sysop', 1);
-		$this->db->limit(1);
-		$query=$this->db->get();
-		if($query->num_rows() == 1){
-			$this->session->mark_as_temp('sysop_login', 1500);
-			return true;
-		}else{
-			return false;
-		}
+
+    function add_sysop_time(){
+    	$this->session->set_tempdata('sysop_login', time(), 900);
     }
 }
