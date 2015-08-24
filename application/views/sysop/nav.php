@@ -13,14 +13,14 @@
 		</div>
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
-				<li class="dropdown">
+				<li class="dropdown<?php if($active=="conf"){?> open<?php }?>">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-university pull-right"></i> 研討會 <span class="caret"></span></a>
 					<ul class="dropdown-menu">
-						<li><a href="#">研討會管理</a></li>
+						<li<?php if($active=="conf" && ( empty($do) || $do =="all")){?> class="active"<?php }?>><a href="<?php echo base_url("sysop/conf");?>">研討會管理</a></li>
 						<li><a href="<?php echo base_url("sysop/conf/add");?>">新增研討會</a></li>
 					</ul>
 				</li>
-				<li class="dropdown">
+				<li class="dropdown<?php if($active=="user"){?> open<?php }?>">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-users pull-right"></i> 使用者 <span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						<li><a href="#">使用者管理</a></li>

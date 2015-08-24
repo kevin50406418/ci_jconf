@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');?>
-<div class="ui segment blue col-md-<?php echo $col_right;?>">
+<div class="col-md-<?php echo $col_right;?>">
+<div class="ui segment blue">
 	<h2>新增研討會</h2>
 	<?php echo validation_errors('<div class="ui message red">', '</div>');?>
 	<?php echo form_open(base_url("sysop/conf/add"),array("class"=>"form-horizontal"))?>
@@ -43,11 +44,11 @@
 			<label for="default_lang" class="col-sm-2 control-label text-info">默認語言</label>
 			<div class="col-sm-10">
 				<div class="btn-group" data-toggle="buttons">
-					<label class="btn btn-success active">
-						<input type="radio" name="default_lang" id="option1" autocomplete="off" value="zhtw" checked> 繁體中文(Traditional Chinese)
+					<label class="btn btn-success<?php if(set_value('default_lang') == "zhtw"){?> active<?php }?>">
+						<input type="radio" name="default_lang" id="option1" autocomplete="off" value="zhtw"<?php if(set_value('default_lang') == "zhtw"){?> checked<?php }?>> 繁體中文(Traditional Chinese)
 					</label>
-					<label class="btn btn-warning">
-						<input type="radio" name="default_lang" id="option2" autocomplete="off" value="eng"> 英文(English)
+					<label class="btn btn-warning<?php if(set_value('default_lang') == "eng"){?> active<?php }?>">
+						<input type="radio" name="default_lang" id="option2" autocomplete="off" value="eng"<?php if(set_value('default_lang') == "eng"){?> checked<?php }?>> 英文(English)
 					</label>
 				</div>
 			</div>
@@ -56,11 +57,11 @@
 			<label for="conf_staus" class="col-sm-2 control-label text-info">顯示/隱藏</label>
 			<div class="col-sm-10">
 				<div class="btn-group" data-toggle="buttons">
-					<label class="btn btn-primary active">
-						<input type="radio" name="conf_staus" autocomplete="off" value="0" checked> 顯示
+					<label class="btn btn-primary<?php if(set_value('conf_staus') == 0){?> active<?php }?>">
+						<input type="radio" name="conf_staus" autocomplete="off" value="0"<?php if(set_value('conf_staus') == 0){?> checked<?php }?>> 顯示
 					</label>
-					<label class="btn btn-danger">
-						<input type="radio" name="conf_staus" autocomplete="off" value="1"> 隱藏
+					<label class="btn btn-danger<?php if(set_value('conf_staus') == 1){?> active<?php }?>">
+						<input type="radio" name="conf_staus" autocomplete="off" value="1"<?php if(set_value('conf_staus') == 1){?> checked<?php }?>> 隱藏
 					</label>
 				</div>
 			</div>
@@ -84,4 +85,5 @@
 			</div>
 		</div>
 	<?php echo form_close();?>
+</div>
 </div>

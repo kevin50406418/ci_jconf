@@ -38,6 +38,7 @@ class Conf_model extends CI_Model {
 			}
 		}
 	}
+
 	function all_conf_config(){
 		$this->db->select('*');
 		$this->db->from('conf');
@@ -132,23 +133,43 @@ class Conf_model extends CI_Model {
 	}
 
 	function update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_desc){
-		$paper = array(
-            "name"   =>$conf_name,
-            "master" =>$conf_master,
-            "email" =>$conf_email,
-            "phone"   =>$conf_phone,
-            "fax"    =>$conf_fax,
-            "address" =>$conf_address,
-            "conf_desc"    =>$conf_desc
+		$conf = array(
+			"conf_name"    =>$conf_name,
+			"conf_master"  =>$conf_master,
+			"conf_email"   =>$conf_email,
+			"conf_phone"   =>$conf_phone,
+			"conf_fax"     =>$conf_fax,
+			"conf_address" =>$conf_address,
+			"conf_desc"    =>$conf_desc
         );
-        $this->db->where("id", $conf_id);
-        if( $this->db->update('conf', $paper) ){
+        $this->db->where("conf_id", $conf_id);
+        if( $this->db->update('conf', $conf) ){
             return true;
         }else{
             return false;
         }
 	}
 
+	function sysop_updateconf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$default_lang,$conf_fax,$conf_desc){
+		$conf = array(
+			"conf_name"    =>$conf_name,
+			"conf_master"  =>$conf_master,
+			"conf_email"   =>$conf_email,
+			"conf_phone"   =>$conf_phone,
+			"conf_fax"     =>$conf_fax,
+			"conf_address" =>$conf_address,
+			"default_lang" =>$default_lang,
+			"conf_staus"   =>$conf_staus,
+			"conf_desc"    =>$conf_desc
+        );
+        $this->db->where("conf_id", $conf_id);
+        if( $this->db->update('conf', $conf) ){
+        	sp($conf_desc);
+            return true;
+        }else{
+            return false;
+        }
+	}
 	function get_paperdir($conf_id){
 		return './upload/paper/'.$conf_id.'/';
 	}
