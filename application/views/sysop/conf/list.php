@@ -19,7 +19,6 @@
 				<?php }else{?>
 				<a href="#" class="ui button green"><i class="fa fa-eye"></i> 顯示</a>
 				<?php }?>
-				<a href="#" class="ui button teal"><i class="fa fa-users"></i> 管理員</a>
 			</td>
 		</tr>
 		<?php }?>

@@ -1,17 +1,13 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');?>
 <script>
 $(function() { 
-    // for bootstrap 3 use 'shown.bs.tab', for bootstrap 2 use 'shown' in the next line
-    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-        // save the latest tab; use cookies if you like 'em better:
-        localStorage.setItem('lastTab', $(this).attr('href'));
-    });
-
-    // go to the latest tab, if it exists:
-    var lastTab = localStorage.getItem('lastTab');
-    if (lastTab) {
-        $('[href="' + lastTab + '"]').tab('show');
-    }
+	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+		localStorage.setItem('<?php echo $conf_config['conf_id'];?>_confsetting', $(this).attr('href'));
+	});
+	var lastTab = localStorage.getItem('<?php echo $conf_config['conf_id'];?>_confsetting');
+	if (lastTab) {
+		$('[href="'+lastTab+'"]').tab('show');
+	}
 });
 </script>
 <div class="ui segment raised">
@@ -23,7 +19,7 @@ $(function() {
 			<li> <a href="#tab_function" data-toggle="tab"> <i class="fa fa-cog fa-lg"></i> 功能設定 </a> </li>
 			<li> <a href="#tab_schedule" data-toggle="tab"> <i class="fa fa-calendar fa-lg"></i> 時間安排 </a> </li>
 			<li> <a href="#tab_org" data-toggle="tab"> <i class="fa fa-users fa-lg"></i> 大會組織 </a> </li>
-			<?php if( $conf_config['staus']==0 ){?>
+			<?php if( $conf_config['conf_staus']==0 ){?>
 				<a href="#" class="ui button red pull-right">關閉研討會</a>
 			<?php }else{?>
 				<a href="#" class="ui button green pull-right">開啟研討會</a>
@@ -36,43 +32,43 @@ $(function() {
 					<div class="form-group">
 						<label class="col-sm-2 control-label">研討會編號</label>
 						<div class="col-sm-10">
-							<p class="form-control-static" title="由系統管理員分配預更改請洽系統管理員"><?php echo $conf_config['id'];?></p>
+							<p class="form-control-static" title="由系統管理員分配預更改請洽系統管理員"><?php echo $conf_config['conf_id'];?></p>
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="conf_name" class="col-sm-2 control-label">研討會名稱</label>
 						<div class="col-sm-10">
-							<input name="conf_name" type="text" class="form-control" id="conf_name" value="<?php echo $conf_config['name'];?>">
+							<input name="conf_name" type="text" class="form-control" id="conf_name" value="<?php echo $conf_config['conf_name'];?>">
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="conf_master" class="col-sm-2 control-label">主要聯絡人</label>
 						<div class="col-sm-10">
-							<input name="conf_master" type="text" class="form-control" id="conf_master" value="<?php echo $conf_config['master'];?>">
+							<input name="conf_master" type="text" class="form-control" id="conf_master" value="<?php echo $conf_config['conf_master'];?>">
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="conf_email" class="col-sm-2 control-label">聯絡信箱</label>
 						<div class="col-sm-10">
-							<input name="conf_email" type="email" class="form-control" id="conf_email" value="<?php echo $conf_config['email'];?>">
+							<input name="conf_email" type="email" class="form-control" id="conf_email" value="<?php echo $conf_config['conf_email'];?>">
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="conf_phone" class="col-sm-2 control-label">聯絡電話</label>
 						<div class="col-sm-10">
-							<input name="conf_phone" type="text" class="form-control" id="conf_phone" value="<?php echo $conf_config['phone'];?>">
+							<input name="conf_phone" type="text" class="form-control" id="conf_phone" value="<?php echo $conf_config['conf_phone'];?>">
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="conf_address" class="col-sm-2 control-label">通訊地址</label>
 						<div class="col-sm-10">
-							<input name="conf_address" type="text" class="form-control" id="conf_address" value="<?php echo $conf_config['address'];?>">
+							<input name="conf_address" type="text" class="form-control" id="conf_address" value="<?php echo $conf_config['conf_address'];?>">
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="conf_fax" class="col-sm-2 control-label">傳真</label>
 						<div class="col-sm-10">
-							<input name="conf_fax" type="text" class="form-control" id="conf_fax" value="<?php echo $conf_config['fax'];?>">
+							<input name="conf_fax" type="text" class="form-control" id="conf_fax" value="<?php echo $conf_config['conf_fax'];?>">
 						</div>
 					</div>
 					<div class="form-group">

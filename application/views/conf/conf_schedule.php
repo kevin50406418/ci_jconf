@@ -1,3 +1,4 @@
+<?php /*
 <div class="ui segments collapse" id="collapseschedule">
 <div class="ui segment center aligned">
 	研討會重要日期
@@ -55,3 +56,4 @@
 	</div>
 </div>
 </div>
+*/?>

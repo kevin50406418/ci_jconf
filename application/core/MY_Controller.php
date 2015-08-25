@@ -38,4 +38,17 @@ class MY_Sysop extends MY_Controller{
 		}
     }
 }
+
+class MY_Topic extends MY_Controller{
+    public function __construct(){
+		parent::__construct();
+		if( !$this->user->is_login() ){
+			redirect('/user/login', 'location', 301);
+		}else{
+			if( !$this->user->is_topic() ){
+				redirect(base_url(), 'location', 301);
+			}
+		}
+    }
+}
 ?>

@@ -25,7 +25,7 @@ class Home extends MY_Controller {
 
 			if( $this->conf->confid_exists($conf_id,$user_sysop) ){
 				$data['conf_config']=$this->conf->conf_config($conf_id);
-				$data['schedule']=$this->conf->conf_schedule($conf_id);
+				//$data['schedule']=$this->conf->conf_schedule($conf_id);
 				$data['conf_content']=$this->conf->conf_content($conf_id);
 
 				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
@@ -35,7 +35,7 @@ class Home extends MY_Controller {
 				$this->load->view('common/nav',$data);
 				$this->load->view('conf/index');
 				$this->load->view('conf/conf_nav',$data);
-				$this->load->view('conf/conf_schedule',$data);
+				//$this->load->view('conf/conf_schedule',$data);
 				$this->load->view('common/footer');
 			}else{
 				$this->cinfo['show_confinfo'] = false;
@@ -60,7 +60,7 @@ class Home extends MY_Controller {
 			$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
 			if( $this->conf->confid_exists($conf_id,$user_sysop) ){
 				$data['conf_config']=$this->conf->conf_config($conf_id);
-				$data['schedule']=$this->conf->conf_schedule($conf_id);
+				//$data['schedule']=$this->conf->conf_schedule($conf_id);
 				$data['conf_content']=$this->conf->conf_content($conf_id);
 
 				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
@@ -70,7 +70,7 @@ class Home extends MY_Controller {
 				$this->load->view('common/nav',$data);
 				$this->load->view('conf/index');
 				$this->load->view('conf/conf_nav',$data);
-				$this->load->view('conf/conf_schedule',$data);
+				//$this->load->view('conf/conf_schedule',$data);
 				$this->load->view('common/footer');
 			}else{
 				$this->cinfo['show_confinfo'] = false;
@@ -96,7 +96,7 @@ class Home extends MY_Controller {
 
 			if( $this->conf->confid_exists($conf_id,$user_sysop) ){
 				$data['conf_config']=$this->conf->conf_config($conf_id);
-				$data['schedule']=$this->conf->conf_schedule($conf_id);
+				//$data['schedule']=$this->conf->conf_schedule($conf_id);
 				$data['conf_content']=$this->conf->conf_content($conf_id);
 
 				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
@@ -106,7 +106,7 @@ class Home extends MY_Controller {
 				$this->load->view('common/nav',$data);
 				$this->load->view('conf/index');
 				$this->load->view('conf/conf_nav',$data);
-				$this->load->view('conf/conf_schedule',$data);
+				//$this->load->view('conf/conf_schedule',$data);
 				if($this->user->is_login()){
 					$this->load->view('conf/menu_submit',$data);
 					if($this->user->is_conf() || $this->user->is_sysop()){
@@ -144,7 +144,7 @@ class Home extends MY_Controller {
 
 			if( $this->conf->confid_exists($conf_id,$user_sysop) ){
 				$data['conf_config']=$this->conf->conf_config($conf_id);
-				$data['schedule']=$this->conf->conf_schedule($conf_id);
+				//$data['schedule']=$this->conf->conf_schedule($conf_id);
 				$data['conf_content']=$this->conf->conf_content($conf_id);
 
 				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
@@ -154,7 +154,7 @@ class Home extends MY_Controller {
 				$this->load->view('common/nav',$data);
 				$this->load->view('conf/index');
 				$this->load->view('conf/conf_nav',$data);
-				$this->load->view('conf/conf_schedule',$data);
+				//$this->load->view('conf/conf_schedule',$data);
 				$this->load->view('common/footer');
 			}else{
 				$this->cinfo['show_confinfo'] = false;

@@ -16,14 +16,14 @@ class Submit extends MY_Conference {
 		}else{
 			$data['spage']=$this->config->item('spage');
 			$data['conf_config']=$this->conf->conf_config($conf_id);
-			$data['schedule']=$this->conf->conf_schedule($conf_id);
+			//$data['schedule']=$this->conf->conf_schedule($conf_id);
 			$data['conf_content']=$this->conf->conf_content($conf_id);
 
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
 
 			$this->load->view('conf/conf_nav',$data);
-			$this->load->view('conf/conf_schedule',$data);
+			//$this->load->view('conf/conf_schedule',$data);
 
 			$this->load->view('conf/menu_submit',$data);
 			$data['lists'] = $this->Submit->show_mypaper($this->session->userdata('user_login'));
@@ -43,7 +43,7 @@ class Submit extends MY_Conference {
 		}else{
 			$data['spage']=$this->config->item('spage');
 			$data['conf_config']=$this->conf->conf_config($conf_id);
-			$data['schedule']=$this->conf->conf_schedule($conf_id);
+			//$data['schedule']=$this->conf->conf_schedule($conf_id);
 			$data['conf_content']=$this->conf->conf_content($conf_id);
 
 			$step = $this->input->get("step");
@@ -52,7 +52,7 @@ class Submit extends MY_Conference {
 				$this->load->view('common/nav',$data);
 
 				$this->load->view('conf/conf_nav',$data);
-				$this->load->view('conf/conf_schedule',$data);
+				//$this->load->view('conf/conf_schedule',$data);
 
 				$this->load->view('conf/menu_submit',$data);
 				
@@ -250,7 +250,7 @@ class Submit extends MY_Conference {
 		}else{
 			$data['spage']=$this->config->item('spage');
 			$data['conf_config']=$this->conf->conf_config($conf_id);
-			$data['schedule']=$this->conf->conf_schedule($conf_id);
+			//$data['schedule']=$this->conf->conf_schedule($conf_id);
 			$data['conf_content']=$this->conf->conf_content($conf_id);
 
 			$step = $this->input->get("step");
@@ -259,7 +259,7 @@ class Submit extends MY_Conference {
 				$this->load->view('common/nav',$data);
 				
 				$this->load->view('conf/conf_nav',$data);
-				$this->load->view('conf/conf_schedule',$data);
+				//$this->load->view('conf/conf_schedule',$data);
 
 				$this->load->view('conf/menu_submit',$data);
 				
@@ -468,7 +468,7 @@ class Submit extends MY_Conference {
 		}else{
 			$data['spage']=$this->config->item('spage');
 			$data['conf_config']=$this->conf->conf_config($conf_id);
-			$data['schedule']=$this->conf->conf_schedule($conf_id);
+			//$data['schedule']=$this->conf->conf_schedule($conf_id);
 			$data['conf_content']=$this->conf->conf_content($conf_id);
 
 			$data['paper'] = $this->Submit->get_paperinfo($paper_id,$user_login);
@@ -481,7 +481,7 @@ class Submit extends MY_Conference {
 			$this->load->view('common/nav',$data);
 
 			$this->load->view('conf/conf_nav',$data);
-			$this->load->view('conf/conf_schedule',$data);
+			//$this->load->view('conf/conf_schedule',$data);
 
 			$this->load->view('conf/menu_submit',$data);
 			$this->load->view('submit/detail',$data);

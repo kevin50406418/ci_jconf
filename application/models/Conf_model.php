@@ -262,4 +262,38 @@ class Conf_model extends CI_Model {
 		}
 		return $return;
 	}
+
+	public function change_dir($new_id,$old_id){
+		$return = array(
+			"status" => false,
+			"error" => ""
+		);
+		$new_paperdir = $this->get_paperdir($new_id);
+		$old_paperdir = $this->get_paperdir($old_id);
+		if( file_exists($new_paperdir) ){
+			$return["status"] = false;
+			$return["error"] = "Directory: '".$old_id."' is exists";
+		}else{
+			if( rename($old_paperdir, $new_paperdir) ){
+				$return["status"] = true;
+			}else{
+				$return["status"] = false;
+				$return["error"] = "change paper directory error.";
+			}
+		}
+		$new_regdir = $this->get_regdir($new_id);
+		$old_regdir = $this->get_regdir($old_id);
+		if( file_exists($new_regdir) ){
+			$return["status"] = false;
+			$return["error"] = "Directory: '".$old_id."' is exists";
+		}else{
+			if( rename($old_paperdir, $new_paperdir) ){
+				$return["status"] = true;
+			}else{
+				$return["status"] = false;
+				$return["error"] = "change registration directory error.";
+			}
+		}
+		return $return;
+	}
 }

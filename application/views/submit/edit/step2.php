@@ -18,7 +18,7 @@
 		<div class="col-sm-10">
 			<select name="sub_topic" id="sub_topic" class="form-control">
 				<?php foreach ($topics as $key => $topic) {?>
-				<option value="<?php echo $topic->ID?>"<?php if($paper->sub_topic==$topic->ID){?> selected="selected" class="bg-info"<?php }?>><?php echo $topic->name?>(<?php echo $topic->name_eng?>)</option>
+				<option value="<?php echo $topic->topic_id?>"<?php if($paper->sub_topic==$topic->topic_id){?> selected="selected" class="bg-info"<?php }?>><?php echo $topic->topic_name?>(<?php echo $topic->topic_name_eng?>)</option>
 				<?php }?>
 			</select>
 		</div>

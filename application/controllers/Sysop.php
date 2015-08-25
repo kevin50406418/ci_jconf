@@ -124,7 +124,7 @@ class Sysop extends MY_Sysop {
 						$data['conf_config'] = $conf_config;
 						$this->load->view('sysop/conf/edit',$data);
 					}else{
-						$this->alert->js("研討會不存在");
+						$this->alert->js("研討會不存在",base_url("sysop/conf/"));
 					}
 				break;
 				case "admin": // auth Conference administrator
