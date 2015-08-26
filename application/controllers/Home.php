@@ -7,6 +7,7 @@ class Home extends MY_Controller {
 		$this->cinfo['show_confinfo'] = true;
 	}
 	public function index($conf_id=''){
+		$data['body_class'] = $this->body_class;
 		$data['conf_id'] = $conf_id;
 		if(empty($conf_id)){
 			$data['confs']=$this->conf->all_conf_config();
@@ -44,6 +45,7 @@ class Home extends MY_Controller {
 		}
 	}
 	public function news($conf_id=''){
+		$data['body_class'] = $this->body_class;
 		$data['conf_id'] = $conf_id;
 		if(empty($conf_id)){
 			$data['confs']=$this->conf->all_conf_config();
@@ -79,6 +81,7 @@ class Home extends MY_Controller {
 		}
 	}
 	public function main($conf_id=''){
+		$data['body_class'] = $this->body_class;
 		$data['conf_id'] = $conf_id;
 		if(empty($conf_id)){
 			$data['confs']=$this->conf->all_conf_config();
@@ -127,6 +130,7 @@ class Home extends MY_Controller {
 		}
 	}
 	public function about($conf_id='',$page_id=''){
+		$data['body_class'] = $this->body_class;
 		$data['conf_id'] = $conf_id;
 		if(empty($conf_id) || empty($page_id)){
 			$data['confs']=$this->conf->all_conf_config();

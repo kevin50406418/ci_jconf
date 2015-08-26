@@ -1,10 +1,8 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+<div class="col-md-<?php echo $col_right;?>">
 <?php echo validation_errors('<div class="ui message red">', '</div>');?>
 <div class="ui segment">
-	<div class="ui message info" role="alert">
-		已經擁有帳號? <a href="<?php echo base_url('user/login');?>">登入帳號</a>。
-	</div>
-	<?php echo form_open(base_url('user/signup'),array("class"=>"form-horizontal","id"=>"register"))?>
+	<?php echo form_open(base_url('sysop/user/add'),array("class"=>"form-horizontal","id"=>"register"))?>
 		<div class="form-group">
 			<label for="user_id" class="col-sm-2 control-label">帳號</label>
 			<div class="col-sm-10">
@@ -138,4 +136,5 @@
 			</div>
 		</div>
 	<?php echo form_close()?>
+</div>
 </div>

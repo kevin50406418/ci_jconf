@@ -9,6 +9,7 @@ class Submit extends MY_Conference {
 
 	public function index($conf_id=''){
 		$data['conf_id'] = $conf_id;
+		$data['body_class'] = $this->body_class;
 		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
 		if( !$this->conf->confid_exists($conf_id,$user_sysop) ){
 			$this->cinfo['show_confinfo'] = false;
@@ -34,6 +35,7 @@ class Submit extends MY_Conference {
 
 	public function add($conf_id=''){
 		$data['conf_id'] = $conf_id;
+		$data['body_class'] = $this->body_class;
 
 		$user_login = $this->session->userdata('user_login');
 		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
@@ -238,6 +240,7 @@ class Submit extends MY_Conference {
 		}
 		$data['conf_id'] = $conf_id;
 		$data['paper_id'] = $paper_id;
+		$data['body_class'] = $this->body_class;
 		$user_login = $this->session->userdata('user_login');
 		if( !$this->Submit->is_author($paper_id, $user_login) ){
 			$this->alert->js("非本篇作者或查無稿件",get_url("submit",$conf_id));
@@ -409,6 +412,7 @@ class Submit extends MY_Conference {
 			$this->alert->js("查無稿件檔案",get_url("submit",$conf_id));
 		}
 		$data['conf_id'] = $conf_id;
+
 		$user_login = $this->session->userdata('user_login');
 		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
 		if( !$this->conf->confid_exists($conf_id,$user_sysop) ){
@@ -456,6 +460,7 @@ class Submit extends MY_Conference {
 		}
 		$data['conf_id'] = $conf_id;
 		$data['paper_id'] = $paper_id;
+		$data['body_class'] = $this->body_class;
 		$user_login = $this->session->userdata('user_login');
 		if( !$this->Submit->is_author($paper_id, $user_login) ){
 			$this->alert->js("非本篇作者或查無稿件",get_url("submit",$conf_id));
@@ -495,6 +500,7 @@ class Submit extends MY_Conference {
 		}
 		$data['conf_id'] = $conf_id;
 		$data['paper_id'] = $paper_id;
+		$data['body_class'] = $this->body_class;
 		$user_login = $this->session->userdata('user_login');
 		if( !$this->Submit->is_author($paper_id, $user_login) ){
 			$this->alert->js("非本篇作者或查無稿件",get_url("submit",$conf_id));

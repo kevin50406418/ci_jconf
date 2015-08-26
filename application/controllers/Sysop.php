@@ -4,12 +4,14 @@ class Sysop extends MY_Sysop {
 	public $col_nav;
 	public $col_right;
 	public $active;
+	
 	public function __construct(){
 		parent::__construct();
 		$this->assets->add_css(asset_url().'style/sysop-style.css');
 		$this->col_nav = 2;
 		$this->col_right = 12-$this->col_nav;
 		$this->active = $this->router->method;
+		$this->body_class ="container-fluid";
 	}
 
 	public function index(){
@@ -21,8 +23,9 @@ class Sysop extends MY_Sysop {
 		$data['col_nav'] = $this->col_nav;
 		$data['col_right'] = $this->col_right;
 		$data['active'] = $this->active;
+		$data['body_class'] = $this->body_class;
 		$this->load->view('common/header');
-		$this->load->view('common/nav');
+		$this->load->view('common/nav',$data);
 		$this->load->view('sysop/nav',$data);
 		$this->load->view('common/footer');
 	}
@@ -37,9 +40,10 @@ class Sysop extends MY_Sysop {
 		$data['col_right'] = $this->col_right;
 		$data['conf_id'] = $conf_id;
 		$data['active'] = $this->active;
+		$data['body_class'] = $this->body_class;
 		$data['do']=$type;
 		$this->load->view('common/header');
-		$this->load->view('common/nav');
+		$this->load->view('common/nav',$data);
 		$this->load->view('sysop/nav',$data);
 		if( empty($conf_id) ){
 			switch($type){
@@ -143,20 +147,90 @@ class Sysop extends MY_Sysop {
 		}
 		$data['col_nav'] = $this->col_nav;
 		$data['col_right'] = $this->col_right;
-		$data['conf_id'] = $conf_id;
 		$data['active'] = $this->active;
+		$data['body_class'] = $this->body_class;
 		$data['do']=$do;
-		$this->load->view('common/header');
-		$this->load->view('common/nav');
-		$this->load->view('sysop/nav',$data);
-		if( !empty($user_login) ){
+		
+		if( empty($user_login) ){
 			switch($do){
 				case "add":
+					$country_list = config_item('country_list');
+					$data['country_list'] = $country_list['zhtw'];
 
+					$this->assets->add_css(asset_url().'style/chosen.css');
+
+					$this->assets->add_js(asset_url().'js/pwstrength-bootstrap-1.2.3.min.js');
+					$this->assets->add_js(asset_url().'js/pwstrength-setting.js');
+					$this->assets->add_js(asset_url().'js/jquery.validate.min.js');
+					$this->assets->add_js(asset_url().'js/jquery.twzipcode.min.js');
+					$this->assets->add_js(asset_url().'js/chosen.jquery.js');
+
+					$this->load->view('common/header');
+					$this->load->view('common/nav',$data);
+					$this->load->view('sysop/nav',$data);
+					$this->load->view('js/signup');
+
+					$this->form_validation->set_rules('user_id', '帳號', 'required');
+				    $this->form_validation->set_rules('user_pw', '密碼', 'required|min_length[6]');
+				    $this->form_validation->set_rules('user_pw2', '重覆輸入密碼', 'required|matches[user_pw]|min_length[6]');
+				    $this->form_validation->set_rules('user_email', '電子信箱', 'required');
+				    $this->form_validation->set_rules('user_title', '稱謂', 'required');
+				    $this->form_validation->set_rules('user_firstname', '名字', 'required');
+				    $this->form_validation->set_rules('user_lastname', '姓氏', 'required');
+				    $this->form_validation->set_rules('user_gender', '性別', 'required');
+				    $this->form_validation->set_rules('user_org', '所屬機構', 'required');
+				    $this->form_validation->set_rules('user_phoneO_1', '電話(公)', 'required');
+				    $this->form_validation->set_rules('user_phoneO_2', '電話(公)', 'required');
+				    $this->form_validation->set_rules('user_postcode', '郵遞區號', 'required');
+				    $this->form_validation->set_rules('user_postadd', '聯絡地址', 'required');
+				    $this->form_validation->set_rules('user_country', '國別', 'required');
+				    $this->form_validation->set_rules('user_lang', '語言', 'required');
+				    $this->form_validation->set_rules('user_title', '研究領域', 'required|min_length[1]');
+				    if ($this->form_validation->run()){
+				    	$user_login = $this->input->post('user_id', TRUE);
+				    	$user_pass = $this->input->post('user_pw', TRUE);
+				    	$user_email = $this->input->post('user_email', TRUE);
+				    	$user_title = $this->input->post('user_title', TRUE);
+				    	$user_firstname = $this->input->post('user_firstname', TRUE);
+				    	$user_lastname = $this->input->post('user_lastname', TRUE);
+				    	$user_gender = $this->input->post('user_gender', TRUE);
+				    	$user_org = $this->input->post('user_org', TRUE);
+				    	$user_phoneO_1 = $this->input->post('user_phoneO_1', TRUE);
+				    	$user_phoneO_2 = $this->input->post('user_phoneO_2', TRUE);
+				    	$user_phoneO_3 = $this->input->post('user_phoneO_3', TRUE);
+				    	$user_phoneO_3 = $this->input->post('user_phoneO_3', TRUE);
+				    	$user_cellphone = $this->input->post('user_cellphone', TRUE);
+				    	$user_fax = $this->input->post('user_fax', TRUE);
+				    	$user_postcode = $this->input->post('user_postcode', TRUE);
+				    	$user_addcounty = $this->input->post('user_addcounty', TRUE);
+				    	$user_area = $this->input->post('user_area', TRUE);
+				    	$user_postaddr = $this->input->post('user_postadd', TRUE);
+				    	$user_country = $this->input->post('user_country', TRUE);
+				    	$user_lang = $this->input->post('user_lang', TRUE);
+				    	$user_research = $this->input->post('user_research', TRUE);
+
+				    	$user_phone_o = $user_phoneO_1.",".$user_phoneO_2.",".$user_phoneO_3;
+				    	$user_postaddr = $user_addcounty.",".$user_area.",".$user_postaddr;
+				    	$res = $this->user->adduser($user_login,$user_pass,$user_title,$user_email,$user_firstname,$user_lastname,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research);
+				    	if( $res['status'] ){
+				    		$this->alert->js("Add User Success");
+				    		$this->form_validation->set_message('signup_success', 'Signup Success');
+				    		//redirect($redirect, 'refresh');
+				    	}else{
+				    		$this->alert->js($res['error']);
+				    		$this->form_validation->set_message('signup_error', $res['error']);
+				    	}
+				    }
+				    $this->load->view('sysop/user/add',$data);
 				break;
 				default:
 				case "all": // view all users
 
+				break;
+				case "import":
+					$this->load->view('common/header');
+					$this->load->view('common/nav',$data);
+					$this->load->view('sysop/nav',$data);
 				break;
 			}
 		}else{
@@ -181,9 +255,9 @@ class Sysop extends MY_Sysop {
 			redirect(base_url("sysop"), 'location', 301);
 		}
 		$this->assets->add_css(asset_url().'style/sysop_login.css');
-
+		$data['body_class'] = $this->body_class;
 		$this->load->view('common/header');
-		$this->load->view('common/nav');
+		$this->load->view('common/nav',$data);
 		$this->form_validation->set_rules('user_pass', '密碼', 'required');
 		if ($this->form_validation->run() == TRUE){
 			$user_pwd = $this->input->post('user_pass', TRUE);
@@ -198,9 +272,10 @@ class Sysop extends MY_Sysop {
 	}
 
 	public function logout(){
+		$data['body_class'] = $this->body_class;
 		$this->sysop->logout();
 		$this->load->view('common/header');
-		$this->load->view('common/nav');
+		$this->load->view('common/nav',$data);
 		$this->alert->show("i","Logout Success",base_url("sysop/login"));
 		$this->load->view('common/footer');
 	}

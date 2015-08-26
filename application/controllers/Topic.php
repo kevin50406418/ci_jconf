@@ -9,7 +9,7 @@ class Topic extends MY_Topic {
 	}
 
 	public function index($conf_id=''){
-
+		$data['body_class'] = $this->body_class;
 	}
 
 }

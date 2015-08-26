@@ -2,7 +2,7 @@
 <div id="alert"></div>
 <div class="ui teal segment">
 	<p>
-		<a href="#" role="button" class="ui purple button">建立研討會主題</a>
+		<a href="<?php echo get_url("dashboard",$conf_id,"topic","add")?>" role="button" class="ui purple button">建立研討會主題</a>
 	</p>
 	<div class="table-responsive">
 	<table class="table table-striped table-bordered table-hover datatable_conftopic">
@@ -24,7 +24,7 @@
 				
 			</td>
 			<td>
-				<!--{$topic['abbr']}-->
+				<?php echo $topic['topic_abbr']?>
 			</td>
 			<td>
 				<div class="small icon ui buttons">

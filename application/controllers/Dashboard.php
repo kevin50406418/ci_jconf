@@ -10,6 +10,7 @@ class Dashboard extends MY_Conference {
 
 	public function index($conf_id=''){
 		$data['conf_id'] = $conf_id;
+		$data['body_class'] = $this->body_class;
 		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
 		if( !$this->conf->confid_exists($conf_id,$user_sysop) ){
 			$this->cinfo['show_confinfo'] = false;
@@ -69,6 +70,7 @@ class Dashboard extends MY_Conference {
 
 	public function topic($conf_id='',$type=''){
 		$data['conf_id'] = $conf_id;
+		$data['body_class'] = $this->body_class;
 		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
 		if( !$this->conf->confid_exists($conf_id,$user_sysop) ){
 			$this->cinfo['show_confinfo'] = false;
@@ -94,10 +96,10 @@ class Dashboard extends MY_Conference {
 					default:
 					case "all":
 						$data['topics'] = $this->conf->get_topic($conf_id);
-						$this->load->view('conf/topic_all',$data);
+						$this->load->view('conf/topic/all',$data);
 					break;
 					case "add":
-
+						$this->load->view('conf/topic/add',$data);
 					break;
 				}
 			}else{
@@ -117,6 +119,7 @@ class Dashboard extends MY_Conference {
 	// Template
 	private function _temp($conf_id=''){
 		$data['conf_id'] = $conf_id;
+		$data['body_class'] = $this->body_class;
 		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
 		if( !$this->conf->confid_exists($conf_id,$user_sysop) ){
 			$this->cinfo['show_confinfo'] = false;

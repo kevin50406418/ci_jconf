@@ -2,9 +2,11 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 class MY_Controller extends CI_Controller{
 	public $cinfo = array();
+	public $body_class;
     public function __construct(){
 		parent::__construct();
 		$this->cinfo['show_confinfo'] = false;
+		$this->body_class ="container";
 		$this->assets->add_css(asset_url().'style/bootstrap.min.css');
 		$this->assets->add_css(asset_url().'style/label.min.css');
 		$this->assets->add_css(asset_url().'style/segment.min.css');

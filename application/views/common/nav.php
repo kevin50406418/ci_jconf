@@ -39,5 +39,5 @@
 	</div>
 </nav>
 <!---fluid-->
-<div class="container">
+<div class="<?php echo $body_class?>">
 	<div class="row">
