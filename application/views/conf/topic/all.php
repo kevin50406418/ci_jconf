@@ -27,7 +27,7 @@
 				<?php echo $topic->topic_abbr?>
 			</td>
 			<td>
-				<a href="<?php echo get_url("dashboard",$conf_id,"topic","add")?>?id=<?php echo $topic->topic_id?>" class="ui blue button">指派主編</a>
+				<a href="<?php echo get_url("dashboard",$conf_id,"topic","assign")?>?id=<?php echo $topic->topic_id?>" class="ui blue button">指派主編</a>
 				<a href="<?php echo get_url("dashboard",$conf_id,"topic","level")?>?id=<?php echo $topic->topic_id?>" class="ui green button">席次分派</a>
 				<a href="<?php echo get_url("dashboard",$conf_id,"topic","edit")?>?id=<?php echo $topic->topic_id?>" class="ui teal button">編輯</a>
 				<a href="<?php echo get_url("dashboard",$conf_id,"topic","remove")?>?id=<?php echo $topic->topic_id?>" class="ui red button" onClick="return confirm('確定是否刪除主題「<!--{$topic['name']}-->(<!--{$topic['name_eng']}-->)」\n注意：刪除後將無法恢復');">刪除</a>
