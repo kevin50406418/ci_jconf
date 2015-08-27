@@ -18,22 +18,19 @@
 		<?php foreach ($topics as $key => $topic) {?>
 		<tr>
 			<td>
-				<span title="<?php echo $topic['topic_info']?>"><?php echo $topic['topic_name']?> (<?php echo $topic['topic_name_eng']?>)</span>
+				<span title="<?php echo $topic->topic_info?>"><?php echo $topic->topic_name?> (<?php echo $topic->topic_name_eng?>)</span>
 			</td>
 			<td class="text-center">
 				
 			</td>
 			<td>
-				<?php echo $topic['topic_abbr']?>
+				<?php echo $topic->topic_abbr?>
 			</td>
 			<td>
-				<div class="small icon ui buttons">
-					<a href="<!--{get_url($conf_id,"conf","topic","assign",$topic['abbr'])}-->#assign" class="ui blue button">指派主編</a>
-					<a href="<!--{get_url($conf_id,"conf","topic","level",$topic['abbr'])}-->#level" class="ui green button">席次分派</a>
-					<a href="<!--{get_url($conf_id,"conf","topic","edit",$topic['abbr'])}-->#edit" class="ui teal button">編輯</a>
-					<a href="<!--{get_url($conf_id,"conf","topic","del",$topic['abbr'])}-->#del" class="ui red button" onClick="return confirm('確定是否刪除主題「<!--{$topic['name']}-->(<!--{$topic['name_eng']}-->)」\n注意：刪除後將無法恢復');">刪除</a>
-				</div>
-				
+				<a href="<?php echo get_url("dashboard",$conf_id,"topic","add")?>?id=<?php echo $topic->topic_id?>" class="ui blue button">指派主編</a>
+				<a href="<?php echo get_url("dashboard",$conf_id,"topic","level")?>?id=<?php echo $topic->topic_id?>" class="ui green button">席次分派</a>
+				<a href="<?php echo get_url("dashboard",$conf_id,"topic","edit")?>?id=<?php echo $topic->topic_id?>" class="ui teal button">編輯</a>
+				<a href="<?php echo get_url("dashboard",$conf_id,"topic","remove")?>?id=<?php echo $topic->topic_id?>" class="ui red button" onClick="return confirm('確定是否刪除主題「<!--{$topic['name']}-->(<!--{$topic['name_eng']}-->)」\n注意：刪除後將無法恢復');">刪除</a>
 			</td>
 		</tr>
 		<?php }?>

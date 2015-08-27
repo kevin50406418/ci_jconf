@@ -125,13 +125,6 @@ class Conf_model extends CI_Model {
 		return $this->db->count_all_results();
 	}
 
-	function get_topic($conf_id){
-		$this->db->from('topic');
-		$this->db->where('conf_id', $conf_id);
-		$query = $this->db->get();
-		return $query->result();
-	}
-
 	function update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_desc){
 		$conf = array(
 			"conf_name"    =>$conf_name,
@@ -295,5 +288,45 @@ class Conf_model extends CI_Model {
 			}
 		}
 		return $return;
+	}
+
+	function get_topic($conf_id){
+		$this->db->from('topic');
+		$this->db->where('conf_id', $conf_id);
+		$query = $this->db->get();
+		return $query->result();
+	}
+	
+	function get_topic_info($conf_id,$topic_id){
+		$this->db->select('*');
+		$this->db->from('topic');
+		$this->db->where('conf_id', $conf_id);
+		$this->db->where('topic_id', $topic_id);
+		$query = $this->db->get();
+		return $query->row_array();
+	}
+
+	function add_topic($conf_id,$topic_name,$topic_abbr,$topic_info,$topic_name_eng){
+		$topic = array(
+			"topic_id"       =>$conf_id."_".$topic_abbr,
+			"conf_id"        =>$conf_id,
+			"topic_name"     =>$topic_name,
+			"topic_abbr"     =>$topic_abbr,
+			"topic_info"     =>$topic_info,
+			"topic_name_eng" =>$topic_name_eng
+		);
+		return $this->db->insert('topic', $topic);
+	}
+
+	function update_topic($topic_id,$conf_id,$topic_name,$topic_abbr,$topic_info,$topic_name_eng){
+		$topic = array(
+			"conf_id"        => $conf_id,
+			"topic_name"     => $topic_name,
+			"topic_abbr"     => $topic_abbr,
+			"topic_info"     => $topic_info,
+			"topic_name_eng" => $topic_name_eng
+		);
+		$this->db->where('topic_id', $topic_id);
+		return $this->db->update('topic', $topic);
 	}
 }

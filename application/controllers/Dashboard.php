@@ -91,7 +91,7 @@ class Dashboard extends MY_Conference {
 			$this->load->view('conf/menu_conf',$data);
 			//$this->load->view('conf/setting',$data);
 			
-			if( is_null($this->input->get('id', TRUE)) ){
+			if( is_null( $this->input->get('id', TRUE)) ){
 				switch($type){
 					default:
 					case "all":
@@ -99,15 +99,52 @@ class Dashboard extends MY_Conference {
 						$this->load->view('conf/topic/all',$data);
 					break;
 					case "add":
+						$this->form_validation->set_rules('topic_name', '主題名稱(中)', 'required');
+						$this->form_validation->set_rules('topic_ename', '主題名稱(英)', 'required');
+						$this->form_validation->set_rules('topic_abbr', '主題簡稱', 'required');
+						$this->form_validation->set_rules('topic_info', '主題說明', 'required');
+						
+						if ($this->form_validation->run()){
+							$topic_name     = $this->input->post('topic_name');
+							$topic_name_eng = $this->input->post('topic_ename');
+							$topic_abbr     = $this->input->post('topic_abbr');
+							$topic_info     = $this->input->post('topic_info');
+							if( $this->conf->add_topic($conf_id,$topic_name,$topic_abbr,$topic_info,$topic_name_eng) ){
+								$this->alert->show("s","成功加入研討會主題: '".$topic_name."(".$topic_name_eng.")'");
+							}else{
+								$this->alert->show("d","無法加入研討會主題: '".$topic_name."(".$topic_name_eng.")'");
+							}
+						}
 						$this->load->view('conf/topic/add',$data);
 					break;
 				}
 			}else{
+				$topic_id=$this->input->get('id', TRUE);
 				switch($type){
 					case "remove":
 
 					break;
 					case "edit":
+						$this->form_validation->set_rules('topic_name', '主題名稱(中)', 'required');
+						$this->form_validation->set_rules('topic_ename', '主題名稱(英)', 'required');
+						$this->form_validation->set_rules('topic_abbr', '主題簡稱', 'required');
+						$this->form_validation->set_rules('topic_info', '主題說明', 'required');
+						
+						if ($this->form_validation->run()){
+							$topic_name     = $this->input->post('topic_name');
+							$topic_name_eng = $this->input->post('topic_ename');
+							$topic_abbr     = $this->input->post('topic_abbr');
+							$topic_info     = $this->input->post('topic_info');
+							if( $this->conf->update_topic($topic_id,$conf_id,$topic_name,$topic_abbr,$topic_info,$topic_name_eng) ){
+								$this->alert->show("s","成功更改研討會主題: '".$topic_name."(".$topic_name_eng.")'");
+							}else{
+								$this->alert->show("d","無法更改研討會主題: '".$topic_name."(".$topic_name_eng.")'");
+							}
+						}
+						$data["topic"] = $this->conf->get_topic_info($conf_id,$topic_id);
+						$this->load->view('conf/topic/edit',$data);
+					break;
+					case "assign":
 
 					break;
 				}

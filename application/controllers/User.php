@@ -4,8 +4,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class User extends MY_Controller {
 
 	public function index(){
+		$data['body_class'] = $this->body_class;
 		$this->load->view('common/header');
-		$this->load->view('common/nav');
+		$this->load->view('common/nav',$data);
 		if(!$this->user->is_login()){
 			redirect('/user/login', 'location', 301);
 		}
@@ -13,6 +14,7 @@ class User extends MY_Controller {
 	}
 
 	public function login($conf_id=""){
+		$data['body_class'] = $this->body_class;
 		if(!$this->user->is_login()){
 			$this->form_validation->set_rules('user_login', '帳號', 'required');
 		    $this->form_validation->set_rules('user_pass', '密碼', 'required');
@@ -44,7 +46,7 @@ class User extends MY_Controller {
 		}
 
 		$this->load->view('common/header');
-		$this->load->view('common/nav');
+		$this->load->view('common/nav',$data);
 		$this->load->view('user/login',$data);
 		$this->load->view('common/footer');
 	}
@@ -55,7 +57,7 @@ class User extends MY_Controller {
 			$this->session->unset_userdata($user_logout);
 
 			$this->load->view('common/header');
-			$this->load->view('common/nav');
+			$this->load->view('common/nav',$data);
 			$this->load->view('user/logout');
 			$this->load->view('common/footer');
 		}else{
@@ -77,7 +79,7 @@ class User extends MY_Controller {
 			$this->assets->add_js(asset_url().'js/chosen.jquery.js');
 
 			$this->load->view('common/header');
-			$this->load->view('common/nav');
+			$this->load->view('common/nav',$data);
 			$this->load->view('js/signup');
 			$this->form_validation->set_rules('user_id', '帳號', 'required');
 		    $this->form_validation->set_rules('user_pw', '密碼', 'required|min_length[6]');
