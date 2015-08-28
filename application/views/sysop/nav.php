@@ -23,7 +23,7 @@
 				<li class="dropdown<?php if($active=="user"){?> open<?php }?>">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-users pull-right"></i> 使用者 <span class="caret"></span></a>
 					<ul class="dropdown-menu">
-						<li><a href="#">使用者管理</a></li>
+						<li><a href="<?php echo base_url("sysop/user/all");?>">使用者管理</a></li>
 						<li><a href="<?php echo base_url("sysop/user/add");?>">新增使用者</a></li>
 						<li><a href="<?php echo base_url("sysop/user/import");?>">匯入使用者</a></li>
 					</ul>

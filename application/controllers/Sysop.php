@@ -225,7 +225,11 @@ class Sysop extends MY_Sysop {
 				break;
 				default:
 				case "all": // view all users
-
+					$data['users']=$this->user->get_all_users();
+					$this->load->view('common/header');
+					$this->load->view('common/nav',$data);
+					$this->load->view('sysop/nav',$data);
+					$this->load->view('sysop/user/all',$data);
 				break;
 				case "import":
 					$this->load->view('common/header');
@@ -234,17 +238,24 @@ class Sysop extends MY_Sysop {
 				break;
 			}
 		}else{
-			switch($do){
-				default:
-				case "view": // view user
-
-				break;
-				case "edit": // edit user
-
-				break;
-				case "reset": // reset user password
-
-				break;
+			$this->load->view('common/header');
+			$this->load->view('common/nav',$data);
+			$this->load->view('sysop/nav',$data);
+			if($this->user->username_exists($user_login)){
+				switch($do){
+					default:
+					case "view": // view user
+						
+					break;
+					case "edit": // edit user
+						
+					break;
+					case "reset": // reset user password
+						
+					break;
+				}
+			}else{
+				$this->alert->js("The username is not exist.",base_url("sysop/user/all"));
 			}
 		}
 		$this->load->view('common/footer');

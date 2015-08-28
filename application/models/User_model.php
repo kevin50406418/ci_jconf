@@ -145,7 +145,7 @@ class User_model extends CI_Model {
 		return $query->row_array();
 	}
 
-	function get_gravatar( $email, $s = 80, $d = 'mm', $r = 'g', $img = false, $atts = array() ) {
+	function get_gravatar( $email, $s = 80, $d = 'identicon', $r = 'g', $img = false, $atts = array() ) {
 	    $url = '//s.gravatar.com/avatar/';
 	    $url .= md5( strtolower( trim( $email ) ) );
 	    $url .= "?s=$s&d=$d&r=$r";
@@ -158,6 +158,10 @@ class User_model extends CI_Model {
 	    return $url;
 	}
 
-	
+	function get_all_users(){
+		$this->db->from('users');
+		$query = $this->db->get();
+		return $query->result();
+	}
 }
 ?>
