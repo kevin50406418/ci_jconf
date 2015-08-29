@@ -145,7 +145,13 @@ class Dashboard extends MY_Conference {
 						$this->load->view('conf/topic/edit',$data);
 					break;
 					case "assign":
-
+						$data['users']=$this->user->get_all_users(0);
+						$data["topic"] = $this->conf->get_topic_info($conf_id,$topic_id);
+						if( !empty($data["topic"]) ){
+							$this->load->view('conf/topic/assign',$data);
+						}else{
+							$this->alert->show("d","研討會主題不存在",get_url("dashboard",$conf_id,"topic"));
+						}
 					break;
 				}
 			}

@@ -9,6 +9,7 @@ class User_model extends CI_Model {
 		$this->db->from('users');
 		$this->db->where('user_login', $username);
 		$this->db->where('user_pass', hash('sha256',$password));
+		$this->db->where('user_staus', 0);
 		$this->db->limit(1);
 
 		$query=$this->db->get();
@@ -213,8 +214,15 @@ class User_model extends CI_Model {
 	    return $url;
 	}
 
-	function get_all_users(){
+	function get_all_users($user_staus=-1){
 		$this->db->from('users');
+		if($user_staus == 0){//get can use users
+			$this->db->where('user_staus', 0);
+		}else if($user_staus == 1){//get banned users
+			$this->db->where('user_staus', 1);
+		}else if($user_staus == 2){//get check users
+			$this->db->where('user_staus', 1);
+		}
 		$query = $this->db->get();
 		return $query->result();
 	}

@@ -18,9 +18,7 @@ class User extends MY_Controller {
 		if(!$this->user->is_login()){
 			$this->form_validation->set_rules('user_login', '帳號', 'required');
 		    $this->form_validation->set_rules('user_pass', '密碼', 'required');
-		    if ($this->form_validation->run() === FALSE){
-
-		    }else{
+		    if ( $this->form_validation->run() ){
 		    	$user_login = $this->input->post('user_login', TRUE);
 		    	$user_pwd = $this->input->post('user_pass', TRUE);
 		    	$redirect = $this->input->post('redirect', TRUE);
