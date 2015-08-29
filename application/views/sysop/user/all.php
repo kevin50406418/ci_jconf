@@ -30,8 +30,8 @@
 			<?php echo $user->user_org?>
 		</td>
 		<td>
-			<a href="#" class="ui button blue tiny"><i class="fa fa-pencil-square-o"></i> 編輯</a>
-			<a href="#" class="ui button teal tiny">查看</a>
+			<a href="<?php echo base_url("sysop/user/edit/".$user->user_login)?>" class="ui button blue tiny"><i class="fa fa-pencil-square-o"></i> 編輯</a>
+			<a href="<?php echo base_url("sysop/user/view/".$user->user_login)?>" class="ui button teal tiny">查看</a>
 			<?php if($user->user_staus == 1){?><a href="#" class="ui button green tiny">啟用</a><?php }?>
 			<a href="#" class="ui button orange tiny">重設密碼</a>
 		</td>

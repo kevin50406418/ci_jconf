@@ -79,6 +79,17 @@ class User_model extends CI_Model {
         }
 	}
 
+	function email_exists_userlogin($user_email,$user_login){
+		$this->db->from('users');
+		$this->db->where("user_login",$user_login);
+		$this->db->where("user_email",$user_email);
+		if( $this->db->count_all_results() >0 ){
+            return true;
+        }else{
+            return false;
+        }
+	}
+
 	function adduser($user_login,$user_pass,$user_title,$user_email,$user_first_name,$user_last_name,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research){
 		$return = array(
 			"status" => false,
@@ -130,6 +141,50 @@ class User_model extends CI_Model {
         return $return;
 	}
 
+	function updateuser($user_login,$user_title,$user_email,$user_first_name,$user_last_name,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research){
+		$return = array(
+			"status" => false,
+			"error" => ""
+		);
+		$user = array(
+			"user_login" => $user_login,
+			"user_title" => $user_title,
+			"user_email" => $user_email,
+			"user_first_name" => $user_first_name,
+			"user_last_name" => $user_last_name,
+			"user_gender" => $user_gender,
+			"user_org" => $user_org,
+			"user_phone_o" => $user_phone_o,
+			"user_cellphone" => $user_cellphone,
+			"user_fax" => $user_fax,
+			"user_postcode" => $user_postcode,
+			"user_postaddr" => $user_postaddr,
+			"user_country" => $user_country,
+			"user_lang" => $user_lang,
+			"user_research" => $user_research,	
+		);
+
+		if( !$this->email_exists_userlogin($user_email,$user_login) ){
+			if($this->email_exists($user_email)){
+				$return["error"] = "Email is exist. If you are not signup this email,please contact system administrator.";
+				return $return;
+			}
+		}
+		$this->db->where('user_login', $user_login);
+		if( $this->db->update('users', $user) ){
+			$return = array(
+				"status" => true,
+				"error" => ""
+			);
+        }else{
+           $return = array(
+				"status" => false,
+				"error" => "Database error! Contact System Adminstritor."
+			);
+        }
+        return $return;
+	}
+
 	function get_user_info($user_login){
 		$this->db->from('users');
 		$this->db->where('user_login', $user_login);
@@ -163,5 +218,7 @@ class User_model extends CI_Model {
 		$query = $this->db->get();
 		return $query->result();
 	}
+
+
 }
 ?>

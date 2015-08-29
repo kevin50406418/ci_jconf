@@ -132,7 +132,7 @@ class User extends MY_Controller {
 		    	$user_research = $this->input->post('user_research', TRUE);
 
 		    	$user_phone_o = $user_phoneO_1.",".$user_phoneO_2.",".$user_phoneO_3;
-		    	$user_postaddr = $user_addcounty.",".$user_area.",".$user_postaddr;
+		    	$user_postaddr = $user_addcounty."|".$user_area."|".$user_postaddr;
 		    	$res = $this->user->adduser($user_login,$user_pass,$user_title,$user_email,$user_firstname,$user_lastname,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research);
 		    	if( $res['status'] ){
 		    		$this->alert->js("Signup Success");
