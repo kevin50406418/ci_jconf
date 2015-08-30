@@ -159,6 +159,258 @@ class Dashboard extends MY_Conference {
 			$this->load->view('common/footer');
 		}
 	}
+
+	public function website($conf_id=''){
+		$data['conf_id'] = $conf_id;
+		$data['body_class'] = $this->body_class;
+		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
+		if( !$this->conf->confid_exists($conf_id,$user_sysop) ){
+			$this->cinfo['show_confinfo'] = false;
+			$this->conf->show_404conf();
+		}else{
+			$data['spage']=$this->config->item('spage');
+			$data['conf_config']=$this->conf->conf_config($conf_id);
+			//$data['schedule']=$this->conf->conf_schedule($conf_id);
+			$data['conf_content']=$this->conf->conf_content($conf_id);
+			
+			if( !$this->user->is_conf() && !$this->user->is_sysop() ){
+				$this->conf->show_permission_deny($data);
+			}
+			$this->load->view('common/header');
+			$this->load->view('common/nav',$data);
+
+			$this->load->view('conf/conf_nav',$data);
+			//$this->load->view('conf/conf_schedule',$data);
+
+			$this->load->view('conf/menu_conf',$data);
+			//$this->load->view('conf/setting',$data);
+			$this->load->view('common/footer');
+		}
+	}
+
+	public function filter($conf_id=''){
+		$data['conf_id'] = $conf_id;
+		$data['body_class'] = $this->body_class;
+		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
+		if( !$this->conf->confid_exists($conf_id,$user_sysop) ){
+			$this->cinfo['show_confinfo'] = false;
+			$this->conf->show_404conf();
+		}else{
+			$data['spage']=$this->config->item('spage');
+			$data['conf_config']=$this->conf->conf_config($conf_id);
+			//$data['schedule']=$this->conf->conf_schedule($conf_id);
+			$data['conf_content']=$this->conf->conf_content($conf_id);
+			
+			if( !$this->user->is_conf() && !$this->user->is_sysop() ){
+				$this->conf->show_permission_deny($data);
+			}
+			$this->load->view('common/header');
+			$this->load->view('common/nav',$data);
+
+			$this->load->view('conf/conf_nav',$data);
+			//$this->load->view('conf/conf_schedule',$data);
+
+			$this->load->view('conf/menu_conf',$data);
+			//$this->load->view('conf/setting',$data);
+			$this->load->view('common/footer');
+		}
+	}
+
+	public function user($conf_id=''){
+		$data['conf_id'] = $conf_id;
+		$data['body_class'] = $this->body_class;
+		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
+		if( !$this->conf->confid_exists($conf_id,$user_sysop) ){
+			$this->cinfo['show_confinfo'] = false;
+			$this->conf->show_404conf();
+		}else{
+			$data['spage']=$this->config->item('spage');
+			$data['conf_config']=$this->conf->conf_config($conf_id);
+			//$data['schedule']=$this->conf->conf_schedule($conf_id);
+			$data['conf_content']=$this->conf->conf_content($conf_id);
+			
+			if( !$this->user->is_conf() && !$this->user->is_sysop() ){
+				$this->conf->show_permission_deny($data);
+			}
+			$this->load->view('common/header');
+			$this->load->view('common/nav',$data);
+
+			$this->load->view('conf/conf_nav',$data);
+			//$this->load->view('conf/conf_schedule',$data);
+
+			$this->load->view('conf/menu_conf',$data);
+			//$this->load->view('conf/setting',$data);
+			$this->load->view('common/footer');
+		}
+	}
+
+	public function news($conf_id=''){
+		$data['conf_id'] = $conf_id;
+		$data['body_class'] = $this->body_class;
+		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
+		if( !$this->conf->confid_exists($conf_id,$user_sysop) ){
+			$this->cinfo['show_confinfo'] = false;
+			$this->conf->show_404conf();
+		}else{
+			$data['spage']=$this->config->item('spage');
+			$data['conf_config']=$this->conf->conf_config($conf_id);
+			//$data['schedule']=$this->conf->conf_schedule($conf_id);
+			$data['conf_content']=$this->conf->conf_content($conf_id);
+			
+			if( !$this->user->is_conf() && !$this->user->is_sysop() ){
+				$this->conf->show_permission_deny($data);
+			}
+			$this->load->view('common/header');
+			$this->load->view('common/nav',$data);
+
+			$this->load->view('conf/conf_nav',$data);
+			//$this->load->view('conf/conf_schedule',$data);
+
+			$this->load->view('conf/menu_conf',$data);
+			//$this->load->view('conf/setting',$data);
+			$this->load->view('common/footer');
+		}
+	}
+
+	public function email($conf_id=''){
+		$data['conf_id'] = $conf_id;
+		$data['body_class'] = $this->body_class;
+		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
+		if( !$this->conf->confid_exists($conf_id,$user_sysop) ){
+			$this->cinfo['show_confinfo'] = false;
+			$this->conf->show_404conf();
+		}else{
+			$data['spage']=$this->config->item('spage');
+			$data['conf_config']=$this->conf->conf_config($conf_id);
+			//$data['schedule']=$this->conf->conf_schedule($conf_id);
+			$data['conf_content']=$this->conf->conf_content($conf_id);
+			
+			if( !$this->user->is_conf() && !$this->user->is_sysop() ){
+				$this->conf->show_permission_deny($data);
+			}
+			$this->load->view('common/header');
+			$this->load->view('common/nav',$data);
+
+			$this->load->view('conf/conf_nav',$data);
+			//$this->load->view('conf/conf_schedule',$data);
+
+			$this->load->view('conf/menu_conf',$data);
+			//$this->load->view('conf/setting',$data);
+			$this->load->view('common/footer');
+		}
+	}
+
+	public function submit($conf_id=''){
+		$data['conf_id'] = $conf_id;
+		$data['body_class'] = $this->body_class;
+		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
+		if( !$this->conf->confid_exists($conf_id,$user_sysop) ){
+			$this->cinfo['show_confinfo'] = false;
+			$this->conf->show_404conf();
+		}else{
+			$data['spage']=$this->config->item('spage');
+			$data['conf_config']=$this->conf->conf_config($conf_id);
+			//$data['schedule']=$this->conf->conf_schedule($conf_id);
+			$data['conf_content']=$this->conf->conf_content($conf_id);
+			
+			if( !$this->user->is_conf() && !$this->user->is_sysop() ){
+				$this->conf->show_permission_deny($data);
+			}
+			$this->load->view('common/header');
+			$this->load->view('common/nav',$data);
+
+			$this->load->view('conf/conf_nav',$data);
+			//$this->load->view('conf/conf_schedule',$data);
+
+			$this->load->view('conf/menu_conf',$data);
+			//$this->load->view('conf/setting',$data);
+			$this->load->view('common/footer');
+		}
+	}
+
+	public function signup($conf_id=''){
+		$data['conf_id'] = $conf_id;
+		$data['body_class'] = $this->body_class;
+		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
+		if( !$this->conf->confid_exists($conf_id,$user_sysop) ){
+			$this->cinfo['show_confinfo'] = false;
+			$this->conf->show_404conf();
+		}else{
+			$data['spage']=$this->config->item('spage');
+			$data['conf_config']=$this->conf->conf_config($conf_id);
+			//$data['schedule']=$this->conf->conf_schedule($conf_id);
+			$data['conf_content']=$this->conf->conf_content($conf_id);
+			
+			if( !$this->user->is_conf() && !$this->user->is_sysop() ){
+				$this->conf->show_permission_deny($data);
+			}
+			$this->load->view('common/header');
+			$this->load->view('common/nav',$data);
+
+			$this->load->view('conf/conf_nav',$data);
+			//$this->load->view('conf/conf_schedule',$data);
+
+			$this->load->view('conf/menu_conf',$data);
+			//$this->load->view('conf/setting',$data);
+			$this->load->view('common/footer');
+		}
+	}
+
+	public function report($conf_id=''){
+		$data['conf_id'] = $conf_id;
+		$data['body_class'] = $this->body_class;
+		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
+		if( !$this->conf->confid_exists($conf_id,$user_sysop) ){
+			$this->cinfo['show_confinfo'] = false;
+			$this->conf->show_404conf();
+		}else{
+			$data['spage']=$this->config->item('spage');
+			$data['conf_config']=$this->conf->conf_config($conf_id);
+			//$data['schedule']=$this->conf->conf_schedule($conf_id);
+			$data['conf_content']=$this->conf->conf_content($conf_id);
+			
+			if( !$this->user->is_conf() && !$this->user->is_sysop() ){
+				$this->conf->show_permission_deny($data);
+			}
+			$this->load->view('common/header');
+			$this->load->view('common/nav',$data);
+
+			$this->load->view('conf/conf_nav',$data);
+			//$this->load->view('conf/conf_schedule',$data);
+
+			$this->load->view('conf/menu_conf',$data);
+			//$this->load->view('conf/setting',$data);
+			$this->load->view('common/footer');
+		}
+	}
+
+	public function logs($conf_id=''){
+		$data['conf_id'] = $conf_id;
+		$data['body_class'] = $this->body_class;
+		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
+		if( !$this->conf->confid_exists($conf_id,$user_sysop) ){
+			$this->cinfo['show_confinfo'] = false;
+			$this->conf->show_404conf();
+		}else{
+			$data['spage']=$this->config->item('spage');
+			$data['conf_config']=$this->conf->conf_config($conf_id);
+			//$data['schedule']=$this->conf->conf_schedule($conf_id);
+			$data['conf_content']=$this->conf->conf_content($conf_id);
+			
+			if( !$this->user->is_conf() && !$this->user->is_sysop() ){
+				$this->conf->show_permission_deny($data);
+			}
+			$this->load->view('common/header');
+			$this->load->view('common/nav',$data);
+
+			$this->load->view('conf/conf_nav',$data);
+			//$this->load->view('conf/conf_schedule',$data);
+
+			$this->load->view('conf/menu_conf',$data);
+			//$this->load->view('conf/setting',$data);
+			$this->load->view('common/footer');
+		}
+	}
 	// Template
 	private function _temp($conf_id=''){
 		$data['conf_id'] = $conf_id;
