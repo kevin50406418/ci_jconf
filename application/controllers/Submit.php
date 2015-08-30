@@ -63,6 +63,7 @@ class Submit extends MY_Conference {
 					case 1:
 						$data['step_class']=array(1=>"active",2=>"disabled",3=>"disabled",4=>"disabled",5=>"disabled",6=>"disabled");
 						$data['filter'] = $this->conf->get_filter($conf_id);
+						$this->load->view('submit/add/step',$data);
 						$this->load->view('submit/add/step1',$data);
 					break;
 					case 2:
@@ -77,6 +78,7 @@ class Submit extends MY_Conference {
 							$data['user'] =  $this->user->get_user_info($user_login);
 							$data['country_list'] = $country_list['zhtw'];
 							$data['topics'] = $this->conf->get_topic($conf_id);
+							$this->load->view('submit/add/step',$data);
 							$this->load->view('submit/add/step2',$data);
 						}else{
 							$this->alert->show("d",'<p>尚未選擇分類</p><p><a href="javascript:history.back();">返回上一頁</a></p>');
@@ -172,9 +174,11 @@ class Submit extends MY_Conference {
 			                	$data['otherfile'] = $this->Submit->get_otherfile($paper_id);
 			                }
 			            }
+			            $this->load->view('submit/add/step',$data);
                 		$this->load->view('submit/add/step3',$data);
 					break;
 					case 4:
+						$data['step_class']=array(1=>"completed",2=>"completed",3=>"completed",4=>"active",5=>"disabled",6=>"disabled");
 						if(!$this->session->has_userdata($conf_id.'_insert_id') ){
 							$this->alert->js("請以正常方式投稿或投稿逾時。",get_url("submit",$conf_id,"add"));
 							exit;
@@ -205,9 +209,11 @@ class Submit extends MY_Conference {
 		                    }
 						}
 						$data['otherfiles'] = $this->Submit->get_otherfiles($paper_id);
+						$this->load->view('submit/add/step',$data);
 						$this->load->view('submit/add/step4',$data);
 					break;
 					case 5:
+						$data['step_class']=array(1=>"completed",2=>"completed",3=>"completed",4=>"completed",5=>"active",6=>"disabled");
 						if(!$this->session->has_userdata($conf_id.'_insert_id') ){
 							$this->alert->js("請以正常方式投稿或投稿逾時。",get_url("submit",$conf_id,"add"));
 							exit;
@@ -223,7 +229,12 @@ class Submit extends MY_Conference {
 							$data['otherfile'] = $this->Submit->get_otherfile($paper_id);
 							$data['otherfiles'] = $this->Submit->get_otherfiles($paper_id);
 						}
+						$this->load->view('submit/add/step',$data);
 						$this->load->view('submit/add/step5',$data);
+					break;
+					case 6:
+						$data['step_class']=array(1=>"completed",2=>"completed",3=>"completed",4=>"completed",5=>"completed",6=>"active");
+						$this->load->view('submit/add/step',$data);
 					break;
 				}
 				//sp($this->session->all_userdata());
@@ -269,11 +280,13 @@ class Submit extends MY_Conference {
 				switch ($step) {
 					default:
 					case 1:
-						$data['step_class']=array(1=>"active",2=>"disabled",3=>"disabled",4=>"disabled",5=>"disabled",6=>"disabled");
+						$data['step_class']=array(1=>"active",2=>"completed",3=>"completed",4=>"completed",5=>"completed",6=>"disabled");
 						$data['filter'] = $this->conf->get_filter($conf_id);
+						$this->load->view('submit/edit/step',$data);
 						$this->load->view('submit/edit/step1',$data);
 					break;
 					case 2:
+						$data['step_class']=array(1=>"completed",2=>"active",3=>"completed",4=>"completed",5=>"completed",6=>"disabled");
 						$this->assets->add_css(asset_url().'style/chosen.css');
 						$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
 						$this->assets->add_js(asset_url().'js/repeatable.js',true);
@@ -283,9 +296,11 @@ class Submit extends MY_Conference {
 						$data['country_list'] = $country_list['zhtw'];
 						$data['topics'] = $this->conf->get_topic($conf_id);
 						$data['authors'] = $this->Submit->get_author($paper_id);
+						$this->load->view('submit/edit/step',$data);
 						$this->load->view('submit/edit/step2',$data);
 					break;
 					case 3:
+						$data['step_class']=array(1=>"completed",2=>"completed",3=>"active",4=>"completed",5=>"completed",6=>"disabled");
 						$data['show_file'] = true;
 						$data['otherfile'] = $this->Submit->get_otherfile($paper_id);
 						//author
@@ -368,10 +383,11 @@ class Submit extends MY_Conference {
                 		if(!is_null($this->input->get("save"))){
                 			//save and exit
 						}
-						
+						$this->load->view('submit/edit/step',$data);
                 		$this->load->view('submit/edit/step3',$data);
 					break;
-					case 4:		                
+					case 4:	
+						$data['step_class']=array(1=>"completed",2=>"completed",3=>"completed",4=>"active",5=>"completed",6=>"disabled");
 						if(!is_null($this->input->get("upload"))){
 							$config['upload_path']= $this->conf->get_paperdir($conf_id);
 			                $config['allowed_types']= 'pdf';
@@ -391,16 +407,23 @@ class Submit extends MY_Conference {
 		                    }
 						}
 						$data['otherfiles'] = $this->Submit->get_otherfiles($paper_id);
+						$this->load->view('submit/edit/step',$data);
 						$this->load->view('submit/edit/step4',$data);
 					break;
 					case 5:
+						$data['step_class']=array(1=>"completed",2=>"completed",3=>"completed",4=>"completed",5=>"active",6=>"disabled");
 						$data['paper'] = $this->Submit->get_paperinfo($paper_id,$user_login);
 						if(!empty($data['paper'])){
 							$data['authors'] = $this->Submit->get_author($paper_id);
 							$data['otherfile'] = $this->Submit->get_otherfile($paper_id);
 							$data['otherfiles'] = $this->Submit->get_otherfiles($paper_id);
 						}
+						$this->load->view('submit/edit/step',$data);
 						$this->load->view('submit/edit/step5',$data);
+					break;
+					case 6:
+						$step_class=array(1=>"completed",2=>"completed",3=>"completed",4=>"completed",5=>"completed",6=>"active");
+						$this->load->view('submit/edit/step',$data);
 					break;
 				}
 			}

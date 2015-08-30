@@ -23,7 +23,7 @@
 					</tr>
 					<tr>
 						<th>主題</th>
-						<td><span title="<?php echo $paper->info?>"><?php echo $paper->name?></span></td>
+						<td><span title="<?php echo $paper->topic_info?>"><?php echo $paper->topic_name?></span></td>
 					</tr>
 					<tr>
 						<th>稿件狀態</th>
@@ -90,7 +90,7 @@
 						<td>投稿資料</td>
 						<td>
 							<?php if(!empty($otherfile)){?>
-							<?php echo $otherfile->file_name?>
+							<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" target="_blank"><?php echo $otherfile->file_name?></a>
 							<?php }else{?>
 							<span class="ui label red">尚未上傳</span>
 							<?php }?>

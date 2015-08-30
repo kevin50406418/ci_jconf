@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');?>
 <div class="ui teal segment row">
-	<h2>系統檢核</h2>
+	<h2>稿件檢核</h2>
 	<div class="col-md-12">
 		<table class="table table-bordered">
 			<tr>
@@ -16,7 +16,7 @@
 			</tr>
 			<tr>
 				<th>主題</th>
-				<td><?php echo $paper->name?></td>
+				<td><?php echo $paper->topic_name?></td>
 			</tr>
 			<tr>
 				<th>關鍵字</th>

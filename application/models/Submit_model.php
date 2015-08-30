@@ -7,7 +7,7 @@ class Submit_model extends CI_Model {
     function show_mypaper($user_login){
         $this->db->select('*');
         $this->db->from('paper');
-        $this->db->join('topic', 'paper.sub_topic = topic.ID');
+        $this->db->join('topic', 'paper.sub_topic = topic.topic_id');
         $this->db->join('paper_author', 'paper.sub_id = paper_author.paper_id');
         $this->db->where('paper_author.user_login', $user_login);
         $this->db->order_by('paper.sub_id', 'DESC');
@@ -163,7 +163,7 @@ class Submit_model extends CI_Model {
 
     function is_author($paper_id, $user_login){
         $this->db->from('paper');
-        $this->db->join('topic', 'paper.sub_topic = topic.ID');
+        $this->db->join('topic', 'paper.sub_topic = topic_id');
         $this->db->join('paper_author', 'paper.sub_id = paper_author.paper_id');
         $this->db->where('user_login', $user_login);
         $this->db->where("sub_id",$paper_id);
@@ -176,7 +176,7 @@ class Submit_model extends CI_Model {
 
     function get_paperinfo($paper_id, $user_login){
         $this->db->from('paper');
-        $this->db->join('topic', 'paper.sub_topic = topic.ID');
+        $this->db->join('topic', 'paper.sub_topic = topic.topic_id');
         $this->db->join('paper_author', 'paper.sub_id = paper_author.paper_id');
         $this->db->where('user_login', $user_login);
         $this->db->where("sub_id",$paper_id);
