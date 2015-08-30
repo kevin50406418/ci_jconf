@@ -197,7 +197,7 @@ fieldset[disabled] .btn-olive.active {
 	cursor: pointer;
 	background-color: inherit;
 	border-color: transparent;
-	font-weight: bold;
+	/*font-weight: bold;*/
 }
 .btn-hover-alt {
 	font-weight: normal;

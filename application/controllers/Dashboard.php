@@ -188,7 +188,7 @@ class Dashboard extends MY_Conference {
 		}
 	}
 
-	public function filter($conf_id=''){
+	public function filter($conf_id='',$type=''){
 		$data['conf_id'] = $conf_id;
 		$data['body_class'] = $this->body_class;
 		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
@@ -204,6 +204,7 @@ class Dashboard extends MY_Conference {
 			if( !$this->user->is_conf() && !$this->user->is_sysop() ){
 				$this->conf->show_permission_deny($data);
 			}
+			$this->assets->add_js(base_url('ckeditor/ckeditor.js'));
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
 
@@ -211,6 +212,54 @@ class Dashboard extends MY_Conference {
 			//$this->load->view('conf/conf_schedule',$data);
 
 			$this->load->view('conf/menu_conf',$data);
+			if( is_null( $this->input->get('id', TRUE)) ){
+				switch($type){
+					default:
+					case "all":
+						$data['filters']=$this->conf->get_filter($conf_id);
+						$this->load->view('conf/filter/all',$data);
+					break;
+					case "add":
+						$this->form_validation->set_rules('content', '檢核清單內容', 'required');
+						$this->form_validation->set_rules('econtent', '檢核清單內容(英)', 'required');
+						
+						if ($this->form_validation->run()){
+							$filter_content     = $this->input->post('content',false);
+							$filter_content_eng = $this->input->post('econtent',false);
+							if( $this->conf->add_filter($conf_id,$filter_content,$filter_content_eng) ){
+								$this->alert->show("s","成功建立投稿檢核清單",get_url("dashboard",$conf_id,"filter","add"));
+							}else{
+								$this->alert->show("d","無法建立投稿檢核清單");
+							}
+						}
+						$this->load->view('conf/filter/add',$data);
+					break;
+				}
+			}else{
+				$filter_id = $this->input->get('id', TRUE);
+				switch($type){
+					case "edit":
+						$data['filter']=$this->conf->get_filter_info($conf_id,$filter_id);
+						if( !empty($data['filter']) ){
+							$this->form_validation->set_rules('content', '檢核清單內容', 'required');
+							$this->form_validation->set_rules('econtent', '檢核清單內容(英)', 'required');
+							if ($this->form_validation->run()){
+								$filter_content     = $this->input->post('content',false);
+								$filter_content_eng = $this->input->post('econtent',false);
+								if( $this->conf->update_filter($conf_id,$filter_id,$filter_content,$filter_content_eng) ){
+									$this->alert->show("s","成功更新投稿檢核清單",get_url("dashboard",$conf_id,"filter","edit")."?id=".$filter_id);
+								}else{
+									$this->alert->show("d","無法更新投稿檢核清單");
+								}
+							}
+
+							$this->load->view('conf/filter/edit',$data);
+						}else{
+							$this->alert->show("d","查無投稿檢核清單",get_url("dashboard",$conf_id,"filter"));
+						}
+					break;
+				}
+			}
 			//$this->load->view('conf/setting',$data);
 			$this->load->view('common/footer');
 		}

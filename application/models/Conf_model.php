@@ -125,6 +125,37 @@ class Conf_model extends CI_Model {
 		return $this->db->count_all_results();
 	}
 
+	function add_filter($conf_id,$filter_content,$filter_content_eng){
+		$filter = array(
+			"conf_id" => $conf_id,
+			"filter_content" => $filter_content,
+			"filter_content_eng" => $filter_content_eng
+		);
+		return $this->db->insert('filter', $filter);
+	}
+
+	function update_filter($conf_id,$filter_id,$filter_content,$filter_content_eng){
+		$filter = array(
+			"filter_content" => $filter_content,
+			"filter_content_eng" => $filter_content_eng
+		);
+        $this->db->where("filter_id", $filter_id);
+        $this->db->where("conf_id", $conf_id);
+        if( $this->db->update('filter', $filter) ){
+            return true;
+        }else{
+            return false;
+        }
+	}
+
+	function get_filter_info($conf_id,$filter_id){
+		$this->db->from('filter');
+		$this->db->where('conf_id', $conf_id);
+		$this->db->where('filter_id', $filter_id);
+		$query = $this->db->get();
+		return $query->row();
+	}
+
 	function update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_desc){
 		$conf = array(
 			"conf_name"    =>$conf_name,
