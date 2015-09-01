@@ -4,14 +4,13 @@
 	<div class="container"> 
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+			<?php if($this->cinfo['show_confinfo']){?>
+			<a class="navbar-brand" href="<?php echo base_url("main/".$conf_config['conf_id']);?>"><i class="fa fa-university"></i> <?php echo $conf_config['conf_name']?></a>
+			<?php }else{?>
 			<a class="navbar-brand" href="<?php echo base_url();?>">亞大研討會系統</a>
+			<?php }?>
 		</div>
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-			<?php if($this->cinfo['show_confinfo']){?>
-			<ul class="nav navbar-nav">
-				<li class="active"><a href="#"><?php echo $conf_config['conf_name']?></a></li>
-			</ul>
-			<?php }?>
 			<?php if($this->user->is_login()){?>
 			<ul class="nav navbar-nav navbar-right">
 				<li class="dropdown">
@@ -24,11 +23,14 @@
 					</ul>
 				</li>
 			</ul>
-			<?php if($this->user->is_sysop()){?>
 			<ul class="nav navbar-nav navbar-right">
-				<li><a href="<?php echo base_url("sysop");?>">系統管理</a></li>
-			</ul>
+			<?php if($this->cinfo['show_confinfo']){?>
+				<li><a href="<?php echo base_url();?>"><i class="fa fa-home fa-lg"></i> 首頁</a></li>
 			<?php }?>
+			<?php if($this->user->is_sysop()){?>
+				<li><a href="<?php echo base_url("sysop");?>">系統管理</a></li>
+			<?php }?>
+			</ul>
 			<?php }else{?>
 			<ul class="nav navbar-nav navbar-right">
 				<li><a href="<?php echo base_url('user/login');?>">登入</a></li>
