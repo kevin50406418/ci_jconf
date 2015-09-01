@@ -156,6 +156,52 @@ class Conf_model extends CI_Model {
 		return $query->row();
 	}
 
+	function get_news($conf_id){
+		$this->db->from('news');
+		$this->db->where('conf_id', $conf_id);
+		$query = $this->db->get();
+		return $query->result();
+	}
+
+	function add_news($conf_id,$news_title,$news_content,$news_title_eng,$news_content_eng){
+		$news = array(
+			"conf_id" => $conf_id,
+			"news_title" => $news_title,
+			"news_content" => $news_content,
+			"news_title_eng" => $news_title_eng,
+			"news_content_eng" => $news_content_eng,
+			"news_posted"=>time(),
+			"news_poster"=>$this->session->user_login
+		);
+		return $this->db->insert('news', $news);
+	}
+
+	function get_news_info($conf_id,$news_id){
+		$this->db->from('news');
+		$this->db->where('conf_id', $conf_id);
+		$this->db->where('news_id', $news_id);
+		$query = $this->db->get();
+		return $query->row();
+	}
+
+	function update_news($conf_id,$news_id,$news_title,$news_content,$news_title_eng,$news_content_eng){
+		$news = array(
+			"conf_id" => $conf_id,
+			"news_title" => $news_title,
+			"news_content" => $news_content,
+			"news_title_eng" => $news_title_eng,
+			"news_content_eng" => $news_content_eng,
+			"news_posted"=>time(),
+		);
+        $this->db->where("news_id", $news_id);
+        $this->db->where("conf_id", $conf_id);
+        if( $this->db->update('news', $news) ){
+            return true;
+        }else{
+            return false;
+        }
+	}
+	
 	function update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_desc){
 		$conf = array(
 			"conf_name"    =>$conf_name,

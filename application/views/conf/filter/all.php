@@ -37,6 +37,7 @@
 							<a href="#" class="ui button red disabled">刪除</a>
 						</td>
 					</tr>
+					<?php if(!empty($filters)){?>
 					<?php foreach ($filters as $key => $filter) {?>
 					<tr>
 						<td>
@@ -47,6 +48,7 @@
 							<a href="#" class="ui button red">刪除</a>
 						</td>
 					</tr>
+					<?php }?>
 					<?php }?>
 				</table>
 			</div>
@@ -78,6 +80,7 @@
 							<a href="#" class="ui button red disabled">刪除</a>
 						</td>
 					</tr>
+					<?php if(!empty($filters)){?>
 					<?php foreach ($filters as $key => $filter) {?>
 					<tr>
 						<td>
@@ -88,6 +91,7 @@
 							<a href="#" class="ui button red">刪除</a>
 						</td>
 					</tr>
+					<?php }?>
 					<?php }?>
 				</table>
 			</div>

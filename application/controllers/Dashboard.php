@@ -281,6 +281,7 @@ class Dashboard extends MY_Conference {
 			if( !$this->user->is_conf() && !$this->user->is_sysop() ){
 				$this->conf->show_permission_deny($data);
 			}
+
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
 
@@ -293,7 +294,7 @@ class Dashboard extends MY_Conference {
 		}
 	}
 
-	public function news($conf_id=''){
+	public function news($conf_id='',$type=''){
 		$data['conf_id'] = $conf_id;
 		$data['body_class'] = $this->body_class;
 		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
@@ -309,6 +310,7 @@ class Dashboard extends MY_Conference {
 			if( !$this->user->is_conf() && !$this->user->is_sysop() ){
 				$this->conf->show_permission_deny($data);
 			}
+			$this->assets->add_js(base_url('ckeditor/ckeditor.js'));
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
 
@@ -316,7 +318,77 @@ class Dashboard extends MY_Conference {
 			//$this->load->view('conf/conf_schedule',$data);
 
 			$this->load->view('conf/menu_conf',$data);
-			//$this->load->view('conf/setting',$data);
+			if( is_null( $this->input->get('id', TRUE)) ){
+				switch($type){
+					default:
+					case "all":
+						$data['news']=$this->conf->get_news($conf_id);
+						$this->load->view('conf/news/all',$data);
+					break;
+					case "add":
+						switch ($data['conf_config']['default_lang']) {
+							default:
+							case 'zhtw':
+								$this->form_validation->set_rules('news_title', '公告標題', 'required');
+								$this->form_validation->set_rules('news_content', '公告內容', 'required');
+							break;
+							case 'eng':
+								$this->form_validation->set_rules('news_title_eng', '公告標題(英)', 'required');
+								$this->form_validation->set_rules('news_content_eng', '公告內容(英)', 'required');
+							break;
+						}
+						
+						if ($this->form_validation->run()){
+							$news_title       = $this->input->post('news_title');
+							$news_content     = $this->input->post('news_content',false);
+							$news_title_eng   = $this->input->post('news_title_eng');
+							$news_content_eng = $this->input->post('news_content_eng',false);
+							if( $this->conf->add_news($conf_id,$news_title,$news_content,$news_title_eng,$news_content_eng) ){
+								$this->alert->show("s","成功建立公告",get_url("dashboard",$conf_id,"news","add"));
+							}else{
+								$this->alert->show("d","無法建立公告");
+							}
+						}
+						$this->load->view('conf/news/add',$data);
+					break;
+				}
+			}else{
+				$news_id = $this->input->get('id', TRUE);
+				switch($type){
+					case "edit":
+						$data['news']=$this->conf->get_news_info($conf_id,$news_id);
+						if( !empty($data['news']) ){
+							switch ($data['conf_config']['default_lang']) {
+								default:
+								case 'zhtw':
+									$this->form_validation->set_rules('news_title', '公告標題', 'required');
+									$this->form_validation->set_rules('news_content', '公告內容', 'required');
+								break;
+								case 'eng':
+									$this->form_validation->set_rules('news_title_eng', '公告標題(英)', 'required');
+									$this->form_validation->set_rules('news_content_eng', '公告內容(英)', 'required');
+								break;
+							}
+							
+							if ($this->form_validation->run()){
+								$news_title       = $this->input->post('news_title');
+								$news_content     = $this->input->post('news_content',false);
+								$news_title_eng   = $this->input->post('news_title_eng');
+								$news_content_eng = $this->input->post('news_content_eng',false);
+								if( $this->conf->update_news($conf_id,$news_id,$news_title,$news_content,$news_title_eng,$news_content_eng) ){
+									$this->alert->show("s","成功更新公告",get_url("dashboard",$conf_id,"news","add"));
+								}else{
+									$this->alert->show("d","無法更新公告");
+								}
+							}
+
+							$this->load->view('conf/news/edit',$data);
+						}else{
+							$this->alert->show("d","查無公告",get_url("dashboard",$conf_id,"filter"));
+						}
+					break;
+				}
+			}
 			$this->load->view('common/footer');
 		}
 	}

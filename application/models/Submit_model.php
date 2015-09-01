@@ -231,5 +231,14 @@ class Submit_model extends CI_Model {
         return $query->result();
     }
 
+    /*function check_paper(){
+        $return = array(
+            "status"=>,
+            ""=>
+        );
+        $otherfile = $this->get_otherfile($paper_id);
+        if(count($otherfile) == 1){
 
+        }
+    }*/
 }
