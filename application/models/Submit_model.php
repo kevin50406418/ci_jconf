@@ -101,7 +101,7 @@ class Submit_model extends CI_Model {
         }
     }
 
-    function update_paper($paper_id,$sub_title,$sub_summary,$sub_keyword,$sub_topic,$sub_lang,$sub_sponsor,$conf_id){
+    function update_paper($paper_id,$conf_id,$sub_title,$sub_summary,$sub_keyword,$sub_topic,$sub_lang,$sub_sponsor){
         $paper = array(
             "sub_title"   =>$sub_title,
             "sub_summary" =>$sub_summary,
@@ -110,9 +110,10 @@ class Submit_model extends CI_Model {
             "sub_lang"    =>$sub_lang,
             "sub_sponsor" =>$sub_sponsor,
             "sub_time"    =>time(),
-            "conf_id"     =>$conf_id
         );
+        sp($paper);
         $this->db->where('sub_id', $paper_id);
+        $this->db->where('conf_id', $conf_id);
         if( $this->db->update('paper', $paper) ){
             return true;
         }else{
@@ -231,14 +232,102 @@ class Submit_model extends CI_Model {
         return $query->result();
     }
 
-    /*function check_paper(){
+    function check_paper($paper){
         $return = array(
-            "status"=>,
-            ""=>
+            "bool_paper"=>false,
+            "need_paper"=>array()
         );
-        $otherfile = $this->get_otherfile($paper_id);
-        if(count($otherfile) == 1){
-
+        if( empty($paper->sub_title) ){
+            array_push($return['need_paper'], "題目");
         }
-    }*/
+
+        if( empty($paper->sub_summary) ){
+            array_push($return['need_paper'], "摘要");
+        }
+
+        if( empty($paper->topic_name) ){
+            array_push($return['need_paper'], "主題");
+        }
+
+        if( empty($paper->sub_keyword) ){
+            array_push($return['need_paper'], "關鍵字");
+        }
+
+        if( empty($paper->sub_lang) ){
+            array_push($return['need_paper'], "語言");
+        }
+
+        if( count($return['need_paper']) ==0 ){
+            $return['bool_paper'] = true;
+        }else{
+            $return['bool_paper'] = false;
+        }
+        return $return;
+    }
+
+    function check_otherfile($otherfile){
+        if(!empty($otherfile)){
+           return true;
+        }else{
+            return false;
+        }
+    }
+
+    function check_authors($authors){
+        $return = array(
+            "bool_authors"=>false,
+            "need_authors"=>array()
+        );
+        if(!empty($authors)){
+            foreach ($authors as $key => $author) {
+                if( empty($author->user_first_name) ){
+                    array_push($return['need_authors'], "<li>作者".$author->author_order."：姓</li>");
+                }
+                if( empty($author->user_last_name) ){
+                    array_push($return['need_authors'], "<li>作者".$author->author_order."：名</li>");
+                }
+                if( empty($author->user_email) ){
+                    array_push($return['need_authors'], "<li>作者".$author->author_order."：電子信箱</li>");
+                }
+                if( empty($author->user_org) ){
+                    array_push($return['need_authors'], "<li>作者".$author->author_order."：所屬機構</li>");
+                }
+                if( empty($author->user_country) ){
+                    array_push($return['need_authors'], "<li>作者".$author->author_order."：國別</li>");
+                }
+            }
+            if( count($return['need_authors']) ==0 ){
+                $return['bool_authors'] = true;
+            }else{
+                $return['bool_authors'] = false;
+            }
+        }else{
+            $return['bool_authors'] = false;
+            array_push($return['need_authors'], "無作者資料");
+        }
+        return $return;
+    }
+
+    function paper_to_review($conf_id,$paper_id){
+        $paper = array(
+            "sub_status"=>3
+        );
+        $this->db->where("conf_id",$conf_id);
+        $this->db->where("sub_id",$paper_id);
+        return $this->db->update('paper', $paper);
+    }
+
+    function is_editable($paper_id, $user_login){
+        $this->db->from('paper');
+        $this->db->join('topic', 'paper.sub_topic = topic_id');
+        $this->db->join('paper_author', 'paper.sub_id = paper_author.paper_id');
+        $this->db->where('user_login', $user_login);
+        $this->db->where("sub_id",$paper_id);
+        $this->db->where("sub_status",-1);
+        if( $this->db->count_all_results() ==1 ){
+            return false;
+        }else{
+            return true;
+        }
+    }
 }

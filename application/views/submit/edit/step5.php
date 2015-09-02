@@ -1,6 +1,52 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');?>
-<div class="ui teal segment row">
+<div class="ui blue segment">
 	<h2>稿件檢核</h2>
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				<th class="text-center">稿件資訊</th>
+				<th class="text-center">稿件檔案</th>
+				<th class="text-center">作者資訊</th>
+			</tr>
+		</thead>
+		<tr class="text-center">
+			<?php if($bool_paper["bool_paper"]){?>
+				<td class="bg-success"><i class="fa fa-check-circle fa-2x"></i></td>
+			<?php }else{?>
+				<td class="bg-danger">
+					資料缺少：
+					<?php foreach ($bool_paper["need_paper"] as $key => $value) {?>
+						<?php echo $value?> 
+					<?php }?>
+				</td>
+			<?php }?>
+			<?php if($bool_otherfile){?>
+			<td class="bg-success"><i class="fa fa-check-circle fa-2x"></i></td>
+			<?php }else{?>
+			<td class="bg-danger"><a href="<?php echo get_url("submit",$conf_id,"edit",$paper_id)."?step=3"?>"><i class="fa fa-times-circle fa-2x"></i> 尚未上傳</a></td>
+			<?php }?>
+			<?php if($bool_authors["bool_authors"]){?>
+				<td class="bg-success"><i class="fa fa-check-circle fa-2x"></i></td>
+			<?php }else{?>
+				<td class="bg-danger">
+					資料缺少：
+					<?php foreach ($bool_authors["need_authors"] as $key => $value) {?>
+						<?php echo $value?> 
+					<?php }?>
+				</td>
+			<?php }?>
+		</tr>
+	</table>
+	<?php if($bool_paper["bool_paper"] && $bool_otherfile && $bool_authors["bool_authors"]){?>
+	<?php echo form_open(get_url("submit",$conf_id,"edit",$paper_id)."?step=6");?>
+	<div class="text-center">
+		<button type="submit" class="ui button orange" name="submit" value="submit">送出審查</button>
+	</div>
+	<?php echo form_close()?>
+	<?php }?>
+</div>
+<div class="ui teal segment row">
+	<h2>稿件資料</h2>
 	<div class="col-md-12">
 		<table class="table table-bordered">
 			<tr>
