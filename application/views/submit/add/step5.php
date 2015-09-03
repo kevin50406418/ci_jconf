@@ -38,9 +38,9 @@
 		</tr>
 	</table>
 	<?php if($bool_paper["bool_paper"] && $bool_otherfile && $bool_authors["bool_authors"]){?>
-	<?php echo form_open(get_url("submit",$conf_id,"edit",$paper_id)."?step=6");?>
+	<?php echo form_open(get_url("submit",$conf_id,"add")."?step=6");?>
 	<div class="text-center">
-		<button type="submit" class="ui button orange">送出審查</button>
+		<button type="submit" class="ui button orange" name="submit" value="submit">送出審查</button>
 	</div>
 	<?php echo form_close()?>
 	<?php }?>

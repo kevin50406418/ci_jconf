@@ -117,7 +117,7 @@ class Submit extends MY_Conference {
 						if ($this->form_validation->run()){
 							$sub_title    =$this->input->post('sub_title');
 							$sub_summary  =$this->input->post('sub_summary');
-							$sub_keyword  =empty($this->input->post('sub_keyword'))?"":$this->input->post('sub_keyword');
+							$sub_keyword  =empty($this->input->post('sub_keywords'))?"":$this->input->post('sub_keywords');
 							$sub_topic    =$this->input->post('sub_topic');
 							$sub_lang     =$this->input->post('sub_lang');
 							$sub_sponsor  =$this->input->post('sub_sponsor');
@@ -174,7 +174,7 @@ class Submit extends MY_Conference {
 	                    	}else{
 	                    		$fid = $this->session->userdata($conf_id.'_file_id');
 	                    		$del_file = $this->Submit->get_otherfile($paper_id);
-	                    		delete_files($this->conf->get_paperdir($conf_id).$del_file->file_system);
+	                    		//delete_files($this->conf->get_paperdir($conf_id).$del_file->file_system); //bug
 	                    		$this->Submit->update_file($conf_id,$paper_id,$fid,$upload_data['client_name'],$upload_data['file_name']);
 	                    	}
 		                	$data['show_file'] = true;
@@ -246,7 +246,7 @@ class Submit extends MY_Conference {
 						$data['otherfiles'] = $this->Submit->get_otherfiles($paper_id);
 
 						$data['bool_paper'] = $this->Submit->check_paper($data['paper']);
-						$data['bool_otherfile'] = $this->Submit->check_otherfile($data['otherfiles']);
+						$data['bool_otherfile'] = $this->Submit->check_otherfile($data['otherfile']);
 						$data['bool_authors'] = $this->Submit->check_authors($data['authors']);
 					}
 					$this->load->view('submit/add/step',$data);
@@ -286,6 +286,7 @@ class Submit extends MY_Conference {
 								'required'   => '請透過表單送出審查'
 					        )
 						);
+
 						if ($this->form_validation->run()){
 							if($bool_paper["bool_paper"] && $bool_otherfile && $bool_authors["bool_authors"]){
 								if( $this->Submit->paper_to_review($conf_id,$paper_id) ){
@@ -509,7 +510,7 @@ class Submit extends MY_Conference {
 						$data['otherfiles'] = $this->Submit->get_otherfiles($paper_id);
 
 						$data['bool_paper'] = $this->Submit->check_paper($data['paper']);
-						$data['bool_otherfile'] = $this->Submit->check_otherfile($data['otherfiles']);
+						$data['bool_otherfile'] = $this->Submit->check_otherfile($data['otherfile']);
 						$data['bool_authors'] = $this->Submit->check_authors($data['authors']);
 					}
 

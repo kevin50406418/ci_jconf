@@ -195,9 +195,9 @@ class Submit_model extends CI_Model {
             "file_type"=>$file_type
         ); 
         if( $this->db->insert('paper_file', $paper_file) ){
-            $this->session->set_userdata($conf_id.'_file_id', $this->db->insert_id());
-            $expire = config_item('insert_id_expire')*60;
-            $this->session->mark_as_temp($conf_id.'_file_id', $expire);
+            if($file_type == "F"){
+                $this->session->set_flashdata($conf_id.'_file_id', $this->db->insert_id());
+            }
             return true;
         }else{
             return false;
