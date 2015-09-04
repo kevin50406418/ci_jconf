@@ -4,11 +4,11 @@
 
 <div class="ui inverted secondary pointing menu">
 	<a class="item" href="<?php echo get_url("main",$conf_config['conf_id']);?>">
-		投稿系統
+		<?php echo lang('submit_system')?>
 	</a>
 	
 	<a class="item" href="<?php echo get_url("news",$conf_config['conf_id']);?>">
-		最新消息
+		<?php echo lang('submit_news')?>
 	</a>
 	<?php foreach ($conf_content as $key => $content) {?>
 		<?php if(in_array($content->page_id,$spage)){?>

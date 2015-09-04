@@ -33,9 +33,10 @@ class MY_Controller extends CI_Controller{
 			}
 			$this->_lang = $lang;
 			$this->session->set_userdata('lang', $lang);
-		}else{
-			$this->_lang = $this->session->lang;
-		}	
+		}else{//$this->session->lang
+			$this->_lang = "en";
+		}
+		$this->lang->load("conf_menu",$this->_lang);	
     }
 }
 

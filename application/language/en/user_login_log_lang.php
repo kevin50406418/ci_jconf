@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-
+$lang['user_log_recent'] = "Recent Login Log";
 $lang['user_log_time'] = "Login Time";
 $lang['user_log_ip'] = "Login IP";
 $lang['user_log_device'] = "Device";
