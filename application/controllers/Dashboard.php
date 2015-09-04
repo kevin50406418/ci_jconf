@@ -84,6 +84,11 @@ class Dashboard extends MY_Conference {
 			if( !$this->user->is_conf() && !$this->user->is_sysop() ){
 				$this->conf->show_permission_deny($data);
 			}
+			if( !is_null( $this->input->get('id', TRUE)) && $type =="assign" ){
+				$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
+				$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
+				$this->assets->add_js(asset_url().'js/dataTables.bootstrap.js',true);
+			}
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
 			$this->load->view('conf/conf_nav',$data);
@@ -148,6 +153,45 @@ class Dashboard extends MY_Conference {
 						$data['users']=$this->user->get_all_users(0);
 						$data["topic"] = $this->conf->get_topic_info($conf_id,$topic_id);
 						if( !empty($data["topic"]) ){
+							$data["topic_users"] = $this->conf->get_editor($topic_id,$conf_id);
+							$auth_users = array();
+							foreach ($data["topic_users"] as $key => $user) {
+								array_push($auth_users, $user->user_login);
+							}
+							$data['auth_users'] = $auth_users;
+							$this->form_validation->set_rules(
+						        'submit', '送出',
+						        'required',
+						        array(
+									'required'   => '請透過表單送出'
+						        )
+							);
+							if ($this->form_validation->run()){
+								$user_logins = $this->input->post('user_login[]');
+								$submit = $this->input->post('submit');
+								if( is_array($user_logins) ){
+									switch($submit){
+										case "add":
+											foreach ($user_logins as $key => $user_login) {
+												if( $this->conf->add_assign_topic($topic_id,$conf_id,$user_login) ){
+													$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 設為 <strong>".$data["topic"]["topic_name"]."(".$data["topic"]["topic_name_eng"].")</strong> 主編");
+												}else{
+													$this->alert->show("d","無法將使用者 <strong>".$user_login."</strong> 設為 <strong>".$data["topic"]["topic_name"]."(".$data["topic"]["topic_name_eng"].")</strong> 主編");
+												}
+											}
+										break;
+										case "del":
+											foreach ($user_logins as $key => $user_login) {
+												if( $this->conf->del_assign_topic($topic_id,$conf_id,$user_login) ){
+													$this->alert->show("s","已將使用者 <strong>".$user_login."</strong> 取消 <strong>".$data["topic"]["topic_name"]."(".$data["topic"]["topic_name_eng"].")</strong> 主編");
+												}else{
+													$this->alert->show("d","無法將使用者 <strong>".$user_login."</strong> 取消 <strong>".$data["topic"]["topic_name"]."(".$data["topic"]["topic_name_eng"].")</strong> 主編");
+												}
+											}
+										break;
+									}
+								}
+							}
 							$this->load->view('conf/topic/assign',$data);
 						}else{
 							$this->alert->show("d","研討會主題不存在",get_url("dashboard",$conf_id,"topic"));

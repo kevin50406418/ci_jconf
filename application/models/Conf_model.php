@@ -406,4 +406,31 @@ class Conf_model extends CI_Model {
 		$this->db->where('topic_id', $topic_id);
 		return $this->db->update('topic', $topic);
 	}
+
+	function add_assign_topic($topic_id,$conf_id,$user_login){
+		$auth_topic = array(
+			"conf_id"     => $conf_id,
+			"user_login"  => $user_login,
+			"topic_id"    => $topic_id,
+			"topic_level" => 0,
+			"auth_time"   => time()
+		);
+		return $this->db->insert('auth_topic', $auth_topic);
+	}
+
+	function del_assign_topic($topic_id,$conf_id,$user_login){
+		$this->db->where('conf_id', $conf_id);
+		$this->db->where('user_login', $user_login);
+		$this->db->where('topic_id', $topic_id);
+		return $this->db->delete('auth_topic');;
+	}
+
+	function get_editor($topic_id,$conf_id){
+		$this->db->from('auth_topic');
+		$this->db->join('users','auth_topic.user_login = users.user_login');
+		$this->db->where('conf_id', $conf_id);
+		$this->db->where('topic_id', $topic_id);
+		$query = $this->db->get();
+		return $query->result();
+	}
 }
