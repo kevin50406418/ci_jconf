@@ -278,21 +278,6 @@ class Conf_model extends CI_Model {
 		return $return;
 	}
 
-	function lang(){
-		if( !$this->session->has_userdata('lang') ){
-			$languages = $this->agent->languages();
-			switch($languages[0]){
-				case "zh":
-					$lang = "zhtw";
-				break;
-				case "en":
-					$lang = "en";
-				break;
-			}
-			$this->session->set_userdata('lang', $lang);
-		}		
-	}
-
 	function add_conf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$default_lang,$conf_fax="",$conf_desc=""){
 		$return = array(
 			"status" => false,

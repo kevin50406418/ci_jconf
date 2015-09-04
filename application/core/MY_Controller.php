@@ -3,6 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class MY_Controller extends CI_Controller{
 	public $cinfo = array();
 	public $body_class;
+	public $_lang;
     public function __construct(){
 		parent::__construct();
 		$this->cinfo['show_confinfo'] = false;
@@ -16,6 +17,25 @@ class MY_Controller extends CI_Controller{
 		$this->assets->add_css(asset_url().'style/font-awesome.min.css');
 		$this->assets->add_css(asset_url().'style/style.css');
 		$this->assets->add_css(asset_url().'style/statistic.min.css');
+
+		if( !$this->session->has_userdata('lang') ){
+			$languages = $this->agent->languages();
+			switch($languages[0]){
+				case "zh-tw":
+				case "zh":
+					$lang = "zhtw";
+				break;
+				default:
+				case "en-us":
+				case "en":
+					$lang = "en";
+				break;
+			}
+			$this->_lang = $lang;
+			$this->session->set_userdata('lang', $lang);
+		}else{
+			$this->_lang = $this->session->lang;
+		}	
     }
 }
 

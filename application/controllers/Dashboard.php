@@ -55,7 +55,6 @@ class Dashboard extends MY_Conference {
 
 			$this->load->view('conf/conf_nav',$data);
 			//$this->load->view('conf/conf_schedule',$data);
-
 			$this->load->view('conf/menu_conf',$data);
 			$this->load->view('conf/setting',$data);
 			$this->load->view('common/footer');

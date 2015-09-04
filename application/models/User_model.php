@@ -16,12 +16,13 @@ class User_model extends CI_Model {
 		
 		if($query->num_rows() == 1){
 			$result = $query->row_array();
-			
+			$this->add_login_log($username,1);
 			$this->session->set_userdata('user_login', $result['user_login']);
 			$this->session->set_userdata('user_sysop', $result['user_sysop']);
 
 			return true;
 		}else{
+			$this->add_login_log($username,0);
 			return false;
 		}
 	}
@@ -227,8 +228,40 @@ class User_model extends CI_Model {
 		return $query->result();
 	}
 
-	function login_log(){
-		
+	function add_login_log($login_user,$staus){
+		if ($this->agent->is_browser()){
+	        $browser = $this->agent->browser().' '.$this->agent->version();
+	        $agent = "pc";
+		}elseif ($this->agent->is_robot()){
+	        $browser = $this->agent->robot();
+	        $agent = "ro";
+		}elseif ($this->agent->is_mobile()){
+	        $browser = $this->agent->mobile();
+	        $agent = "mo";
+		}else{
+	        $browser = 'Unidentified User Agent';
+	        $agent = "un";
+		}
+		$log=array(
+			"login_user"     => $login_user,
+			"login_time"     => time(),
+			"login_staus"    => $staus,
+			"login_ip"       => $this->input->ip_address(),
+			"login_host"     => $this->input->server('HTTP_HOST'),
+			"login_agent"    => $this->agent->agent_string(),
+			"login_platform" => $this->agent->platform(),
+			"login_browser"  => $browser,
+			"login_agent"    => $agent,
+			"sessions_id"    => session_id()
+		);
+		return $this->db->insert("login_log", $log);
+	}
+
+	function get_login_log($login_user){
+		$this->db->from('login_log');
+		$this->db->order_by('login_id', 'DESC');
+		$query = $this->db->get();
+		return $query->result();
 	}
 
 }

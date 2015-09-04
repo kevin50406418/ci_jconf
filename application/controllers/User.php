@@ -2,6 +2,9 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class User extends MY_Controller {
+	public function __construct() {        
+	    parent::__construct();
+	}
 
 	public function index(){
 		$data['body_class'] = $this->body_class;
@@ -50,6 +53,7 @@ class User extends MY_Controller {
 	}
 
 	public function logout($conf_id=""){
+		$data['body_class'] = $this->body_class;
 		if($this->user->is_login()){
 			$user_logout = array('user_login', 'user_sysop');
 			$this->session->unset_userdata($user_logout);
@@ -63,7 +67,22 @@ class User extends MY_Controller {
 		}
 	}
 
+	public function log(){
+		$data['body_class'] = $this->body_class;
+		$this->lang->load("user_login_log",$this->_lang);
+		if($this->user->is_login()){
+			$data['logs'] = $this->user->get_login_log($this->session->user_login);
+			$this->load->view('common/header');
+			$this->load->view('common/nav',$data);
+			$this->load->view('user/log',$data);
+			$this->load->view('common/footer');
+		}else{
+			redirect('/user/login', 'location', 301);
+		}
+	}
+
 	public function signup(){
+		$data['body_class'] = $this->body_class;
 		if(!$this->user->is_login()){
 			$country_list = config_item('country_list');
 			$data['country_list'] = $country_list['zhtw'];
