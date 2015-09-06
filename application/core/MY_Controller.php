@@ -33,8 +33,8 @@ class MY_Controller extends CI_Controller{
 			}
 			$this->_lang = $lang;
 			$this->session->set_userdata('lang', $lang);
-		}else{//$this->session->lang
-			$this->_lang = "en";
+		}else{//"en"
+			$this->_lang = $this->session->lang;
 		}
 		$this->lang->load("conf_menu",$this->_lang);	
     }
@@ -67,8 +67,9 @@ class MY_Topic extends MY_Controller{
 		parent::__construct();
 		if( !$this->user->is_login() ){
 			redirect('/user/login', 'location', 301);
-		}else{
-			if( !$this->user->is_topic() ){
+			if( $this->user->is_topic() || $this->user->is_sysop()){
+				
+			}else{
 				redirect(base_url(), 'location', 301);
 			}
 		}

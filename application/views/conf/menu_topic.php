@@ -5,7 +5,7 @@
 	</div>
 	<div class="panel-body">
 		<div class="text-center row">
-			<a href="#" class="btn btn-lg btn-hover btn-olive col-md-2"><i class="fa fa-archive fa-4x"></i><br><?php echo lang('topic_assign')?></a>
+			<a href="<?php echo get_url("topic",$conf_id,"index")?>" class="btn btn-lg btn-hover btn-olive col-md-2"><i class="fa fa-archive fa-4x"></i><br><?php echo lang('topic_assign')?></a>
 			<!--<a href="#" class="btn btn-lg btn-hover btn-olive col-md-2"><i class="fa fa-exclamation-circle fa-4x"></i><br>主題主編手冊</a>-->
 		</div>
 	</div>

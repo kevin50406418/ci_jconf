@@ -83,9 +83,10 @@ class Conf_model extends CI_Model {
 	}
 
 	function show_404conf(){
+		$data['body_class'] = "container";
 		$this->output->set_status_header('404');
 		$this->load->view('common/header');
-		$this->load->view('common/nav');
+		$this->load->view('common/nav',$data);
 		$this->load->view('common/conf_404');
 		$this->load->view('common/footer');
 		$this->output->_display();
@@ -93,6 +94,7 @@ class Conf_model extends CI_Model {
 	}
 
 	function show_permission_deny($data){
+		$data['body_class'] = "container";
 		$this->output->set_status_header('404');
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
