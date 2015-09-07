@@ -11,6 +11,7 @@ class Topic extends MY_Topic {
 	public function index($conf_id=''){
 		$data['conf_id'] = $conf_id;
 		$data['body_class'] = $this->body_class;
+		$data['_lang'] = $this->_lang;
 		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
 		if( !$this->conf->confid_exists($conf_id,$user_sysop) ){
 			$this->cinfo['show_confinfo'] = false;
@@ -30,6 +31,13 @@ class Topic extends MY_Topic {
 			}else{
 				$topic_id = $this->input->get('id', TRUE);
 				$data['papers']=$this->topic->get_paper($conf_id,$user_login,$topic_id);
+			}
+			$paper_author=$this->topic->get_paper($conf_id,$user_login);
+			$data['paper_author'] = array();
+			if(is_array($paper_author)){
+				foreach ($paper_author as $key => $pa) {
+					array_push($data['paper_author'],$pa->sub_id);
+				}
 			}
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);

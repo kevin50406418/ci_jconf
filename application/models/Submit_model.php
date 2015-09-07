@@ -21,47 +21,47 @@ class Submit_model extends CI_Model {
     	$desc="";
     	switch($submit_staus){
     		case -4:
-    			$staus_text="撤稿中";
+    			$staus_text=$this->lang->line('status_removing');
     			$html_class="brown";
     			$desc="稿件撤稿中(待主編確認中)";
     		break;
     		case -3:
-    			$staus_text="刪除";
+    			$staus_text=$this->lang->line('status_delete');
     			$html_class="grey";
     			$desc="稿件被作者撤稿(將不被作為研討會審查稿件)";
     		break;
     		case -2:
-    			$staus_text="拒絕";
+    			$staus_text=$this->lang->line('status_reject');
     			$html_class="red";
     			$desc="稿件被主編及審查人拒絕";
     		break;
     		case -1:
-    			$staus_text="編輯中";
+    			$staus_text=$this->lang->line('status_editing');
     			$html_class="purple";
     			$desc="稿件目前尚在編輯中";
     		break;
     		case 1:
-    			$staus_text="投稿完成";
+    			$staus_text=$this->lang->line('status_submitcomplete');
     			$html_class="teal";
     			$desc="稿件完成投稿，待主題主編分派審查人";
     		break;
     		case 2:
-    			$staus_text="大會待決";
+    			$staus_text=$this->lang->line('status_pending');
     			$html_class="yellow";
     			$desc="搞件將於大會時決議";
     		break;
     		case 3:
-    			$staus_text="審查中";
+    			$staus_text=$this->lang->line('status_review');
     			$html_class="orange";
     			$desc="搞件進入審查";
     		break;
     		case 4:
-    			$staus_text="接受";
+    			$staus_text=$this->lang->line('status_accepte');
     			$html_class="green";
     			$desc="研討會接受本篇稿件投稿";
     		break;
     		case 5:
-    			$staus_text="完稿";
+    			$staus_text=$this->lang->line('status_complete');
     			$html_class="blue";
     			$desc="完成搞件最後上傳資料";
     		break;
@@ -310,7 +310,7 @@ class Submit_model extends CI_Model {
 
     function paper_to_review($conf_id,$paper_id){
         $paper = array(
-            "sub_status"=>3
+            "sub_status"=>1
         );
         $this->db->where("conf_id",$conf_id);
         $this->db->where("sub_id",$paper_id);

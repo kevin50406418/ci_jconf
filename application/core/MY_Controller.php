@@ -36,7 +36,8 @@ class MY_Controller extends CI_Controller{
 		}else{//"en"
 			$this->_lang = $this->session->lang;
 		}
-		$this->lang->load("conf_menu",$this->_lang);	
+		$this->lang->load("conf_menu",$this->_lang);
+		$this->lang->load("paper_status",$this->_lang);	
     }
 }
 
