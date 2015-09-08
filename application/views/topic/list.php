@@ -69,7 +69,7 @@
 				<div class="small icon ui buttons basic">
 				<?php if(in_array($paper->sub_id,$paper_author)){?>
 					<!--{get_url($conf_id,"topic","detail",$list['sub_id'])}-->
-					<a href="#" class="ui blue button basic">查看</a>
+					<a href="<?php echo get_url("topic",$conf_id,"detail",$paper->sub_id)?>" class="ui blue button basic">查看</a>
 					<?php if($paper->sub_status == 1){?>
 					<form method="post" action="<!--{get_url($conf_id,"topic","detail",$list['sub_id'])}-->">
 						<button onclick="return confirm('是否拒絕稿件[#<!--{$list['sub_id']}--> <!--{$list['sub_title']}-->]\n注意：拒絕稿件後，將無法撤回操作');" class="ui red button basic" name="reject">拒絕稿件</button>

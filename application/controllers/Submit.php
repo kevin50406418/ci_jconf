@@ -19,7 +19,7 @@ class Submit extends MY_Conference {
 			$data['conf_config']=$this->conf->conf_config($conf_id);
 			//$data['schedule']=$this->conf->conf_schedule($conf_id);
 			$data['conf_content']=$this->conf->conf_content($conf_id);
-
+			$user_login=$this->session->userdata('user_login');
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
 
@@ -27,7 +27,7 @@ class Submit extends MY_Conference {
 			//$this->load->view('conf/conf_schedule',$data);
 
 			$this->load->view('conf/menu_submit',$data);
-			$data['lists'] = $this->Submit->show_mypaper($this->session->userdata('user_login'));
+			$data['lists'] = $this->Submit->show_mypaper($user_login,$conf_id);
 			$this->load->view('submit/list',$data);
 			$this->load->view('common/footer');
 		}

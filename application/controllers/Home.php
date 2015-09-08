@@ -167,6 +167,29 @@ class Home extends MY_Controller {
 		}
 	}
 
+	public function change_lang($lang='zhtw'){
+		if ( $this->input->is_ajax_request() ){
+			switch($lang){
+				case "zhtw":
+				case "zh-tw":
+				case "tw":
+				case "zh":
+					$lang = "zhtw";
+				break;
+				default:
+				case "en-us":
+				case "en":
+					$lang = "en";
+				break;
+			}
+			$this->_lang = $lang;
+			$this->session->set_userdata('lang', $lang);
+			$this->alert->refresh(0);
+		}else{
+			$this->alert->js("No direct script access allowed",base_url());
+		}
+	}
+
 	public function ckeditor(){
 		$this->assets->add_js(asset_url().'ckeditor/ckeditor.js');
 		//print_r($this->input->post(NULL,FALSE));

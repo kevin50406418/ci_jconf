@@ -17,25 +17,7 @@ class MY_Controller extends CI_Controller{
 		$this->assets->add_css(asset_url().'style/font-awesome.min.css');
 		$this->assets->add_css(asset_url().'style/style.css');
 		$this->assets->add_css(asset_url().'style/statistic.min.css');
-
-		if( !$this->session->has_userdata('lang') ){
-			$languages = $this->agent->languages();
-			switch($languages[0]){
-				case "zh-tw":
-				case "zh":
-					$lang = "zhtw";
-				break;
-				default:
-				case "en-us":
-				case "en":
-					$lang = "en";
-				break;
-			}
-			$this->_lang = $lang;
-			$this->session->set_userdata('lang', $lang);
-		}else{//"en"
-			$this->_lang = $this->session->lang;
-		}
+		$this->_lang = $this->user->get_clang();
 		$this->lang->load("conf_menu",$this->_lang);
 		$this->lang->load("paper_status",$this->_lang);	
     }

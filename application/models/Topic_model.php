@@ -35,4 +35,13 @@ class Topic_model extends CI_Model {
 		$this->db->where('paper_author.user_login', $user_login);
 		$this->db->where('auth_topic.conf_id', $conf_id);
     }
+
+    function get_paperinfo($paper_id, $conf_id){
+        $this->db->from('paper');
+        $this->db->join('topic', 'paper.sub_topic = topic.topic_id');
+        $this->db->where('paper.conf_id', $conf_id);
+        $this->db->where("sub_id",$paper_id);
+        $query = $this->db->get();
+        return $query->row();
+    }
 }

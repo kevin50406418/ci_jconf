@@ -28,6 +28,8 @@ $(document).ready(function(){
 	$('[data-toggle="popover"]').popover();
 })
 </script>
+<script src="https://use.typekit.net/wnd2iaa.js"></script>
+<script>try{Typekit.load({ async: true });}catch(e){}</script>
 </head>
 
 <body>

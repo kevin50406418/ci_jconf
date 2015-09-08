@@ -4,12 +4,13 @@ class Submit_model extends CI_Model {
 		parent::__construct();
     }
 
-    function show_mypaper($user_login){
+    function show_mypaper($user_login,$conf_id){
         $this->db->select('*');
         $this->db->from('paper');
         $this->db->join('topic', 'paper.sub_topic = topic.topic_id');
         $this->db->join('paper_author', 'paper.sub_id = paper_author.paper_id');
         $this->db->where('paper_author.user_login', $user_login);
+        $this->db->where('paper.conf_id', $conf_id);
         $this->db->order_by('paper.sub_id', 'DESC');
         $query = $this->db->get();
         return $query->result();
@@ -329,5 +330,15 @@ class Submit_model extends CI_Model {
         }else{
             return true;
         }
+    }
+
+    function get_allpaper($conf_id){
+        $this->db->from('paper');
+        $this->db->join('topic', 'paper.sub_topic = topic.topic_id');
+        $this->db->join('paper_author', 'paper.sub_id = paper_author.paper_id');
+        $this->db->where('paper.conf_id', $conf_id);
+        $this->db->order_by('paper.sub_id', 'ASC');
+        $query = $this->db->get();
+        return $query->result();
     }
 }

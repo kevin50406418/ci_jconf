@@ -264,5 +264,31 @@ class User_model extends CI_Model {
 		return $query->result();
 	}
 
+	function get_clang(){
+		if( !$this->session->has_userdata('lang') ){
+			$languages = $this->agent->languages();
+			switch($languages[0]){
+				case "zhtw":
+				case "zh-tw":
+				case "tw":
+				case "zh":
+					$lang = "zhtw";
+				break;
+				default:
+				case "en-us":
+				case "en":
+					$lang = "en";
+				break;
+			}
+			$this->session->set_userdata('lang', $lang);
+			return $lang;
+		}else{
+			return $this->session->lang;
+		}
+	}
+
+	function get_nowlang(){
+		return $this->get_clang();
+	}
 }
 ?>

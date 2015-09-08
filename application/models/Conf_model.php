@@ -420,4 +420,18 @@ class Conf_model extends CI_Model {
 		$query = $this->db->get();
 		return $query->result();
 	}
+
+	function count_editor($conf_id){
+		$this->db->select('topic_id,count(*) as cnt');
+		$this->db->from('auth_topic');
+		$this->db->where('conf_id', $conf_id);
+		$this->db->group_by('topic_id');
+		$query = $this->db->get();
+		$count=$query->result();
+		$count_editor = array();
+		foreach ($count as $key => $v) {
+			$count_editor[$v->topic_id]=$v->cnt;
+		}
+		return $count_editor;
+	}
 }
