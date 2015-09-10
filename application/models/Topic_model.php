@@ -44,4 +44,16 @@ class Topic_model extends CI_Model {
         $query = $this->db->get();
         return $query->row();
     }
+
+    function get_file($fid,$paper_id,$user_login){
+    	$this->db->from("paper");
+		$this->db->join('topic', 'paper.sub_topic = topic.topic_id');
+		$this->db->join('auth_topic', 'auth_topic.topic_id = topic.topic_id');
+		$this->db->join('paper_file', 'paper.sub_id = paper_file.paper_id');
+		$this->db->where('auth_topic.user_login', $user_login);
+		$this->db->where("paper.sub_id",$paper_id);
+		$this->db->where("fid",$fid);
+		$query = $this->db->get();
+		return $query->row();
+    }
 }

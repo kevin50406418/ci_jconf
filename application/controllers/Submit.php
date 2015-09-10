@@ -234,7 +234,7 @@ class Submit extends MY_Conference {
 						$this->Submit->add_time($conf_id,$paper_id);
 					}
 					$user_login = $this->session->userdata('user_login');
-					$data['paper'] = $this->Submit->get_paperinfo($paper_id,$user_login);
+					$data['paper'] = $this->Submit->get_paperinfo($conf_id,$paper_id,$user_login);
 					
 					$bool_paper["bool_paper"]     =false;
 					$bool_otherfile               =false;
@@ -267,7 +267,7 @@ class Submit extends MY_Conference {
 
 					$this->load->view('submit/add/step',$data);
 
-					$paper = $this->Submit->get_paperinfo($paper_id,$user_login);
+					$paper = $this->Submit->get_paperinfo($conf_id,$paper_id,$user_login);
 					$bool_paper["bool_paper"]     =false;
 					$bool_otherfile               =false;
 					$bool_authors["bool_authors"] =false;
@@ -377,7 +377,7 @@ class Submit extends MY_Conference {
 					$this->assets->add_js(asset_url().'js/repeatable.js',true);
 					$this->assets->add_js(asset_url().'js/chosen.jquery.js');
 					$country_list = config_item('country_list');
-					$data['paper'] = $this->Submit->get_paperinfo($paper_id, $user_login);
+					$data['paper'] = $this->Submit->get_paperinfo($conf_id,$paper_id, $user_login);
 					$data['country_list'] = $country_list['zhtw'];
 					$data['topics'] = $this->conf->get_topic($conf_id);
 					$data['authors'] = $this->Submit->get_author($paper_id);
@@ -499,7 +499,7 @@ class Submit extends MY_Conference {
 				break;
 				case 5:
 					$data['step_class']=array(1=>"completed",2=>"completed",3=>"completed",4=>"completed",5=>"active",6=>"disabled");
-					$data['paper'] = $this->Submit->get_paperinfo($paper_id,$user_login);
+					$data['paper'] = $this->Submit->get_paperinfo($conf_id,$paper_id,$user_login);
 					$bool_paper["bool_paper"]     =false;
 					$bool_otherfile               =false;
 					$bool_authors["bool_authors"] =false;
@@ -521,7 +521,7 @@ class Submit extends MY_Conference {
 					$data['step_class']=array(1=>"completed",2=>"completed",3=>"completed",4=>"completed",5=>"completed",6=>"active");
 					$this->load->view('submit/edit/step',$data);
 
-					$paper = $this->Submit->get_paperinfo($paper_id,$user_login);
+					$paper = $this->Submit->get_paperinfo($conf_id,$paper_id,$user_login);
 					$bool_paper["bool_paper"]     =false;
 					$bool_otherfile               =false;
 					$bool_authors["bool_authors"] =false;
@@ -640,7 +640,7 @@ class Submit extends MY_Conference {
 			//$data['schedule']=$this->conf->conf_schedule($conf_id);
 			$data['conf_content']=$this->conf->conf_content($conf_id);
 
-			$data['paper'] = $this->Submit->get_paperinfo($paper_id,$user_login);
+			$data['paper'] = $this->Submit->get_paperinfo($conf_id,$paper_id,$user_login);
 			if(!empty($data['paper'])){
 				$data['authors'] = $this->Submit->get_author($paper_id);
 				$data['otherfile'] = $this->Submit->get_otherfile($paper_id);

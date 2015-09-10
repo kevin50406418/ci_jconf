@@ -32,7 +32,7 @@ class Topic extends MY_Topic {
 				$topic_id = $this->input->get('id', TRUE);
 				$data['papers']=$this->topic->get_paper($conf_id,$user_login,$topic_id);
 			}
-			$paper_author=$this->topic->get_paper($conf_id,$user_login);
+			$paper_author=$this->Submit->show_mypaper($user_login,$conf_id);
 			$data['paper_author'] = array();
 			if(is_array($paper_author)){
 				foreach ($paper_author as $key => $pa) {
@@ -75,7 +75,7 @@ class Topic extends MY_Topic {
 			}
 			$user_login = $this->session->userdata('user_login');
 			
-			$paper_author=$this->topic->get_paper($conf_id,$user_login);
+			$paper_author=$this->Submit->show_mypaper($user_login,$conf_id);
 			$paper_array = array();
 			if(is_array($paper_author)){
 				foreach ($paper_author as $key => $pa) {
@@ -101,6 +101,50 @@ class Topic extends MY_Topic {
 			}
 			
 			$this->load->view('common/footer');
+		}
+	}
+
+	public function files($conf_id='',$paper_id=''){
+		if( empty($conf_id) || empty($paper_id) ){
+			$this->alert->js("查無稿件檔案",get_url("submit",$conf_id));
+		}
+		$data['conf_id'] = $conf_id;
+
+		$user_login = $this->session->userdata('user_login');
+		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
+		if( !$this->conf->confid_exists($conf_id,$user_sysop) ){
+			$this->cinfo['show_confinfo'] = false;
+			$this->conf->show_404conf();
+		}else{
+			if( is_null($this->input->get("fid") ) ){
+				$this->alert->js("查無稿件檔案",get_url("submit",$conf_id));
+				$this->load->view('common/footer');
+				$this->output->_display();
+				exit;
+			}else{
+				$fid = $this->input->get("fid");
+				$file=$this->topic->get_file($fid,$paper_id,$user_login);
+				if(empty($file)){
+					$this->alert->js("查無稿件檔案",get_url("submit",$conf_id));
+					$this->load->view('common/footer');
+					$this->output->_display();
+					exit;
+				}
+				$this->load->helper('download');
+				$do = $this->input->get("do");
+				switch($do){
+					case "download":
+						force_download($file->file_name,file_get_contents($this->conf->get_paperdir($conf_id).$file->file_system));
+					break;
+					default:
+					case "view":
+						$this->output
+							->set_content_type('pdf')
+							->set_header("Content-Disposition: inline; filename=\"".$paper_id."-".$file->fid."-".$file->file_name."\"")
+							->set_output(file_get_contents($this->conf->get_paperdir($conf_id).$file->file_system));
+					break;
+				}
+			}
 		}
 	}
 

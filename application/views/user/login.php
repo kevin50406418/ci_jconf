@@ -1,4 +1,5 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
+?>
 <div class="row">
 	<div class="col-md-2"></div>
 	<div class="ui segment col-md-8">

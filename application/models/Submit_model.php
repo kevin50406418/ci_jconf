@@ -176,12 +176,13 @@ class Submit_model extends CI_Model {
         }
     }
 
-    function get_paperinfo($paper_id, $user_login){
+    function get_paperinfo($conf_id,$paper_id, $user_login){
         $this->db->from('paper');
         $this->db->join('topic', 'paper.sub_topic = topic.topic_id');
         $this->db->join('paper_author', 'paper.sub_id = paper_author.paper_id');
         $this->db->where('user_login', $user_login);
         $this->db->where("sub_id",$paper_id);
+        $this->db->where("paper.conf_id",$conf_id);
         $query = $this->db->get();
         return $query->row();
     }

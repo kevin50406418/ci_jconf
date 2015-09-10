@@ -259,6 +259,7 @@ class User_model extends CI_Model {
 
 	function get_login_log($login_user){
 		$this->db->from('login_log');
+		$this->db->where('login_user', $login_user);
 		$this->db->order_by('login_id', 'DESC');
 		$query = $this->db->get();
 		return $query->result();
