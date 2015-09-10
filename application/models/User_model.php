@@ -222,7 +222,10 @@ class User_model extends CI_Model {
 		}else if($user_staus == 1){//get banned users
 			$this->db->where('user_staus', 1);
 		}else if($user_staus == 2){//get check users
-			$this->db->where('user_staus', 1);
+			$this->db->where('user_staus', 2);
+		}else if($user_staus == 10){
+			$staus = array(0, 2);
+			$this->db->where_in('user_staus', $staus);
 		}
 		$query = $this->db->get();
 		return $query->result();
