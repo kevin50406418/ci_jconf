@@ -434,4 +434,47 @@ class Conf_model extends CI_Model {
 		}
 		return $count_editor;
 	}
+
+	function get_contents($conf_id){
+		$this->db->from('conf_content');
+		$this->db->where('conf_id', $conf_id);
+		$this->db->order_by("page_show","DESC");
+		$this->db->order_by("page_order","ASC");
+		$query = $this->db->get();
+		return $query->result();
+	}
+
+	function get_content($conf_id,$page_id){
+		$this->db->from('conf_content');
+		$this->db->where('conf_id', $conf_id);
+		$this->db->where('page_id', $page_id);
+		$query = $this->db->get();
+		return $query->result();
+	}
+
+	function add_content($conf_id,$page_id,$page_title,$page_content,$page_lang){
+		if( !in_array($page_lang,array("zhtw","eng")) ){
+			return false;
+		}
+		$content = array(
+			"conf_id"      => $conf_id,
+			"page_id"      => $page_id,
+			"page_title"   => $page_title,
+			"page_content" => $page_content,
+			"page_lang"    => $page_lang,
+			"page_order"   => 99,
+			"page_show"    => 0
+		);
+		return $this->db->insert('conf_content', $content);
+	}
+
+	function update_contents($conf_id,$page_id,$page_order,$page_show){
+		$contents = array(
+			"page_order" => $page_order,
+			"page_show"  => $page_show
+		);
+		$this->db->where('conf_id', $conf_id);
+		$this->db->where('page_id', $page_id);
+		return $this->db->update('conf_content', $contents);
+	}
 }

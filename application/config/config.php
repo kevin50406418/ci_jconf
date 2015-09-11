@@ -362,7 +362,7 @@ $config['sess_expiration'] = 3600;
 $config['sess_save_path'] = 'users_sessions';
 $config['sess_match_ip'] = false;
 $config['sess_time_to_update'] = 3600;
-$config['sess_regenerate_destroy'] = TRUE;
+$config['sess_regenerate_destroy'] = false;
 
 /*
 |--------------------------------------------------------------------------

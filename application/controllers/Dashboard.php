@@ -204,7 +204,7 @@ class Dashboard extends MY_Conference {
 		}
 	}
 
-	public function website($conf_id=''){
+	public function website($conf_id='',$do='all'){
 		$data['conf_id'] = $conf_id;
 		$data['body_class'] = $this->body_class;
 		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
@@ -220,6 +220,16 @@ class Dashboard extends MY_Conference {
 			if( !$this->user->is_conf() && !$this->user->is_sysop() ){
 				$this->conf->show_permission_deny($data);
 			}
+
+			if( is_null( $this->input->get('id', TRUE)) && $do=="all"){
+				$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
+				$this->assets->add_js(asset_url().'js/repeatable.js',true);
+			}
+
+			if( $do=="edit" || $do=="add" ){
+				$this->assets->add_js(base_url('ckeditor/ckeditor.js'));
+			}
+
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
 
@@ -227,7 +237,58 @@ class Dashboard extends MY_Conference {
 			//$this->load->view('conf/conf_schedule',$data);
 
 			$this->load->view('conf/menu_conf',$data);
-			//$this->load->view('conf/setting',$data);
+			if( is_null( $this->input->get('id', TRUE)) ){
+				switch($do){
+					default:
+					case "all":
+						$this->form_validation->set_rules('show[]', '檢核清單內容', 'required');
+						$this->form_validation->set_rules('page_id[]', '檢核清單內容(英)', 'required');
+						if($this->form_validation->run()){
+							$page_ids=$this->input->post('page_id');
+							$shows=$this->input->post('show');
+							foreach($page_ids as $key => $page_id){
+								$page_order = $key+1;
+								if( !empty($shows[$page_id]) ){
+									$page_show  = 1;
+									$text = "公開";
+								}else{
+									$page_show  = 0;
+									$text = "隱藏";
+								}
+								if( $this->conf->update_contents($conf_id,$page_id,$page_order,$page_show) ){
+									$this->alert->show("s","成功更新".$page_id."順序及狀態(".$text.")");
+								}else{
+									$this->alert->show("d","更新".$page_id."順序及狀態失敗(".$text.")");
+								}
+							}
+							$this->alert->refresh(2);
+						}
+						$contents = array();
+						$all_contents = $this->conf->get_contents($conf_id);
+						foreach ($all_contents as $key => $v) {
+							$contents[$v->page_lang][$v->page_id] = array();
+							$contents[$v->page_lang][$v->page_id] = $v;
+						}
+						$data['contents']=$contents;
+						$this->load->view('conf/content/all',$data);
+					break;
+					case "add":
+
+					break;
+				}
+			}else{
+				$page_id = $this->input->get('id', TRUE);
+				switch($do){
+					case "edit":
+						$data['page_id']=$page_id;
+						$data['content']=$this->conf->get_content($conf_id,$page_id);
+						$this->load->view('conf/content/edit',$data);
+					break;
+					case "del":
+
+					break;
+				}
+			}
 			$this->load->view('common/footer');
 		}
 	}
