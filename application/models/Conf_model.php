@@ -452,12 +452,13 @@ class Conf_model extends CI_Model {
 		return $query->result();
 	}
 
-	function get_content($conf_id,$page_id){
+	function get_content($conf_id,$page_id,$page_lang){
 		$this->db->from('conf_content');
 		$this->db->where('conf_id', $conf_id);
+		$this->db->where('page_lang', $page_lang);
 		$this->db->where('page_id', $page_id);
 		$query = $this->db->get();
-		return $query->result();
+		return $query->row();
 	}
 
 	function add_content($conf_id,$page_id,$page_title,$page_content,$page_lang){
@@ -476,13 +477,25 @@ class Conf_model extends CI_Model {
 		return $this->db->insert('conf_content', $content);
 	}
 
-	function update_contents($conf_id,$page_id,$page_order,$page_show){
+	function update_contents($conf_id,$page_id,$page_lang,$page_order,$page_show){
 		$contents = array(
 			"page_order" => $page_order,
 			"page_show"  => $page_show
 		);
 		$this->db->where('conf_id', $conf_id);
 		$this->db->where('page_id', $page_id);
+		$this->db->where('page_lang', $page_lang);
 		return $this->db->update('conf_content', $contents);
+	}
+
+	function update_content($conf_id,$page_id,$page_lang,$page_title,$page_content){
+		$content = array(
+			"page_title" => $page_title,
+			"page_content"  => $page_content
+		);
+		$this->db->where('conf_id', $conf_id);
+		$this->db->where('page_id', $page_id);
+		$this->db->where('page_lang', $page_lang);
+		return $this->db->update('conf_content', $content);
 	}
 }

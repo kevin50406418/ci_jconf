@@ -60,7 +60,7 @@
 							<span class="move ui black button"><i class="fa fa-arrows-alt fa-lg"></i></span>
 						</td>
 						<td class="text-center">
-							<input type="checkbox" name="eng[show_eng][<?php echo $content->page_id?>]" value="1" <?php if($content->page_show==1){?> checked<?php }?>>
+							<input type="checkbox" name="eng[show][<?php echo $content->page_id?>]" value="1" <?php if($content->page_show==1){?> checked<?php }?>>
 							<input type="hidden" name="eng[page_id][]" value="<?php echo $content->page_id?>">
 						</td>
 						<td>

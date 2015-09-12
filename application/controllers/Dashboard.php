@@ -247,8 +247,9 @@ class Dashboard extends MY_Conference {
 						if(in_array("zhtw",$data['conf_lang'])){
 							$this->form_validation->set_rules('zhtw[]', '', 'required');
 							$data['contents']['zhtw'] = $this->conf->get_contents($conf_id,"zhtw");
-							$zhtw=$this->input->post('zhtw');
+							
 							if($this->form_validation->run()){
+								$zhtw=$this->input->post('zhtw');
 								foreach($zhtw['page_id'] as $key => $page_id){
 									$page_order = $key+1;
 									if( array_key_exists($page_id, $zhtw['show']) ){
@@ -258,36 +259,37 @@ class Dashboard extends MY_Conference {
 										$page_show  = 0;
 										$text = "隱藏";
 									}
-									if( $this->conf->update_contents($conf_id,$page_id,$page_order,$page_show) ){
+									if( $this->conf->update_contents($conf_id,$page_id,'zhtw',$page_order,$page_show) ){
 										$this->alert->show("s","成功更新".$page_id."順序及狀態(".$text.")");
 									}else{
 										$this->alert->show("d","更新".$page_id."順序及狀態失敗(".$text.")");
 									}
 								}
-								$this->alert->refresh(2);
+								//$this->alert->refresh(2);
 							}
 						}
 						if(in_array("eng",$data['conf_lang'])){
 							$this->form_validation->set_rules('eng[]', '', 'required');
 							$data['contents']['eng'] = $this->conf->get_contents($conf_id,"eng");
-							$eng=$this->input->post('eng');
+							
 							if($this->form_validation->run()){
+								$eng=$this->input->post('eng');
 								foreach($eng['page_id'] as $key => $page_id){
 									$page_order = $key+1;
-									if( array_key_exists($page_id, $zhtw['show']) ){
+									if( array_key_exists($page_id, $eng['show']) ){
 										$page_show  = 1;
 										$text = "公開";
 									}else{
 										$page_show  = 0;
 										$text = "隱藏";
 									}
-									if( $this->conf->update_contents($conf_id,$page_id,$page_order,$page_show) ){
+									if( $this->conf->update_contents($conf_id,$page_id,'eng',$page_order,$page_show) ){
 										$this->alert->show("s","成功更新".$page_id."順序及狀態(".$text.")");
 									}else{
 										$this->alert->show("d","更新".$page_id."順序及狀態失敗(".$text.")");
 									}
 								}
-								$this->alert->refresh(2);
+								//$this->alert->refresh(2);
 							}
 						}
 						
@@ -298,11 +300,26 @@ class Dashboard extends MY_Conference {
 					break;
 				}
 			}else{
-				$page_id = $this->input->get('id', TRUE);
+				$page_id   = $this->input->get('id', TRUE);
+				$page_lang = $this->input->get('lang', TRUE);
 				switch($do){
 					case "edit":
 						$data['page_id']=$page_id;
-						$data['content']=$this->conf->get_content($conf_id,$page_id);
+						$data['content']=$this->conf->get_content($conf_id,$page_id,$page_lang);
+						if( !empty($data['content']) ){
+							$this->form_validation->set_rules('page_title', '標題', 'required');
+							$this->form_validation->set_rules('page_content', '網頁內容', 'required');
+							if($this->form_validation->run()){
+								$page_title   =$this->input->post('page_title');
+								$page_content =$this->input->post('page_content');
+								if( $this->conf->update_content($conf_id,$page_id,$page_lang,$page_title,$page_content) ){
+									$this->alert->show("s","成功更新".$page_id."網頁內容");
+								}else{
+									$this->alert->show("d","更新".$page_id."網頁內容失敗");
+								}
+								$this->alert->refresh(2);
+							}
+						}
 						$this->load->view('conf/content/edit',$data);
 					break;
 					case "del":
