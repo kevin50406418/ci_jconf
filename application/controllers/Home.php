@@ -9,8 +9,9 @@ class Home extends MY_Controller {
 	public function index($conf_id=''){
 		$data['body_class'] = $this->body_class;
 		$data['conf_id'] = $conf_id;
+		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
 		if(empty($conf_id)){
-			$data['confs']=$this->conf->all_conf_config();
+			$data['confs']=$this->conf->all_conf_config($user_sysop);
 			$this->cinfo['show_confinfo'] = false;
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
@@ -21,11 +22,8 @@ class Home extends MY_Controller {
 				redirect('/user/login', 'location', 301);
 			}
 			$data['spage']=$this->config->item('spage');
-
-			$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
-
 			if( $this->conf->confid_exists($conf_id,$user_sysop) ){
-				$data['conf_config']=$this->conf->conf_config($conf_id);
+				$data['conf_config']=$this->conf->conf_config($conf_id,$user_sysop);
 				//$data['schedule']=$this->conf->conf_schedule($conf_id);
 				$data['conf_content']=$this->conf->conf_content($conf_id);
 
@@ -47,8 +45,9 @@ class Home extends MY_Controller {
 	public function news($conf_id=''){
 		$data['body_class'] = $this->body_class;
 		$data['conf_id'] = $conf_id;
+		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
 		if(empty($conf_id)){
-			$data['confs']=$this->conf->all_conf_config();
+			$data['confs']=$this->conf->all_conf_config($user_sysop);
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
 			$this->load->view('common/index',$data);
@@ -59,9 +58,9 @@ class Home extends MY_Controller {
 			}
 			$data['spage']=$this->config->item('spage');
 
-			$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
+			
 			if( $this->conf->confid_exists($conf_id,$user_sysop) ){
-				$data['conf_config']=$this->conf->conf_config($conf_id);
+				$data['conf_config']=$this->conf->conf_config($conf_id,$user_sysop);
 				//$data['schedule']=$this->conf->conf_schedule($conf_id);
 				$data['conf_content']=$this->conf->conf_content($conf_id);
 
@@ -83,8 +82,9 @@ class Home extends MY_Controller {
 	public function main($conf_id=''){
 		$data['body_class'] = $this->body_class;
 		$data['conf_id'] = $conf_id;
+		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
 		if(empty($conf_id)){
-			$data['confs']=$this->conf->all_conf_config();
+			$data['confs']=$this->conf->all_conf_config($user_sysop);
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
 			$this->load->view('common/index',$data);
@@ -95,10 +95,10 @@ class Home extends MY_Controller {
 			}
 			$data['spage']=$this->config->item('spage');
 
-			$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
+			
 
 			if( $this->conf->confid_exists($conf_id,$user_sysop) ){
-				$data['conf_config']=$this->conf->conf_config($conf_id);
+				$data['conf_config']=$this->conf->conf_config($conf_id,$user_sysop);
 				//$data['schedule']=$this->conf->conf_schedule($conf_id);
 				$data['conf_content']=$this->conf->conf_content($conf_id);
 
@@ -132,8 +132,9 @@ class Home extends MY_Controller {
 	public function about($conf_id='',$page_id=''){
 		$data['body_class'] = $this->body_class;
 		$data['conf_id'] = $conf_id;
+		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
 		if(empty($conf_id) || empty($page_id)){
-			$data['confs']=$this->conf->all_conf_config();
+			$data['confs']=$this->conf->all_conf_config($user_sysop);
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
 			$this->load->view('common/index',$data);
@@ -144,10 +145,10 @@ class Home extends MY_Controller {
 			}
 			$data['spage']=$this->config->item('spage');
 
-			$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
+			
 
 			if( $this->conf->confid_exists($conf_id,$user_sysop) ){
-				$data['conf_config']=$this->conf->conf_config($conf_id);
+				$data['conf_config']=$this->conf->conf_config($conf_id,$user_sysop);
 				//$data['schedule']=$this->conf->conf_schedule($conf_id);
 				$data['conf_content']=$this->conf->conf_content($conf_id);
 

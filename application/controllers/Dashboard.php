@@ -5,7 +5,6 @@ class Dashboard extends MY_Conference {
 	public function __construct(){
 		parent::__construct();
 		$this->cinfo['show_confinfo'] = true;
-		
 	}
 
 	public function index($conf_id=''){
@@ -17,7 +16,8 @@ class Dashboard extends MY_Conference {
 			$this->conf->show_404conf();
 		}else{
 			$data['spage']=$this->config->item('spage');
-			$data['conf_config']=$this->conf->conf_config($conf_id);
+			$conf_config=$this->conf->conf_config($conf_id,$user_sysop);
+			$data['conf_config']=$conf_config;
 			//$data['schedule']=$this->conf->conf_schedule($conf_id);
 			$data['conf_content']=$this->conf->conf_content($conf_id);
 			
@@ -76,7 +76,8 @@ class Dashboard extends MY_Conference {
 			$this->conf->show_404conf();
 		}else{
 			$data['spage']=$this->config->item('spage');
-			$data['conf_config']=$this->conf->conf_config($conf_id);
+			$conf_config=$this->conf->conf_config($conf_id,$user_sysop);
+			$data['conf_config']=$conf_config;
 			//$data['schedule']=$this->conf->conf_schedule($conf_id);
 			$data['conf_content']=$this->conf->conf_content($conf_id);
 			$data['count_editor']=$this->conf->count_editor($conf_id);
@@ -213,7 +214,9 @@ class Dashboard extends MY_Conference {
 			$this->conf->show_404conf();
 		}else{
 			$data['spage']=$this->config->item('spage');
-			$data['conf_config']=$this->conf->conf_config($conf_id);
+			$conf_config=$this->conf->conf_config($conf_id,$user_sysop);
+			$data['conf_config']=$conf_config;
+			$data['conf_lang'] = explode(",", $conf_config['conf_lang']);
 			//$data['schedule']=$this->conf->conf_schedule($conf_id);
 			$data['conf_content']=$this->conf->conf_content($conf_id);
 			
@@ -241,35 +244,53 @@ class Dashboard extends MY_Conference {
 				switch($do){
 					default:
 					case "all":
-						$this->form_validation->set_rules('show[]', '檢核清單內容', 'required');
-						$this->form_validation->set_rules('page_id[]', '檢核清單內容(英)', 'required');
-						if($this->form_validation->run()){
-							$page_ids=$this->input->post('page_id');
-							$shows=$this->input->post('show');
-							foreach($page_ids as $key => $page_id){
-								$page_order = $key+1;
-								if( !empty($shows[$page_id]) ){
-									$page_show  = 1;
-									$text = "公開";
-								}else{
-									$page_show  = 0;
-									$text = "隱藏";
+						if(in_array("zhtw",$data['conf_lang'])){
+							$this->form_validation->set_rules('zhtw[]', '', 'required');
+							$data['contents']['zhtw'] = $this->conf->get_contents($conf_id,"zhtw");
+							$zhtw=$this->input->post('zhtw');
+							if($this->form_validation->run()){
+								foreach($zhtw['page_id'] as $key => $page_id){
+									$page_order = $key+1;
+									if( array_key_exists($page_id, $zhtw['show']) ){
+										$page_show  = 1;
+										$text = "公開";
+									}else{
+										$page_show  = 0;
+										$text = "隱藏";
+									}
+									if( $this->conf->update_contents($conf_id,$page_id,$page_order,$page_show) ){
+										$this->alert->show("s","成功更新".$page_id."順序及狀態(".$text.")");
+									}else{
+										$this->alert->show("d","更新".$page_id."順序及狀態失敗(".$text.")");
+									}
 								}
-								if( $this->conf->update_contents($conf_id,$page_id,$page_order,$page_show) ){
-									$this->alert->show("s","成功更新".$page_id."順序及狀態(".$text.")");
-								}else{
-									$this->alert->show("d","更新".$page_id."順序及狀態失敗(".$text.")");
-								}
+								$this->alert->refresh(2);
 							}
-							$this->alert->refresh(2);
 						}
-						$contents = array();
-						$all_contents = $this->conf->get_contents($conf_id);
-						foreach ($all_contents as $key => $v) {
-							$contents[$v->page_lang][$v->page_id] = array();
-							$contents[$v->page_lang][$v->page_id] = $v;
+						if(in_array("eng",$data['conf_lang'])){
+							$this->form_validation->set_rules('eng[]', '', 'required');
+							$data['contents']['eng'] = $this->conf->get_contents($conf_id,"eng");
+							$eng=$this->input->post('eng');
+							if($this->form_validation->run()){
+								foreach($eng['page_id'] as $key => $page_id){
+									$page_order = $key+1;
+									if( array_key_exists($page_id, $zhtw['show']) ){
+										$page_show  = 1;
+										$text = "公開";
+									}else{
+										$page_show  = 0;
+										$text = "隱藏";
+									}
+									if( $this->conf->update_contents($conf_id,$page_id,$page_order,$page_show) ){
+										$this->alert->show("s","成功更新".$page_id."順序及狀態(".$text.")");
+									}else{
+										$this->alert->show("d","更新".$page_id."順序及狀態失敗(".$text.")");
+									}
+								}
+								$this->alert->refresh(2);
+							}
 						}
-						$data['contents']=$contents;
+						
 						$this->load->view('conf/content/all',$data);
 					break;
 					case "add":
@@ -302,7 +323,8 @@ class Dashboard extends MY_Conference {
 			$this->conf->show_404conf();
 		}else{
 			$data['spage']=$this->config->item('spage');
-			$data['conf_config']=$this->conf->conf_config($conf_id);
+			$conf_config=$this->conf->conf_config($conf_id,$user_sysop);
+			$data['conf_config']=$conf_config;
 			//$data['schedule']=$this->conf->conf_schedule($conf_id);
 			$data['conf_content']=$this->conf->conf_content($conf_id);
 			
@@ -380,7 +402,8 @@ class Dashboard extends MY_Conference {
 			$this->conf->show_404conf();
 		}else{
 			$data['spage']=$this->config->item('spage');
-			$data['conf_config']=$this->conf->conf_config($conf_id);
+			$conf_config=$this->conf->conf_config($conf_id,$user_sysop);
+			$data['conf_config']=$conf_config;
 			//$data['schedule']=$this->conf->conf_schedule($conf_id);
 			$data['conf_content']=$this->conf->conf_content($conf_id);
 			
@@ -502,7 +525,8 @@ class Dashboard extends MY_Conference {
 			$this->conf->show_404conf();
 		}else{
 			$data['spage']=$this->config->item('spage');
-			$data['conf_config']=$this->conf->conf_config($conf_id);
+			$conf_config=$this->conf->conf_config($conf_id,$user_sysop);
+			$data['conf_config']=$conf_config;
 			//$data['schedule']=$this->conf->conf_schedule($conf_id);
 			$data['conf_content']=$this->conf->conf_content($conf_id);
 			
@@ -601,7 +625,8 @@ class Dashboard extends MY_Conference {
 			$this->conf->show_404conf();
 		}else{
 			$data['spage']=$this->config->item('spage');
-			$data['conf_config']=$this->conf->conf_config($conf_id);
+			$conf_config=$this->conf->conf_config($conf_id,$user_sysop);
+			$data['conf_config']=$conf_config;
 			//$data['schedule']=$this->conf->conf_schedule($conf_id);
 			$data['conf_content']=$this->conf->conf_content($conf_id);
 			
@@ -629,7 +654,8 @@ class Dashboard extends MY_Conference {
 			$this->conf->show_404conf();
 		}else{
 			$data['spage']=$this->config->item('spage');
-			$data['conf_config']=$this->conf->conf_config($conf_id);
+			$conf_config=$this->conf->conf_config($conf_id,$user_sysop);
+			$data['conf_config']=$conf_config;
 			//$data['schedule']=$this->conf->conf_schedule($conf_id);
 			$data['conf_content']=$this->conf->conf_content($conf_id);
 			
@@ -659,7 +685,8 @@ class Dashboard extends MY_Conference {
 			$this->conf->show_404conf();
 		}else{
 			$data['spage']=$this->config->item('spage');
-			$data['conf_config']=$this->conf->conf_config($conf_id);
+			$conf_config=$this->conf->conf_config($conf_id,$user_sysop);
+			$data['conf_config']=$conf_config;
 			//$data['schedule']=$this->conf->conf_schedule($conf_id);
 			$data['conf_content']=$this->conf->conf_content($conf_id);
 			
@@ -687,7 +714,8 @@ class Dashboard extends MY_Conference {
 			$this->conf->show_404conf();
 		}else{
 			$data['spage']=$this->config->item('spage');
-			$data['conf_config']=$this->conf->conf_config($conf_id);
+			$conf_config=$this->conf->conf_config($conf_id,$user_sysop);
+			$data['conf_config']=$conf_config;
 			//$data['schedule']=$this->conf->conf_schedule($conf_id);
 			$data['conf_content']=$this->conf->conf_content($conf_id);
 			
@@ -715,7 +743,8 @@ class Dashboard extends MY_Conference {
 			$this->conf->show_404conf();
 		}else{
 			$data['spage']=$this->config->item('spage');
-			$data['conf_config']=$this->conf->conf_config($conf_id);
+			$conf_config=$this->conf->conf_config($conf_id,$user_sysop);
+			$data['conf_config']=$conf_config;
 			//$data['schedule']=$this->conf->conf_schedule($conf_id);
 			$data['conf_content']=$this->conf->conf_content($conf_id);
 			
@@ -743,7 +772,8 @@ class Dashboard extends MY_Conference {
 			$this->conf->show_404conf();
 		}else{
 			$data['spage']=$this->config->item('spage');
-			$data['conf_config']=$this->conf->conf_config($conf_id);
+			$conf_config=$this->conf->conf_config($conf_id,$user_sysop);
+			$data['conf_config']=$conf_config;
 			//$data['schedule']=$this->conf->conf_schedule($conf_id);
 			$data['conf_content']=$this->conf->conf_content($conf_id);
 			

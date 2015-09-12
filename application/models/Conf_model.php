@@ -24,10 +24,13 @@ class Conf_model extends CI_Model {
 		}
 	}
 
-    function conf_config($conf_id){
-		$user_sysop=$this->session->has_userdata('user_sysop')?0:1;
+    function conf_config($conf_id,$user_sysop=false){
+    	if(!$user_sysop){
+    		$user_sysop=0;
+    	}else{
+    		$user_sysop=1;
+    	}
 		if($this->conf->confid_exists( $conf_id , $user_sysop)){
-			$this->db->select('*');
 			$this->db->from('conf');
 			$this->db->where('conf_id', $conf_id);
 			$query = $this->db->get();
@@ -39,10 +42,12 @@ class Conf_model extends CI_Model {
 		}
 	}
 
-	function all_conf_config(){
+	function all_conf_config($sysop=false){
 		$this->db->select('*');
 		$this->db->from('conf');
-		$this->db->where('conf_staus', 0);
+		if(!$sysop){
+			$this->db->where('conf_staus', 0);
+		}
 		$query = $this->db->get();
 		return $query->result();
 	}
@@ -222,7 +227,8 @@ class Conf_model extends CI_Model {
         }
 	}
 
-	function sysop_updateconf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$default_lang,$conf_fax,$conf_desc){
+	function sysop_updateconf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$conf_lang,$conf_fax,$conf_desc){
+		$conf_lang = implode(",",$conf_lang);
 		$conf = array(
 			"conf_name"    =>$conf_name,
 			"conf_master"  =>$conf_master,
@@ -230,7 +236,7 @@ class Conf_model extends CI_Model {
 			"conf_phone"   =>$conf_phone,
 			"conf_fax"     =>$conf_fax,
 			"conf_address" =>$conf_address,
-			"default_lang" =>$default_lang,
+			"conf_lang"    =>$conf_lang,
 			"conf_staus"   =>$conf_staus,
 			"conf_desc"    =>$conf_desc
         );
@@ -280,11 +286,12 @@ class Conf_model extends CI_Model {
 		return $return;
 	}
 
-	function add_conf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$default_lang,$conf_fax="",$conf_desc=""){
+	function add_conf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$conf_lang,$conf_fax="",$conf_desc=""){
 		$return = array(
 			"status" => false,
 			"error" => ""
 		);
+		$conf_lang = implode(",",$conf_lang);
 		if( $this->confid_exists( $conf_id , 1) ){
 			$return["error"] = "研討會ID: '".$conf_id."' 已存在";
 		}else{
@@ -300,7 +307,7 @@ class Conf_model extends CI_Model {
 					"conf_phone" => $conf_phone,
 					"conf_address" => $conf_address,
 					"conf_staus" => $conf_staus,
-					"default_lang" => $default_lang,
+					"conf_lang" => $conf_lang,
 					"conf_fax" => $conf_fax,
 					"conf_desc" => $conf_desc
 				);
@@ -435,9 +442,10 @@ class Conf_model extends CI_Model {
 		return $count_editor;
 	}
 
-	function get_contents($conf_id){
+	function get_contents($conf_id,$page_lang){
 		$this->db->from('conf_content');
 		$this->db->where('conf_id', $conf_id);
+		$this->db->where('page_lang', $page_lang);
 		$this->db->order_by("page_show","DESC");
 		$this->db->order_by("page_order","ASC");
 		$query = $this->db->get();

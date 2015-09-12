@@ -13,7 +13,7 @@ $(function() {
 <div class="ui segment raised">
 <div class="tabbable-panel">
 	<div class="tabbable-line">
-		<ul class="nav nav-tabs ">
+		<ul class="nav nav-tabs nav-tabs-center">
 			<li class="active"> <a href="#tab_config" data-toggle="tab"> <i class="fa fa-info-circle fa-lg"></i> 研討會資訊 </a> </li>
 			<!--<li> <a href="#tab_style" data-toggle="tab"> <i class="fa fa-magic fa-lg"></i> 研討會樣式 </a> </li>-->
 			<li> <a href="#tab_function" data-toggle="tab"> <i class="fa fa-cog fa-lg"></i> 功能設定 </a> </li>

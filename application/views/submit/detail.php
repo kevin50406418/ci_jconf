@@ -2,7 +2,7 @@
 <div class="ui segment raised">
 <div class="tabbable-panel">
 	<div class="tabbable-line">
-		<ul class="nav nav-tabs ">
+		<ul class="nav nav-tabs nav-tabs-center">
 			<li class="active"> <a href="#tab_info" data-toggle="tab"> 稿件資訊 </a> </li>
 			<li> <a href="#tab_author" data-toggle="tab"> 作者資訊 </a> </li>
 			<li> <a href="#tab_file" data-toggle="tab"> 稿件檔案 </a> </li>

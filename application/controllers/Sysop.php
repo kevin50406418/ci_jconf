@@ -49,7 +49,7 @@ class Sysop extends MY_Sysop {
 			switch($type){
 				default:
 				case "all": // Conference Admin index
-					$data['confs']=$this->conf->all_conf_config();
+					$data['confs']=$this->conf->all_conf_config(true);
 					$this->load->view('sysop/conf/list',$data);
 				break;
 				case "add": // New Conference
@@ -60,7 +60,7 @@ class Sysop extends MY_Sysop {
 					$this->form_validation->set_rules('conf_phone', '聯絡電話', 'required');
 					$this->form_validation->set_rules('conf_address', '通訊地址', 'required');
 					$this->form_validation->set_rules('conf_staus', '顯示/隱藏', 'required');
-					$this->form_validation->set_rules('default_lang', '默認語言', 'required');
+					$this->form_validation->set_rules('conf_lang[]', '語言', 'required');
 					if ($this->form_validation->run() == TRUE){
 						$conf_id = $this->input->post('conf_id', TRUE);
 						$conf_name = $this->input->post('conf_name', TRUE);
@@ -69,12 +69,12 @@ class Sysop extends MY_Sysop {
 						$conf_phone = $this->input->post('conf_phone', TRUE);
 						$conf_address = $this->input->post('conf_address', TRUE);
 						$conf_staus = $this->input->post('conf_staus', TRUE);
-						$default_lang = $this->input->post('default_lang', TRUE);
+						$conf_lang = $this->input->post('conf_lang', TRUE);
 						$conf_fax = $this->input->post('conf_fax', TRUE);
 						$conf_desc = $this->input->post('conf_desc', TRUE);
 						$next = $this->input->post('next', TRUE);
-						
-						$add = $this->conf->add_conf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$default_lang,$conf_fax,$conf_desc);
+
+						$add = $this->conf->add_conf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$conf_lang,$conf_fax,$conf_desc);
 						if( !is_null($next) ){
 							if($add['status']){
 								$this->alert->js($add['error'],base_url("sysop/conf/edit/".$conf_id));
@@ -104,7 +104,8 @@ class Sysop extends MY_Sysop {
 						$this->form_validation->set_rules('conf_phone', '聯絡電話', 'required');
 						$this->form_validation->set_rules('conf_address', '通訊地址', 'required');
 						$this->form_validation->set_rules('conf_staus', '顯示/隱藏', 'required');
-						$this->form_validation->set_rules('default_lang', '默認語言', 'required');
+						$this->form_validation->set_rules('conf_lang[]', '語言', 'required');
+						
 						if ($this->form_validation->run() == TRUE){
 							$conf_name = $this->input->post('conf_name', TRUE);
 							$conf_master = $this->input->post('conf_master', TRUE);
@@ -112,20 +113,21 @@ class Sysop extends MY_Sysop {
 							$conf_phone = $this->input->post('conf_phone', TRUE);
 							$conf_address = $this->input->post('conf_address', TRUE);
 							$conf_staus = $this->input->post('conf_staus', TRUE);
-							$default_lang = $this->input->post('default_lang', TRUE);
+							$conf_lang = $this->input->post('conf_lang', TRUE);
 							$conf_fax = $this->input->post('conf_fax', TRUE);
 							$conf_desc = $this->input->post('conf_desc', TRUE);
 
-							$update = $this->conf->sysop_updateconf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$default_lang,$conf_fax,$conf_desc);
+							$update = $this->conf->sysop_updateconf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$conf_lang,$conf_fax,$conf_desc);
 							if( $update ){
 								$this->alert->js("更新成功",base_url("sysop/conf/edit/".$conf_id));
 							}else{
-								$this->alert->js("d","更新失敗",base_url("sysop/conf/edit/".$conf_id));
+								$this->alert->js("更新失敗",base_url("sysop/conf/edit/".$conf_id));
 							}
 						}
 						
-						$conf_config = $this->conf->conf_config($conf_id);
+						$conf_config = $this->conf->conf_config($conf_id,true);
 						$data['conf_config'] = $conf_config;
+						$data['conf_lang'] = explode(",", $data['conf_config']['conf_lang']);
 						$this->load->view('sysop/conf/edit',$data);
 					}else{
 						$this->alert->js("研討會不存在",base_url("sysop/conf/"));
