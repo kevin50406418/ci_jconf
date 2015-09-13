@@ -33,7 +33,7 @@
 						<td><?php echo $content->page_id?></td>
 						<td class="text-center">
 							<a href="<?php echo get_url("dashboard",$conf_id,"website","edit")?>?id=<?php echo $content->page_id?>&lang=<?php echo $content->page_lang?>" class="ui blue button"><i class="fa fa-pencil"></i> 編輯</a>
-							<a href="#" class="ui red button disabled"><i class="fa fa-trash-o"></i> 刪除</a>
+							<a href="<?php echo get_url("dashboard",$conf_id,"website","del")?>?id=<?php echo $content->page_id?>" class="ui red button" onclick="return confirm('是否刪除?\n注意: 刪除會同時刪除不同語系之網頁')"><i class="fa fa-trash-o"></i> 刪除</a>
 						</td>
 					</tr>
 					<?php }?>
@@ -69,7 +69,7 @@
 						<td><?php echo $content->page_id?></td>
 						<td class="text-center">
 							<a href="<?php echo get_url("dashboard",$conf_id,"website","edit")?>?id=<?php echo $content->page_id?>&lang=<?php echo $content->page_lang?>" class="ui blue button"><i class="fa fa-pencil"></i> 編輯</a>
-							<a href="#" class="ui red button disabled"><i class="fa fa-trash-o"></i> 刪除</a>
+							<a href="<?php echo get_url("dashboard",$conf_id,"website","del")?>?id=<?php echo $content->page_id?>" class="ui red button" onclick="return confirm('是否刪除?\n注意: 刪除會同時刪除不同語系之網頁')"><i class="fa fa-trash-o"></i> 刪除</a>
 						</td>
 					</tr>
 					<?php }?>

@@ -296,7 +296,35 @@ class Dashboard extends MY_Conference {
 						$this->load->view('conf/content/all',$data);
 					break;
 					case "add":
-
+						$this->form_validation->set_rules('page_title[]', '標題', 'required');
+						$this->form_validation->set_rules('page_id', '網頁簡稱', 'required');
+						$this->form_validation->set_rules('page_content[]', '網頁內容', 'required');
+						if($this->form_validation->run()){
+							$page_title   =$this->input->post('page_title');
+							$page_id      =$this->input->post('page_id');
+							$page_content =$this->input->post('page_content',false);
+							if(in_array("zhtw",$data['conf_lang'])){
+								if( $this->conf->add_content($conf_id,$page_id,$page_title['zhtw'],$page_content['zhtw'],'zhtw') ){
+									$this->alert->show("s","成功新增".$page_id."網頁內容");
+								}else{
+									$this->alert->show("d","新增".$page_id."網頁內容失敗");
+								}
+							}
+							if(in_array("eng",$data['conf_lang'])){
+								if( $this->conf->add_content($conf_id,$page_id,$page_title['eng'],$page_content['eng'],'eng') ){
+									$this->alert->show("s","成功新增".$page_id."網頁內容");
+								}else{
+									$this->alert->show("d","新增".$page_id."網頁內容失敗");
+								}
+							}
+							/*if( $this->conf->add_content($conf_id,$page_id,$page_title,$page_content,$page_lang) ){
+								$this->alert->show("s","成功新增".$page_id."網頁內容");
+							}else{
+								$this->alert->show("d","新增".$page_id."網頁內容失敗");
+							}*/
+							//$this->alert->refresh(2);
+						}
+						$this->load->view('conf/content/add',$data);
 					break;
 				}
 			}else{
@@ -311,7 +339,7 @@ class Dashboard extends MY_Conference {
 							$this->form_validation->set_rules('page_content', '網頁內容', 'required');
 							if($this->form_validation->run()){
 								$page_title   =$this->input->post('page_title');
-								$page_content =$this->input->post('page_content');
+								$page_content =$this->input->post('page_content',false);
 								if( $this->conf->update_content($conf_id,$page_id,$page_lang,$page_title,$page_content) ){
 									$this->alert->show("s","成功更新".$page_id."網頁內容");
 								}else{
@@ -323,7 +351,11 @@ class Dashboard extends MY_Conference {
 						$this->load->view('conf/content/edit',$data);
 					break;
 					case "del":
-
+						if( $this->conf->del_contents($conf_id,$page_id) ){
+							$this->alert->js("成功刪除".$page_id."網頁內容",get_url("dashboard",$conf_id,"website"));
+						}else{
+							$this->alert->js("刪除".$page_id."網頁內容失敗",get_url("dashboard",$conf_id,"website"));
+						}
 					break;
 				}
 			}

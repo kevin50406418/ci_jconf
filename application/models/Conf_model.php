@@ -498,4 +498,10 @@ class Conf_model extends CI_Model {
 		$this->db->where('page_lang', $page_lang);
 		return $this->db->update('conf_content', $content);
 	}
+
+	function del_contents($conf_id,$page_id){
+		$this->db->where('conf_id', $conf_id);
+		$this->db->where('page_id', $page_id);
+		return $this->db->delete('conf_content');
+	}
 }
