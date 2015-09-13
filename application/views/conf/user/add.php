@@ -1,6 +1,11 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <?php echo validation_errors('<div class="ui message red">', '</div>');?>
 <div class="ui segment">
+	<div class="modal-header">
+		<a href="#" class="ui blue button pull-right"><i class="fa fa-user"></i> 使用者管理</a>
+		<h4 class="modal-title">新增使用者</h4>
+	</div>
+	<div class="modal-body">
 	<?php echo form_open(get_url("dashboard",$conf_id,"user","add"),array("class"=>"form-horizontal","id"=>"register"))?>
 		<div class="form-group">
 			<label for="user_id" class="col-sm-2 control-label">帳號</label>
@@ -66,7 +71,6 @@
 				<textarea name="user_org" rows="4" maxlength="40" required class="form-control" id="user_affiliation"><?php echo set_value('user_org'); ?></textarea>
 			</div>
 		</div>
-		
 		<div class="form-group">
 			<label for="user_phoneO" class="col-sm-2 control-label">電話(公)</label>
 			<div class="col-sm-10">
@@ -135,4 +139,5 @@
 			</div>
 		</div>
 	<?php echo form_close()?>
+	</div>
 </div>

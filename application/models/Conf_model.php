@@ -504,4 +504,15 @@ class Conf_model extends CI_Model {
 		$this->db->where('page_id', $page_id);
 		return $this->db->delete('conf_content');
 	}
+
+	function get_reviewer($conf_id){
+		$staus = array(0, 2);
+		
+		$this->db->from('auth_reviewer');
+		$this->db->join('users','users.user_login = auth_reviewer.user_login');
+		$this->db->where('conf_id', $conf_id);
+		$this->db->where_in('user_staus', $staus);
+		$query = $this->db->get();
+		return $query->result();
+	}
 }

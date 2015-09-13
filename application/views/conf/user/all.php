@@ -1,14 +1,15 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <?php echo form_open(get_url("dashboard",$conf_id,"user"),array("class"=>"ui segment"))?>
 	<div class="ui inverted segment">
+		<a href="<?php echo get_url("dashboard",$conf_id,"user","add")?>" class="ui blue inverted button">新增使用者</a>
 		<div class="ui buttons">
-			<button class="ui inverted teal button" name="type" value="add_admin">設為研討會管理員</button>
-			<button class="ui inverted pink button" name="type" value="del_admin">取消研討會管理員</button>
+			<button class="ui teal button" name="type" value="add_admin">設為研討會管理員</button>
+			<button class="ui pink button" name="type" value="del_admin">取消研討會管理員</button>
 		</div>
 
 		<div class="ui buttons">
-			<button class="ui inverted orange button" name="type" value="add_review">設為審查人</button>
-			<button class="ui inverted purple button" name="type" value="del_review">取消審查人</button>
+			<button class="ui orange button" name="type" value="add_review">設為審查人</button>
+			<button class="ui purple button" name="type" value="del_review">取消審查人</button>
 		</div>
 	</div>
 	<table class="table table-hover table-bordered">
@@ -45,7 +46,7 @@
 				<?php echo $user->user_org?>
 			</td>
 			<td>
-				<a href="#" class="ui button blue tiny"><i class="fa fa-pencil-square-o"></i> 編輯</a>
+				<a href="<?php echo get_url("dashboard",$conf_id,"user","edit",$user->user_login)?>" class="ui button blue tiny"><i class="fa fa-pencil-square-o"></i> 編輯</a>
 				<a href="#" class="ui button teal tiny">查看</a>
 				<a href="#" class="ui button orange tiny">重設密碼</a>
 			</td>

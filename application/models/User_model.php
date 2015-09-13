@@ -356,5 +356,21 @@ class User_model extends CI_Model {
 		}
 		return $users;
 	}
+
+	function user_valid(){
+		$this->form_validation->set_rules('user_email', '電子信箱', 'required');
+	    $this->form_validation->set_rules('user_title', '稱謂', 'required');
+	    $this->form_validation->set_rules('user_firstname', '名字', 'required');
+	    $this->form_validation->set_rules('user_lastname', '姓氏', 'required');
+	    $this->form_validation->set_rules('user_gender', '性別', 'required');
+	    $this->form_validation->set_rules('user_org', '所屬機構', 'required');
+	    $this->form_validation->set_rules('user_phoneO_1', '電話(公)', 'required');
+	    $this->form_validation->set_rules('user_phoneO_2', '電話(公)', 'required');
+	    $this->form_validation->set_rules('user_postcode', '郵遞區號', 'required');
+	    $this->form_validation->set_rules('user_postadd', '聯絡地址', 'required');
+	    $this->form_validation->set_rules('user_country', '國別', 'required');
+	    $this->form_validation->set_rules('user_lang', '語言', 'required');
+	    $this->form_validation->set_rules('user_title', '研究領域', 'required|min_length[1]');
+	}
 }
 ?>

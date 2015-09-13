@@ -265,7 +265,7 @@ class Dashboard extends MY_Conference {
 										$this->alert->show("d","更新".$page_id."順序及狀態失敗(".$text.")");
 									}
 								}
-								//$this->alert->refresh(2);
+								$this->alert->refresh(2);
 							}
 						}
 						if(in_array("eng",$data['conf_lang'])){
@@ -454,47 +454,30 @@ class Dashboard extends MY_Conference {
 			if( !$this->user->is_conf() && !$this->user->is_sysop() ){
 				$this->conf->show_permission_deny($data);
 			}
+			if( ( empty($user_login) && $do=="add" ) || ( !empty($user_login) && $do=="edit" ) ){
+				$country_list = config_item('country_list');
+				$data['country_list'] = $country_list['zhtw'];
 
-			
+				$this->assets->add_css(asset_url().'style/chosen.css');
+
+				$this->assets->add_js(asset_url().'js/pwstrength-bootstrap-1.2.3.min.js');
+				$this->assets->add_js(asset_url().'js/pwstrength-setting.js');
+				$this->assets->add_js(asset_url().'js/jquery.validate.min.js');
+				$this->assets->add_js(asset_url().'js/jquery.twzipcode.min.js');
+				$this->assets->add_js(asset_url().'js/chosen.jquery.js');
+			}
+			$this->load->view('common/header');
+			$this->load->view('common/nav',$data);
+
+			$this->load->view('conf/conf_nav',$data);
+			//$this->load->view('conf/conf_schedule',$data);
+			$this->load->view('conf/menu_conf',$data);
+
 			if( empty($user_login) ){
 				switch($do){
 					case "add":
-						$country_list = config_item('country_list');
-						$data['country_list'] = $country_list['zhtw'];
-
-						$this->assets->add_css(asset_url().'style/chosen.css');
-
-						$this->assets->add_js(asset_url().'js/pwstrength-bootstrap-1.2.3.min.js');
-						$this->assets->add_js(asset_url().'js/pwstrength-setting.js');
-						$this->assets->add_js(asset_url().'js/jquery.validate.min.js');
-						$this->assets->add_js(asset_url().'js/jquery.twzipcode.min.js');
-						$this->assets->add_js(asset_url().'js/chosen.jquery.js');
-
-						$this->load->view('common/header');
-						$this->load->view('common/nav',$data);
-
-						$this->load->view('conf/conf_nav',$data);
-						//$this->load->view('conf/conf_schedule',$data);
-
-						$this->load->view('conf/menu_conf',$data);
 						$this->load->view('js/signup');
-
-						$this->form_validation->set_rules('user_id', '帳號', 'required');
-					    $this->form_validation->set_rules('user_pw', '密碼', 'required|min_length[6]');
-					    $this->form_validation->set_rules('user_pw2', '重覆輸入密碼', 'required|matches[user_pw]|min_length[6]');
-					    $this->form_validation->set_rules('user_email', '電子信箱', 'required');
-					    $this->form_validation->set_rules('user_title', '稱謂', 'required');
-					    $this->form_validation->set_rules('user_firstname', '名字', 'required');
-					    $this->form_validation->set_rules('user_lastname', '姓氏', 'required');
-					    $this->form_validation->set_rules('user_gender', '性別', 'required');
-					    $this->form_validation->set_rules('user_org', '所屬機構', 'required');
-					    $this->form_validation->set_rules('user_phoneO_1', '電話(公)', 'required');
-					    $this->form_validation->set_rules('user_phoneO_2', '電話(公)', 'required');
-					    $this->form_validation->set_rules('user_postcode', '郵遞區號', 'required');
-					    $this->form_validation->set_rules('user_postadd', '聯絡地址', 'required');
-					    $this->form_validation->set_rules('user_country', '國別', 'required');
-					    $this->form_validation->set_rules('user_lang', '語言', 'required');
-					    $this->form_validation->set_rules('user_title', '研究領域', 'required|min_length[1]');
+						$this->user->user_valid();
 					    if ($this->form_validation->run()){
 					    	$user_login = $this->input->post('user_id', TRUE);
 					    	$user_pass = $this->input->post('user_pw', TRUE);
@@ -522,7 +505,7 @@ class Dashboard extends MY_Conference {
 					    	$user_postaddr = $user_addcounty."|".$user_area."|".$user_postaddr;
 					    	$res = $this->user->adduser($user_login,$user_pass,$user_title,$user_email,$user_firstname,$user_lastname,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research);
 					    	if( $res['status'] ){
-					    		$this->alert->js("Add User Success",base_url("sysop/user/add"));
+					    		$this->alert->js("Add User Success");
 					    		$this->form_validation->set_message('signup_success', 'Signup Success');
 					    		//redirect($redirect, 'refresh');
 					    	}else{
@@ -538,13 +521,6 @@ class Dashboard extends MY_Conference {
 						$data['confs']=$this->user->get_conf_array($conf_id);
 						$data['reviewers']=$this->user->get_reviewer_array($conf_id);
 						
-						$this->load->view('common/header');
-						$this->load->view('common/nav',$data);
-
-						$this->load->view('conf/conf_nav',$data);
-						//$this->load->view('conf/conf_schedule',$data);
-
-						$this->load->view('conf/menu_conf',$data);
 						$this->form_validation->set_rules('type', '操作', 'required');
 						$this->form_validation->set_rules('user_login[]', '帳號', 'required');
 					    if ($this->form_validation->run()){
@@ -556,16 +532,16 @@ class Dashboard extends MY_Conference {
 					    				if( $this->user->add_conf($conf_id,$user_login) ){
 					    					$this->alert->show("s","成功將使用者 <strong>".$user_login."<strong> 設為研討會管理員");
 					    				}else{
-
+					    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 設為研討會管理員失敗");
 					    				}
 					    			}
 					    		break;
 					    		case "del_admin":
 					    			foreach ($user_logins as $key => $user_login) {
 					    				if( $this->user->del_conf($conf_id,$user_login) ){
-					    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 設為研討會管理員失敗");
+					    					$this->alert->show("s","將使用者 <strong>".$user_login."<strong> 取消設為研討會管理員");
 					    				}else{
-
+					    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 取消研討會管理員失敗");
 					    				}
 					    			}
 					    		break;
@@ -574,33 +550,76 @@ class Dashboard extends MY_Conference {
 					    				if( $this->user->add_reviewer($conf_id,$user_login) ){
 					    					$this->alert->show("s","成功將使用者 <strong>".$user_login."<strong> 設為審查人");
 					    				}else{
-
+					    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 設為審查人失敗");
 					    				}
 					    			}
 					    		break;
 					    		case "del_review":
 					    			foreach ($user_logins as $key => $user_login) {
 					    				if( $this->user->del_reviewer($conf_id,$user_login) ){
-					    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 設為審查人失敗");
+					    					$this->alert->show("s","將使用者 <strong>".$user_login."<strong> 取消設為審查人失敗");
 					    				}else{
-
+					    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 取消審查人失敗");
 					    				}
 					    			}
 					    		break;
 					    	}
+					    	$this->alert->refresh(2);
 					    }
 						$this->load->view('conf/user/all',$data);
 					break;
 					case "import":
-						$this->load->view('common/header');
-						$this->load->view('common/nav',$data);
-
-						$this->load->view('conf/conf_nav',$data);
-						//$this->load->view('conf/conf_schedule',$data);
-
-						$this->load->view('conf/menu_conf',$data);
+						
 						
 					break;
+				}
+			}else{
+				if($this->user->username_exists($user_login)){
+					$data['user']=$this->user->get_user_info($user_login);
+					$data['user']->user_phone_o=explode(",", $data['user']->user_phone_o);
+					$data['user']->user_postaddr=explode("|", $data['user']->user_postaddr);
+					$country_list = config_item('country_list');
+					$data['country_list'] = $country_list['zhtw'];
+
+					switch($do){
+						case "edit":
+							$this->user->user_valid();
+							if ($this->form_validation->run()){
+						    	$user_email = $this->input->post('user_email', TRUE);
+						    	$user_title = $this->input->post('user_title', TRUE);
+						    	$user_firstname = $this->input->post('user_firstname', TRUE);
+						    	$user_lastname = $this->input->post('user_lastname', TRUE);
+						    	$user_gender = $this->input->post('user_gender', TRUE);
+						    	$user_org = $this->input->post('user_org', TRUE);
+						    	$user_phoneO_1 = $this->input->post('user_phoneO_1', TRUE);
+						    	$user_phoneO_2 = $this->input->post('user_phoneO_2', TRUE);
+						    	$user_phoneO_3 = $this->input->post('user_phoneO_3', TRUE);
+						    	$user_phoneO_3 = $this->input->post('user_phoneO_3', TRUE);
+						    	$user_cellphone = $this->input->post('user_cellphone', TRUE);
+						    	$user_fax = $this->input->post('user_fax', TRUE);
+						    	$user_postcode = $this->input->post('user_postcode', TRUE);
+						    	$user_addcounty = $this->input->post('user_addcounty', TRUE);
+						    	$user_area = $this->input->post('user_area', TRUE);
+						    	$user_postaddr = $this->input->post('user_postadd', TRUE);
+						    	$user_country = $this->input->post('user_country', TRUE);
+						    	$user_lang = $this->input->post('user_lang', TRUE);
+						    	$user_research = $this->input->post('user_research', TRUE);
+
+						    	$user_phone_o = $user_phoneO_1.",".$user_phoneO_2.",".$user_phoneO_3;
+						    	$user_postaddr = $user_addcounty."|".$user_area."|".$user_postaddr;
+
+								$res = $this->user->updateuser($user_login,$user_title,$user_email,$user_firstname,$user_lastname,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research);
+						    	if( $res['status'] ){
+						    		$this->alert->js("Edit Success");
+						    	}else{
+						    		$this->alert->js($res['error']);
+						    		$this->form_validation->set_message('signup_error', $res['error']);
+						    	}
+						    }
+							$this->load->view('js/signup');
+							$this->load->view('conf/user/edit',$data);
+						break;
+					}
 				}
 			}
 			$this->load->view('common/footer');

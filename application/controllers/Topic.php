@@ -89,12 +89,14 @@ class Topic extends MY_Topic {
 			//$this->load->view('conf/conf_schedule',$data);
 			$this->load->view('conf/menu_topic',$data);
 			if( !in_array($paper_id,$paper_array) ){
+				$data['reviewers']=$this->conf->get_reviewer($conf_id);
 				$data['paper'] = $this->topic->get_paperinfo($paper_id,$conf_id);
 				if(!empty($data['paper'])){
 					$data['authors'] = $this->Submit->get_author($paper_id);
 					$data['otherfile'] = $this->Submit->get_otherfile($paper_id);
 					$data['otherfiles'] = $this->Submit->get_otherfiles($paper_id);
 				}
+				$this->load->view('topic/reviewers',$data);
 				$this->load->view('topic/detail',$data);
 			}else{
 				$this->alert->js("由於您為本篇稿件作者之一，無法分派本篇稿件",get_url("topic",$conf_id,"index"));
