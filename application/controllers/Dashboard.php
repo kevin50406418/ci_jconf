@@ -317,12 +317,7 @@ class Dashboard extends MY_Conference {
 									$this->alert->show("d","新增".$page_id."網頁內容失敗");
 								}
 							}
-							/*if( $this->conf->add_content($conf_id,$page_id,$page_title,$page_content,$page_lang) ){
-								$this->alert->show("s","成功新增".$page_id."網頁內容");
-							}else{
-								$this->alert->show("d","新增".$page_id."網頁內容失敗");
-							}*/
-							//$this->alert->refresh(2);
+							$this->alert->refresh(2);
 						}
 						$this->load->view('conf/content/add',$data);
 					break;
@@ -540,6 +535,9 @@ class Dashboard extends MY_Conference {
 					default:
 					case "all": // view all users
 						$data['users']=$this->user->get_all_users(10);
+						$data['confs']=$this->user->get_conf_array($conf_id);
+						$data['reviewers']=$this->user->get_reviewer_array($conf_id);
+						
 						$this->load->view('common/header');
 						$this->load->view('common/nav',$data);
 
@@ -547,6 +545,50 @@ class Dashboard extends MY_Conference {
 						//$this->load->view('conf/conf_schedule',$data);
 
 						$this->load->view('conf/menu_conf',$data);
+						$this->form_validation->set_rules('type', '操作', 'required');
+						$this->form_validation->set_rules('user_login[]', '帳號', 'required');
+					    if ($this->form_validation->run()){
+					    	$type = $this->input->post('type');
+					    	$user_logins = $this->input->post('user_login');
+					    	switch($type){
+					    		case "add_admin":
+					    			foreach ($user_logins as $key => $user_login) {
+					    				if( $this->user->add_conf($conf_id,$user_login) ){
+					    					$this->alert->show("s","成功將使用者 <strong>".$user_login."<strong> 設為研討會管理員");
+					    				}else{
+
+					    				}
+					    			}
+					    		break;
+					    		case "del_admin":
+					    			foreach ($user_logins as $key => $user_login) {
+					    				if( $this->user->del_conf($conf_id,$user_login) ){
+					    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 設為研討會管理員失敗");
+					    				}else{
+
+					    				}
+					    			}
+					    		break;
+					    		case "add_review":
+					    			foreach ($user_logins as $key => $user_login) {
+					    				if( $this->user->add_reviewer($conf_id,$user_login) ){
+					    					$this->alert->show("s","成功將使用者 <strong>".$user_login."<strong> 設為審查人");
+					    				}else{
+
+					    				}
+					    			}
+					    		break;
+					    		case "del_review":
+					    			foreach ($user_logins as $key => $user_login) {
+					    				if( $this->user->del_reviewer($conf_id,$user_login) ){
+					    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 設為審查人失敗");
+					    				}else{
+
+					    				}
+					    			}
+					    		break;
+					    	}
+					    }
 						$this->load->view('conf/user/all',$data);
 					break;
 					case "import":

@@ -294,5 +294,67 @@ class User_model extends CI_Model {
 	function get_nowlang(){
 		return $this->get_clang();
 	}
+
+	function add_conf($conf_id,$user_login){
+		$admin = array(
+			"conf_id"    =>$conf_id,
+			"user_login" =>$user_login,
+			"auth_time"  =>time()
+		);
+		return $this->db->insert('auth_conf', $admin);
+	}
+
+	function del_conf($conf_id,$user_login){
+		$this->db->where('conf_id', $conf_id);
+		$this->db->where('user_login', $user_login);
+		return $this->db->delete('auth_conf');
+	}
+
+	function add_reviewer($conf_id,$user_login){
+		$reviewer = array(
+			"conf_id"    =>$conf_id,
+			"user_login" =>$user_login,
+			"auth_time"  =>time()
+		);
+		return $this->db->insert('auth_reviewer', $reviewer);
+	}
+
+	function del_reviewer($conf_id,$user_login){
+		$this->db->where('conf_id', $conf_id);
+		$this->db->where('user_login', $user_login);
+		return $this->db->delete('auth_reviewer');
+	}
+
+	function get_conf($conf_id){
+		$this->db->from('auth_conf');
+		$this->db->where('conf_id', $conf_id);
+		$query = $this->db->get();
+		return $query->result();
+	}
+
+	function get_reviewer($conf_id){
+		$this->db->from('auth_reviewer');
+		$this->db->where('conf_id', $conf_id);
+		$query = $this->db->get();
+		return $query->result();
+	}
+
+	function get_conf_array($conf_id){
+		$users_array = $this->get_conf($conf_id);
+		$users = array();
+		foreach ($users_array as $key => $user) {
+			array_push($users,$user->user_login);
+		}
+		return $users;
+	}
+
+	function get_reviewer_array($conf_id){
+		$users_array = $this->get_reviewer($conf_id);
+		$users = array();
+		foreach ($users_array as $key => $user) {
+			array_push($users,$user->user_login);
+		}
+		return $users;
+	}
 }
 ?>
