@@ -383,7 +383,7 @@ $config['cookie_prefix']	= '';
 $config['cookie_domain']	= '210.70.80.80';
 $config['cookie_path']		= '/';
 $config['cookie_secure']	= FALSE;
-$config['cookie_httponly'] 	= FALSE;
+$config['cookie_httponly'] 	= true;
 
 /*
 |--------------------------------------------------------------------------

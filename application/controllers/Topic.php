@@ -89,15 +89,72 @@ class Topic extends MY_Topic {
 			//$this->load->view('conf/conf_schedule',$data);
 			$this->load->view('conf/menu_topic',$data);
 			if( !in_array($paper_id,$paper_array) ){
-				$data['reviewers']=$this->conf->get_reviewer($conf_id);
 				$data['paper'] = $this->topic->get_paperinfo($paper_id,$conf_id);
 				if(!empty($data['paper'])){
+					$data['reviewers']=$this->conf->get_reviewer($conf_id);
 					$data['authors'] = $this->Submit->get_author($paper_id);
 					$data['otherfile'] = $this->Submit->get_otherfile($paper_id);
 					$data['otherfiles'] = $this->Submit->get_otherfiles($paper_id);
+
+					$pedding_reviewers=$this->topic->get_reviewer_pedding($conf_id,$paper_id);
+					
+					$is_pedding = array(); //目前已被分派至審查帳號
+					$not_reviewers = array(); //無法被分派審查帳號(作者群+審查人)
+					foreach ($pedding_reviewers as $key => $v) {//審查人
+						array_push($is_pedding,$v->user_login);
+						array_push($not_reviewers,$v->user_login);
+					}
+
+					foreach ($data['authors'] as $key => $v) {//作者群
+						array_push($not_reviewers,$v->user_login);
+					}
+					$data['pedding_reviewers'] = $pedding_reviewers;
+					$data['not_reviewers'] = $not_reviewers;//無法被分派審查帳號(作者群+審查人)
+					$data['pedding_count'] = count($data['pedding_reviewers']);
+					if( $data['paper']->sub_status == 1 ){
+						$this->form_validation->set_rules('user_login[]', '帳號', 'required');
+						$this->form_validation->set_rules('type', '', 'required');
+						if ($this->form_validation->run()){
+							$type = $this->input->post('type');
+							$user_logins = $this->input->post('user_login');
+							switch($type){
+								case "add":
+									if( $data['pedding_count']+count($user_logins)<=5 ){
+										foreach ($user_logins as $key => $user_login) {
+											if( !in_array($user_login, $data['not_reviewers']) ){
+												if( $this->topic->assign_reviewer_pedding($paper_id,$user_login) ){
+													$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 加入本篇稿件審查");
+												}else{
+													$this->alert->show("d","將使用者 <strong>".$user_login."</strong> 加入本篇稿件審查失敗");
+												}
+											}else{
+												$this->alert->show("d","使用者 <strong>".$user_login."</strong> 無法審查本篇稿件");
+											}
+										}
+									}else{
+										$this->alert->js("審查人最多5人");
+									}
+									$this->alert->refresh(2);
+								break;
+								case "confirm":
+									foreach ($user_logins as $key => $user_login) {
+										if( !in_array($user_login, $data['not_reviewers']) ){
+
+										}
+									}
+								break;
+								case "del":
+									foreach ($user_logins as $key => $user_login) {
+										
+									}
+								break;
+							}
+						}
+						$this->load->view('topic/reviewers',$data);
+						$this->load->view('topic/pedding_reviewers',$data);
+					}
+					$this->load->view('topic/detail',$data);
 				}
-				$this->load->view('topic/reviewers',$data);
-				$this->load->view('topic/detail',$data);
 			}else{
 				$this->alert->js("由於您為本篇稿件作者之一，無法分派本篇稿件",get_url("topic",$conf_id,"index"));
 			}
