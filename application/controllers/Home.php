@@ -26,7 +26,7 @@ class Home extends MY_Controller {
 				$data['conf_config']=$this->conf->conf_config($conf_id,$user_sysop);
 				//$data['schedule']=$this->conf->conf_schedule($conf_id);
 				$data['conf_content']=$this->conf->conf_content($conf_id);
-
+				$conf_col=$data['conf_config']['conf_col'];
 				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
 				
 
@@ -35,6 +35,8 @@ class Home extends MY_Controller {
 				$this->load->view('conf/index');
 				$this->load->view('conf/conf_nav',$data);
 				//$this->load->view('conf/conf_schedule',$data);
+				//echo ;
+				//$this->load->view('common/'.$conf_col);
 				$this->load->view('common/footer');
 			}else{
 				$this->cinfo['show_confinfo'] = false;

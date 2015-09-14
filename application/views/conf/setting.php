@@ -90,6 +90,33 @@ $(function() {
 			</div>
 			<div class="tab-pane container-fluid" id="tab_function">
 				<h2><i class="fa fa-cog fa-lg"></i> 功能設定</h2>
+				<div class="form-group">
+					<label for="conf_address" class="col-sm-2 control-label">首頁排版</label>
+					<div class="col-sm-1 text-center">
+						<img src="<?php echo asset_url()?>img/col/col-1c.png" class="img-thumbnail">
+						<input name="conf_col" type="radio" id="conf_col" value="1c"<?php if($conf_config['conf_col'] == "1c" ){?> checked<?php }?>>
+					</div>
+					<div class="col-sm-1 text-center">
+						<img src="<?php echo asset_url()?>img/col/col-2cl.png" class="img-thumbnail">
+						<input name="conf_col" type="radio" id="conf_col" value="2cl"<?php if($conf_config['conf_col'] == "2cl" ){?> checked<?php }?>>
+					</div>
+					<div class="col-sm-1 text-center">
+						<img src="<?php echo asset_url()?>img/col/col-2cr.png" class="img-thumbnail">
+						<input name="conf_col" type="radio" id="conf_col" value="2cr"<?php if($conf_config['conf_col'] == "2cr" ){?> checked<?php }?>>
+					</div>
+					<div class="col-sm-1 text-center">
+						<img src="<?php echo asset_url()?>img/col/col-3cl.png" class="img-thumbnail">
+						<input name="conf_col" type="radio" id="conf_col" value="3cl"<?php if($conf_config['conf_col'] == "3cl" ){?> checked<?php }?>>
+					</div>
+					<div class="col-sm-1 text-center">
+						<img src="<?php echo asset_url()?>img/col/col-3cm.png" class="img-thumbnail">
+						<input name="conf_col" type="radio" id="conf_col" value="3cm"<?php if($conf_config['conf_col'] == "3cm" ){?> checked<?php }?>>
+					</div>
+					<div class="col-sm-1 text-center">
+						<img src="<?php echo asset_url()?>img/col/col-3cr.png" class="img-thumbnail">
+						<input name="conf_col" type="radio" id="conf_col" value="3cr"<?php if($conf_config['conf_col'] == "3cr" ){?> checked<?php }?>>
+					</div>
+				</div>
 			</div>
 			<div class="tab-pane container-fluid" id="tab_schedule">
 				<h2><i class="fa fa-calendar fa-lg"></i> 時間安排</h2>
