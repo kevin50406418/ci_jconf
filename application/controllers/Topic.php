@@ -137,16 +137,40 @@ class Topic extends MY_Topic {
 									$this->alert->refresh(2);
 								break;
 								case "confirm":
-									foreach ($user_logins as $key => $user_login) {
-										if( !in_array($user_login, $data['not_reviewers']) ){
-
+									if($data['pedding_count']<=5){
+										if( $data['pedding_count']%2 == 1 ){
+											foreach ($pedding_reviewers as $key => $user_login) {
+												if( !in_array($user_login, $data['not_reviewers']) ){
+													$this->alert->show("d","使用者 <strong>".$user_login."</strong> 無法審查本篇稿件!!");
+													$this->output->_display();
+													exit;
+												}
+											}
+											foreach ($pedding_reviewers as $key => $user_login) {
+												if( $this->topic->$this->topic->assign_reviewer($paper_id,$user_login) ){
+													$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 加入本篇稿件審查");
+												}else{
+													$this->alert->show("d","將使用者 <strong>".$user_login."</strong> 加入本篇稿件審查失敗");
+												}
+											}
+										}else{
+											$this->alert->js("審查人必須為奇數個");
 										}
+									}else{
+										$this->alert->js("審查人最多5人");
 									}
+									$this->alert->refresh(2);
 								break;
 								case "del":
 									foreach ($user_logins as $key => $user_login) {
+										if( $this->topic->del_reviewer_pedding($paper_id,$user_login) ){
+											$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 移除本篇稿件審查");
+										}else{
+											$this->alert->show("d","將使用者 <strong>".$user_login."</strong> 移除本篇稿件審查失敗");
+										}
 										
 									}
+									$this->alert->refresh(2);
 								break;
 							}
 						}

@@ -29,6 +29,7 @@ $(function() {
 			<div class="tab-pane active container-fluid" id="tab_config">
 				<h2><i class="fa fa-info-circle fa-lg"></i> 研討會資訊</h2>
 				<?php echo form_open(get_url("dashboard",$conf_id,"setting"),array("class"=>"form-horizontal"))?>
+					<?php echo form_hidden('do', 'config');?>
 					<div class="form-group">
 						<label class="col-sm-2 control-label">研討會編號</label>
 						<div class="col-sm-10">
@@ -82,7 +83,6 @@ $(function() {
 							<input type="submit" name="submit_1" value="修改" class="ui button blue">
 						</div>
 					</div>
-					<input type="hidden" value="config" name="do">
 				<?php echo form_close()?>
 			</div>
 			<div class="tab-pane container-fluid" id="tab_style">
@@ -90,6 +90,8 @@ $(function() {
 			</div>
 			<div class="tab-pane container-fluid" id="tab_function">
 				<h2><i class="fa fa-cog fa-lg"></i> 功能設定</h2>
+				<?php echo form_open(get_url("dashboard",$conf_id,"setting"),array("class"=>"form-horizontal"))?>
+				<?php echo form_hidden('do', 'func');?>
 				<div class="form-group">
 					<label for="conf_address" class="col-sm-2 control-label">首頁排版</label>
 					<div class="col-sm-1 text-center">
@@ -117,6 +119,12 @@ $(function() {
 						<input name="conf_col" type="radio" id="conf_col" value="3cr"<?php if($conf_config['conf_col'] == "3cr" ){?> checked<?php }?>>
 					</div>
 				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<input type="submit" name="submit_1" value="修改" class="ui button blue">
+					</div>
+				</div>
+				<?php echo form_close()?>
 			</div>
 			<div class="tab-pane container-fluid" id="tab_schedule">
 				<h2><i class="fa fa-calendar fa-lg"></i> 時間安排</h2>

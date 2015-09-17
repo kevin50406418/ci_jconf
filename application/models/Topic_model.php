@@ -76,4 +76,18 @@ class Topic_model extends CI_Model {
 		$query = $this->db->get();
 		return $query->result();
 	}
+
+	function del_reviewer_pedding($paper_id,$user_login){
+		$this->db->where('user_login', $user_login);
+		$this->db->where('paper_id', $paper_id);
+		return $this->db->delete('paper_review_pedding');;
+	}
+
+	function assign_reviewer($paper_id,$user_login){
+		$reviewer = array(
+			"paper_id"      => $paper_id,
+			"user_login"   => $user_login
+		);
+		return $this->db->insert('paper_review', $reviewer);
+	}
 }

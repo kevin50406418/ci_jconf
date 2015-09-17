@@ -143,5 +143,7 @@ $autoload['model'] = array(
 	'submit_model' => 'Submit',
 	'sysop_model'  => 'sysop',
 	'alert_model'  => 'alert',
-	'topic_model'  => 'topic'
+	'topic_model'  => 'topic',
+	'module_model' => 'module'
 );
+

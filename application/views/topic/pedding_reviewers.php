@@ -6,6 +6,13 @@
 		<h4 class="modal-title">分派審查(確認中)</h4>
 	</div>
 	<div class="modal-body">
+		<?php if($pedding_count%2==0){?>
+		<div class="ui info message">
+			<div class="header">
+				本篇稿件目前審查人人數為 <?php echo $pedding_count?>人，分派審查人人數必須為奇數個
+			</div>
+		</div>
+		<?php }?>
 		<div class="ui info message">
 			<div class="header">
 				目前審查為確認中，若以確認後，請按"送出"，分派審查人才算完成，分派之審查人才可進行審查稿件。
@@ -44,6 +51,6 @@
 	<?php echo form_close()?>
 	<?php echo form_open(get_url("dashboard",$conf_id,"topic",$paper->sub_id),array("class"=>"text-center"))?>
 	<?php echo form_hidden('type', 'confirm');?>
-	<button type="submit" class="ui button blue">確認審查人</button>
+	<button type="submit" class="ui button blue"<?php if($pedding_count%2==0){?> disabled<?php }?>>確認審查人</button>
 	<?php echo form_close()?>
 </div>

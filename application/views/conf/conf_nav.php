@@ -3,10 +3,12 @@
 <div class="ui inverted segment">
 
 <div class="ui inverted secondary pointing menu">
+	<a class="item" href="<?php echo get_url("index",$conf_config['conf_id']);?>">
+		首頁
+	</a>
 	<a class="item" href="<?php echo get_url("main",$conf_config['conf_id']);?>">
 		<?php echo lang('submit_system')?>
 	</a>
-	
 	<a class="item" href="<?php echo get_url("news",$conf_config['conf_id']);?>">
 		<?php echo lang('submit_news')?>
 	</a>

@@ -516,4 +516,19 @@ class Conf_model extends CI_Model {
 		return $query->result();
 	}
 
+	function update_confcol($conf_id,$conf_col){
+		$conf_col = array(
+			"conf_col" => $conf_col
+		);
+		$this->db->where('conf_id', $conf_id);
+		return $this->db->update('conf', $conf_col);
+	}
+
+	function get_module($conf_id,$module_lang){
+		$this->db->from('module');
+		$this->db->order_by("module_position","DESC");
+		$this->db->order_by("module_order","DESC");
+		$query = $this->db->get();
+		return $query->result();
+	}
 }

@@ -26,18 +26,26 @@ class Home extends MY_Controller {
 				$data['conf_config']=$this->conf->conf_config($conf_id,$user_sysop);
 				//$data['schedule']=$this->conf->conf_schedule($conf_id);
 				$data['conf_content']=$this->conf->conf_content($conf_id);
+				$data['conf_id'] = $conf_id;
 				$conf_col=$data['conf_config']['conf_col'];
+				$conf_template=$data['conf_config']['conf_template'];
+				$template_dir = "template/".$conf_template;
 				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
 				
+				/*$this->module->get_module($conf_id,"sidebar-1","zhtw");
+				$this->module->get_module($conf_id,"sidebar-2","zhtw");
+				$this->module->get_module($conf_id,"content","zhtw");*/
 
-				$this->load->view('common/header');
-				$this->load->view('common/nav',$data);
-				$this->load->view('conf/index');
-				$this->load->view('conf/conf_nav',$data);
-				//$this->load->view('conf/conf_schedule',$data);
-				//echo ;
-				//$this->load->view('common/'.$conf_col);
-				$this->load->view('common/footer');
+				if( $conf_template == "default"){
+					$this->load->view('common/header');
+					$this->load->view('common/nav',$data);
+					$this->load->view('conf/index');
+					$this->load->view('conf/conf_nav',$data);
+					//$this->load->view('conf/conf_schedule',$data);
+					
+					$this->load->view($template_dir."/col-".$conf_col,$data);
+					$this->load->view('common/footer');
+				}
 			}else{
 				$this->cinfo['show_confinfo'] = false;
 				$this->conf->show_404conf();

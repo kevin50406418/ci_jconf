@@ -48,6 +48,16 @@ class Dashboard extends MY_Conference {
 							}
 						}
 					break;
+					case "func":
+						$this->form_validation->set_rules('conf_col', '首頁排版', 'required');
+						if ($this->form_validation->run()){
+							$conf_col    = $this->input->post('conf_col');
+							if( $this->conf->update_confcol($conf_id,$conf_col) ){
+								$this->alert->js("更新成功");
+								$this->alert->refresh(0);
+							}
+						}
+					break;
 				}
 			}
 			$this->load->view('common/header');
@@ -435,6 +445,7 @@ class Dashboard extends MY_Conference {
 			$this->load->view('common/footer');
 		}
 	}
+
 
 	public function user($conf_id='',$do="all",$user_login=""){
 		$data['conf_id'] = $conf_id;
@@ -869,6 +880,75 @@ class Dashboard extends MY_Conference {
 
 			$this->load->view('conf/menu_conf',$data);
 			//$this->load->view('conf/setting',$data);
+			$this->load->view('common/footer');
+		}
+	}
+
+	public function modules($conf_id='',$do="all",$module_id=''){
+		$data['conf_id'] = $conf_id;
+		$data['body_class'] = $this->body_class;
+		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
+		if( !$this->conf->confid_exists($conf_id,$user_sysop) ){
+			$this->cinfo['show_confinfo'] = false;
+			$this->conf->show_404conf();
+		}else{
+			$data['spage']=$this->config->item('spage');
+			$conf_config=$this->conf->conf_config($conf_id,$user_sysop);
+			$data['conf_config']=$conf_config;
+			//$data['schedule']=$this->conf->conf_schedule($conf_id);
+			$data['conf_content']=$this->conf->conf_content($conf_id);
+			
+			if( !$this->user->is_conf() && !$this->user->is_sysop() ){
+				$this->conf->show_permission_deny($data);
+			}
+			$this->load->view('common/header');
+			$this->load->view('common/nav',$data);
+
+			$this->load->view('conf/conf_nav',$data);
+			//$this->load->view('conf/conf_schedule',$data);
+			
+			$this->load->view('conf/menu_conf',$data);
+			
+			if( empty($module_id) ){
+				switch($do){
+					case "all":
+						$data['module_zhtw'] = $this->conf->get_module($conf_id,"zhtw");
+						$data['module_eng'] = $this->conf->get_module($conf_id,"eng");
+						$this->load->view('conf/module/all',$data);
+					break;
+					case "add":
+						$module = $this->input->get('module');
+						switch ($module) {
+							case "news":
+								# code...
+							break;
+							case "text":
+							default:
+								$this->form_validation->set_rules('module_title', '標題', 'required');
+								$this->form_validation->set_rules('module_position', '位置', 'required');
+								$this->form_validation->set_rules('module_showtitle', '顯示/隱藏標題', 'required');
+								$this->form_validation->set_rules('module_lang', '語言', 'required');
+								$this->form_validation->set_rules('module_content', '內容', 'required');
+								if($this->form_validation->run()){
+									$module_title = $this->input->post("module_title");
+									$module_position = $this->input->post("module_position");
+									$module_showtitle = $this->input->post("module_showtitle");
+									$module_lang = $this->input->post("module_lang");
+									$module_content = $this->input->post("module_content",false);
+									if( $this->module->add_text($conf_id,$module_title,$module_position,$module_showtitle,$module_lang,$module_content) ){
+										$this->alert->show("s","成功新增文字模組");
+									}else{
+										$this->alert->show("d","新增文字模組失敗");
+									}
+									$this->alert->refresh(2);
+								}
+								$this->assets->add_js(base_url('ckeditor/ckeditor.js'),true);
+								$this->load->view('conf/module/add_text',$data);
+							break;
+						}
+					break;
+				}
+			}
 			$this->load->view('common/footer');
 		}
 	}
