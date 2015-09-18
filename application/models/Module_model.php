@@ -50,4 +50,15 @@ class Module_model extends CI_Model {
         return $this->db->insert('module', $text);
     }
     
+    function add_news($conf_id,$module_title,$module_position,$module_showtitle,$module_lang){
+        $news = array(
+            "conf_id"          =>$conf_id,
+            "module_title"     => $module_title,
+            "module_position"  => $module_position,
+            "module_type"      => "news",
+            "module_showtitle" => $module_showtitle,
+            "module_lang"      => $module_lang,
+        );
+        return $this->db->insert('module', $news);
+    }
 }

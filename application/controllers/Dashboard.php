@@ -920,7 +920,23 @@ class Dashboard extends MY_Conference {
 						$module = $this->input->get('module');
 						switch ($module) {
 							case "news":
-								# code...
+								$this->form_validation->set_rules('module_title', '標題', 'required');
+								$this->form_validation->set_rules('module_position', '位置', 'required');
+								$this->form_validation->set_rules('module_showtitle', '顯示/隱藏標題', 'required');
+								$this->form_validation->set_rules('module_lang', '語言', 'required');
+								if($this->form_validation->run()){
+									$module_title = $this->input->post("module_title");
+									$module_position = $this->input->post("module_position");
+									$module_showtitle = $this->input->post("module_showtitle");
+									$module_lang = $this->input->post("module_lang");
+									if( $this->module->add_news($conf_id,$module_title,$module_position,$module_showtitle,$module_lang) ){
+										$this->alert->show("s","成功新增文字模組");
+									}else{
+										$this->alert->show("d","新增文字模組失敗");
+									}
+									$this->alert->refresh(2);
+								}
+								$this->load->view('conf/module/add_news',$data);
 							break;
 							case "text":
 							default:
@@ -940,7 +956,7 @@ class Dashboard extends MY_Conference {
 									}else{
 										$this->alert->show("d","新增文字模組失敗");
 									}
-									$this->alert->refresh(2);
+									//$this->alert->refresh(2);
 								}
 								$this->assets->add_js(base_url('ckeditor/ckeditor.js'),true);
 								$this->load->view('conf/module/add_text',$data);

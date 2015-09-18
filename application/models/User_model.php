@@ -372,5 +372,17 @@ class User_model extends CI_Model {
 	    $this->form_validation->set_rules('user_lang', '語言', 'required');
 	    $this->form_validation->set_rules('user_title', '研究領域', 'required|min_length[1]');
 	}
+
+	function change_passwd($user_login,$user_pass){
+		$user = array(
+			"user_pass" => hash('sha256',$user_pass)
+		);
+		$this->db->where('user_login', $user_login);
+		if( $this->db->update('users', $user) ){
+			return true;
+		}else{
+			return false;
+		}
+	}
 }
 ?>

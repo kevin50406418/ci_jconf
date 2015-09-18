@@ -6,7 +6,5 @@
 	<?php $this->module->get_module($conf_id,"sidebar-2","zhtw")?>
 </div>
 <div class="col-md-6">
-	<div class="ui segment">
-		<?php $this->module->get_module($conf_id,"content","zhtw")?>
-	</div>
+	<?php $this->module->get_module($conf_id,"content","zhtw")?>
 </div>

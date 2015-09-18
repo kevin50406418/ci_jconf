@@ -1,11 +1,11 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <div class="ui segment raised green">
 	<div class="modal-header">
-		<h4 class="modal-title">建立文字模組</h4>
+		<h4 class="modal-title">建立公告模組</h4>
 	</div>
 	<div class="modal-body">
 		<?php echo validation_errors('<div class="ui message red">', '</div>');?>
-		<?php echo form_open(get_url("dashboard",$conf_id,"modules","add")."?module=text",array("class"=>"form-horizontal"))?>
+		<?php echo form_open(get_url("dashboard",$conf_id,"modules","add")."?module=news",array("class"=>"form-horizontal"))?>
 			<div class="form-group">
 				<label class="col-sm-2 control-label">標題</label>
 				<div class="col-sm-10">
@@ -46,12 +46,6 @@
 							<input type="radio" name="module_lang" autocomplete="off" value="eng"> 英文(English)
 						</label>
 					</div>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-2 control-label">內容</label>
-				<div class="col-sm-10">
-					<textarea name="module_content" rows="5" class="form-control ckeditor"></textarea>
 				</div>
 			</div>
 			<div class="text-center">

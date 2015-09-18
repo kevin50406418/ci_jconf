@@ -526,6 +526,7 @@ class Conf_model extends CI_Model {
 
 	function get_module($conf_id,$module_lang){
 		$this->db->from('module');
+		$this->db->where('module_lang', $module_lang);
 		$this->db->order_by("module_position","DESC");
 		$this->db->order_by("module_order","DESC");
 		$query = $this->db->get();

@@ -35,7 +35,9 @@
 							<td><?php echo $module->module_position?></td>
 							<td><?php echo $module->module_type?></td>
 							<td><?php echo $module->module_lang?></td>
-							<td>操作</td>
+							<td>
+								<a href="#" class="ui button blue basic">編輯</a>
+							</td>
 						</tr>
 						<?php }?>
 					</table>
