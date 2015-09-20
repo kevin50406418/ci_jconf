@@ -901,6 +901,10 @@ class Dashboard extends MY_Conference {
 			if( !$this->user->is_conf() && !$this->user->is_sysop() ){
 				$this->conf->show_permission_deny($data);
 			}
+			if( empty($module_id) && $do=="all"){
+				$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
+				$this->assets->add_js(asset_url().'js/repeatable.js',true);
+			}
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
 

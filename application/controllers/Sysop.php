@@ -12,14 +12,19 @@ class Sysop extends MY_Sysop {
 		$this->col_right = 12-$this->col_nav;
 		$this->active = $this->router->method;
 		$this->body_class ="container-fluid";
+		$fetch_method = $this->router->fetch_method();
+		$no_redirect = array("login","logout");
+		if( !in_array($fetch_method,$no_redirect) ){
+			if( !$this->sysop->is_sysop_login() ){
+				$this->session->set_tempdata('user_back', current_url(), 300);
+				redirect(base_url("sysop/login"), 'location', 301);
+			}else{
+				$this->sysop->add_sysop_time();
+			}
+		}
 	}
 
 	public function index(){
-		if( !$this->sysop->is_sysop_login() ){
-			redirect(base_url("sysop/login"), 'location', 301);
-		}else{
-			$this->sysop->add_sysop_time();
-		}
 		$data['col_nav'] = $this->col_nav;
 		$data['col_right'] = $this->col_right;
 		$data['active'] = $this->active;
@@ -31,11 +36,6 @@ class Sysop extends MY_Sysop {
 	}
 
 	public function conf($type="all",$conf_id=""){
-		if( !$this->sysop->is_sysop_login() ){
-			redirect(base_url("sysop/login"), 'location', 301);
-		}else{
-			$this->sysop->add_sysop_time();
-		}
 		$data['col_nav'] = $this->col_nav;
 		$data['col_right'] = $this->col_right;
 		$data['conf_id'] = $conf_id;
@@ -142,11 +142,6 @@ class Sysop extends MY_Sysop {
 	}
 
 	public function user($do="all",$user_login=""){
-		if( !$this->sysop->is_sysop_login() ){
-			redirect(base_url("sysop/login"), 'location', 301);
-		}else{
-			$this->sysop->add_sysop_time();
-		}
 		$data['col_nav'] = $this->col_nav;
 		$data['col_right'] = $this->col_right;
 		$data['active'] = $this->active;
@@ -228,6 +223,10 @@ class Sysop extends MY_Sysop {
 				default:
 				case "all": // view all users
 					$data['users']=$this->user->get_all_users();
+					$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
+					$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
+					$this->assets->add_js(asset_url().'js/dataTables.bootstrap.js',true);
+
 					$this->load->view('common/header');
 					$this->load->view('common/nav',$data);
 					$this->load->view('sysop/nav',$data);
@@ -237,6 +236,50 @@ class Sysop extends MY_Sysop {
 					$this->load->view('common/header');
 					$this->load->view('common/nav',$data);
 					$this->load->view('sysop/nav',$data);
+				break;
+				case "manage":
+					if ( $this->input->is_ajax_request() ) {
+						$this->form_validation->set_rules('user_login[]', '帳號', 'required');
+						$this->form_validation->set_rules('type', '操作', 'required');
+						if ($this->form_validation->run()){
+					    	$user_logins = $this->input->post('user_login', TRUE);
+					    	$type = $this->input->post('type', TRUE);
+					    	switch($type){
+					    		case "sysop":
+					    			$ban = $this->config->item('ban');
+					    			foreach ($user_logins as $key => $user_login) {
+					    				if( !in_array($user_login,$ban) ){
+					    					if( $this->sysop->set_sysop($user_login,1) ){
+					    						$this->alert->show("s","使用者 <strong>".$user_login."</strong> 成功設定為系統管理員身份");
+					    					}else{
+					    						$this->alert->show("d","使用者 <strong>".$user_login."</strong> 無法設定為系統管理員身份");
+					    					}
+					    				}else{
+					    					$this->alert->show("d","使用者 <strong>".$user_login."</strong> 無法設定為系統管理員身份(請洽系統架設人員)");
+					    				}
+					    			}
+					    			$this->alert->refresh(2);
+					    			
+					    		break;
+					    		case "unsysop":
+					    			$developer = $this->config->item('developer');
+					    			foreach ($user_logins as $key => $user_login) {
+					    				if( !in_array($user_login,$developer) ){
+					    					if( $this->sysop->set_sysop($user_login,0) ){
+					    						$this->alert->show("s","使用者 <strong>".$user_login."</strong> 成功取消系統管理員身份");
+					    					}else{
+					    						$this->alert->show("d","使用者 <strong>".$user_login."</strong> 無法取消系統管理員身份");
+					    					}
+					    				}else{
+					    					$this->alert->show("d","使用者 <strong>".$user_login."</strong> 無法取消系統管理員身份(請洽系統架設人員)");
+					    				}
+					    			}
+					    			$this->alert->refresh(2);
+					    		break;
+					    	}
+					    }
+
+					}
 				break;
 			}
 		}else{
@@ -304,9 +347,30 @@ class Sysop extends MY_Sysop {
 						$this->load->view('js/edit');
 					break;
 					case "reset": // reset user password
+						$data['passwd'] = "";
+
 						$this->load->view('common/header');
 						$this->load->view('common/nav',$data);
 						$this->load->view('sysop/nav',$data);
+
+						$this->form_validation->set_rules('type', '', 'required');
+						if ($this->form_validation->run()){
+					    	$type = $this->input->post('type', TRUE);
+					    	switch($type){
+					    		case "get":
+					    			$data['passwd'] = $this->user->generator_password(8);
+					    		break;
+					    		case "update":
+					    			$user_pass = $this->input->post('user_pass', TRUE);
+					    			if( $this->user->change_passwd($user_login,$user_pass) ){
+					    				$this->sysop->notice_passwd($user_login,$user_pass,$data['user']->user_email);
+					    				$this->alert->js("成功更新使用者 ".$user_login." 密碼");
+					    			}else{
+					    				$this->alert->show("d","更新使用者 ".$user_login." 密碼失敗");
+					    			}
+					    		break;
+					    	}
+					    }
 						$this->load->view('sysop/user/reset',$data);
 					break;
 				}
@@ -314,9 +378,32 @@ class Sysop extends MY_Sysop {
 				$this->alert->js("The username is not exist.",base_url("sysop/user/all"));
 			}
 		}
-		$this->load->view('common/footer');
+		if( empty($user_login) && $do != "manage" ){
+			$this->load->view('common/footer');
+		}
 	}
 
+	public function setting(){
+		$data['col_nav'] = $this->col_nav;
+		$data['col_right'] = $this->col_right;
+		$data['active'] = $this->active;
+		$data['body_class'] = $this->body_class;
+		$this->load->view('common/header');
+		$this->load->view('common/nav',$data);
+		$this->load->view('sysop/nav',$data);
+
+		$this->form_validation->set_rules('site_name', '網站名稱', 'required');
+	    if ($this->form_validation->run()){
+	    	$site_name = $this->input->post('site_name', TRUE);
+	    	if( $this->config->set_item('site_name', $site_name) ){
+	    		$this->alert->show("s","成功更新網站名稱");
+	    	}else{
+	    		$this->alert->show("d","更新網站名稱失敗");
+	    	}
+	    }
+		$this->load->view('sysop/setting/index',$data);
+		$this->load->view('common/footer');
+	}
 	public function login(){
 		if( $this->sysop->is_sysop_login() ){
 			redirect(base_url("sysop"), 'location', 301);
@@ -329,7 +416,8 @@ class Sysop extends MY_Sysop {
 		if ($this->form_validation->run() == TRUE){
 			$user_pwd = $this->input->post('user_pass', TRUE);
 			if( $this->sysop->sysop_login($user_pwd) ){
-				$this->alert->show("i","Login Success",base_url("sysop"));
+				$redirect = $this->session->has_userdata('user_back')?$this->session->user_back:base_url("sysop");
+				$this->alert->show("i","Login Success",$redirect);
 			}else{
 				$this->alert->show("d","Login Error");
 			}

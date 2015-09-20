@@ -4,6 +4,7 @@ class MY_Controller extends CI_Controller{
 	public $cinfo = array();
 	public $body_class;
 	public $_lang;
+	public $data = array();
     public function __construct(){
 		parent::__construct();
 		$this->cinfo['show_confinfo'] = false;

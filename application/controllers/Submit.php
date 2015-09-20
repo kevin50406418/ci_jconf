@@ -645,6 +645,7 @@ class Submit extends MY_Conference {
 				$data['authors'] = $this->Submit->get_author($paper_id);
 				$data['otherfile'] = $this->Submit->get_otherfile($paper_id);
 				$data['otherfiles'] = $this->Submit->get_otherfiles($paper_id);
+				$data['reviewers'] = $this->topic->get_reviewer($paper_id);
 			}
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
