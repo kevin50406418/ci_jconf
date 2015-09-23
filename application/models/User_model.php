@@ -384,5 +384,17 @@ class User_model extends CI_Model {
 			return false;
 		}
 	}
+
+	function generator_password($password_len){
+		$password = '';
+	    $word = 'abcdefghijkmnpqrstuvwxyz!@#$%^&*()-=ABCDEFGHIJKLMNPQRSTUVWXYZ<>;{}[]23456789';
+	    $len = strlen($word);
+
+	    for ($i = 0; $i < $password_len; $i++) {
+	        $password.= $word[rand() % $len];
+	    }
+	    return $password;
+	}
+
 }
 ?>

@@ -7,7 +7,12 @@ $(function() {
 	var lastTab = localStorage.getItem('<?php echo $conf_config['conf_id'];?>_confsetting');
 	if (lastTab) {
 		$('[href="'+lastTab+'"]').tab('show');
-	}
+	};
+	$('.input-daterange').datepicker({
+		format: "yyyy-mm-dd",
+		todayBtn: "linked",
+		todayHighlight: true,
+	});
 });
 </script>
 <div class="ui segment raised">
@@ -128,6 +133,74 @@ $(function() {
 			</div>
 			<div class="tab-pane container-fluid" id="tab_schedule">
 				<h2><i class="fa fa-calendar fa-lg"></i> 時間安排</h2>
+				<?php echo form_open(get_url("dashboard",$conf_id,"setting"),array("class"=>"form-horizontal"))?>
+				<?php echo form_hidden('do', 'schedule');?>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">會議舉行日期</label>
+					<div class="col-sm-10">
+						<div class="col-sm-offset-2 col-sm-10">
+							<div class="input-daterange input-group" id="datepicker">
+								<input type="text" class="input-sm form-control" name="hold[start]" value="">
+								<span class="input-group-addon">~</span>
+								<input type="text" class="input-sm form-control" name="hold[end]" value="">
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-2 control-label">論文徵稿</label>
+					<div class="col-sm-10">
+						<div class="col-sm-offset-2 col-sm-10">
+							<div class="input-daterange input-group" id="datepicker">
+								<input type="text" class="input-sm form-control" name="submit[start]" value="">
+								<span class="input-group-addon">~</span>
+								<input type="text" class="input-sm form-control" name="submit[end]" value="">
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-sm-2 control-label">早鳥繳費</label>
+					<div class="col-sm-10">
+						<div class="col-sm-offset-2 col-sm-10">
+							<div class="input-daterange input-group" id="datepicker">
+								<input type="text" class="input-sm form-control" name="early_bird[start]" value="">
+								<span class="input-group-addon">~</span>
+								<input type="text" class="input-sm form-control" name="early_bird[end]" value="">
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-2 control-label">線上註冊</label>
+					<div class="col-sm-10">
+						<div class="col-sm-offset-2 col-sm-10">
+							<div class="input-daterange input-group" id="datepicker">
+								<input type="text" class="input-sm form-control" name="register[start]" value="">
+								<span class="input-group-addon">~</span>
+								<input type="text" class="input-sm form-control" name="register[end]" value="">
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-2 control-label">上傳完稿截止</label>
+					<div class="col-sm-10">
+						<div class="col-sm-offset-2 col-sm-10">
+							<div class="input-daterange input-group" id="datepicker">
+								<input type="text" class="input-sm form-control" name="finish[end]" value="">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<input type="submit" name="submit_1" value="修改" class="ui button blue">
+				</div>
+				<?php echo form_close()?>
 			</div>
 			<div class="tab-pane container-fluid" id="tab_org">
 				<h2><i class="fa fa-users fa-lg"></i> 大會組織</h2>

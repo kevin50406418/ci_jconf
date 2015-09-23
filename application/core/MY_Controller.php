@@ -4,6 +4,7 @@ class MY_Controller extends CI_Controller{
 	public $cinfo = array();
 	public $body_class;
 	public $_lang;
+	public $data = array();
     public function __construct(){
 		parent::__construct();
 		$this->cinfo['show_confinfo'] = false;
@@ -19,7 +20,7 @@ class MY_Controller extends CI_Controller{
 		$this->assets->add_css(asset_url().'style/statistic.min.css');
 		$this->_lang = $this->user->get_clang();
 		$this->lang->load("conf_menu",$this->_lang);
-		$this->lang->load("paper_status",$this->_lang);	
+		$this->lang->load("paper_status",$this->_lang);
     }
 }
 

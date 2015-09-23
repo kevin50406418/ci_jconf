@@ -322,6 +322,49 @@ class Conf_model extends CI_Model {
 						"error" => "Database error! Contact System Adminstritor."
 					);
 		        }
+		        $date = array(
+			        array(
+						'conf_id'     => $conf_id,
+						'date_type'   => 'hold',
+						'start_value' => 0,
+						'end_value'   => 0
+			        ),
+			        array(
+						'conf_id'     => $conf_id,
+						'date_type'   => 'submit',
+						'start_value' => 0,
+						'end_value'   => 0
+			        ),
+			        array(
+						'conf_id'     => $conf_id,
+						'date_type'   => 'early_bird',
+						'start_value' => 0,
+						'end_value'   => 0
+			        ),
+			        array(
+						'conf_id'     => $conf_id,
+						'date_type'   => 'register',
+						'start_value' => 0,
+						'end_value'   => 0
+			        ),
+			        array(
+						'conf_id'     => $conf_id,
+						'date_type'   => 'finish',
+						'start_value' => 0,
+						'end_value'   => 0
+			        )
+				);
+				if( $this->db->insert_batch('conf_date',$date) ){
+					$return = array(
+						"status" => true,
+						"error" => "Success Add Conference Schedule"
+					);
+		        }else{
+		           $return = array(
+						"status" => false,
+						"error" => "Database error! Contact System Adminstritor.(Schedule)"
+					);
+		        }
 			}
 		}
 		return $return;
@@ -531,5 +574,15 @@ class Conf_model extends CI_Model {
 		$this->db->order_by("module_order","DESC");
 		$query = $this->db->get();
 		return $query->result();
+	}
+
+	function update_schedule($conf_id,$date_type,$start_value,$end_value){
+		$schedule = array(
+			"start_value" => $start_value,
+			"end_value" => $end_value
+		);
+		$this->db->where('conf_id', $conf_id);
+		$this->db->where('date_type', $date_type);
+		return $this->db->update('conf_date', $schedule);
 	}
 }

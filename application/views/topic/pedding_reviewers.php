@@ -49,8 +49,11 @@
 	</div>
 	<button type="submit" class="ui button red">刪除審查人</button>
 	<?php echo form_close()?>
-	<?php echo form_open(get_url("dashboard",$conf_id,"topic",$paper->sub_id),array("class"=>"text-center"))?>
-	<?php echo form_hidden('type', 'confirm');?>
+	<?php
+		echo form_open(get_url("topic",$conf_id,"detail",$paper->sub_id),array("class"=>"text-center"));
+		echo form_hidden('type', 'confirm');
+		foreach ($pedding_reviewers as $key => $user) { echo form_hidden('user_login[]', $user->user_login);}
+	?>
 	<button type="submit" class="ui button blue"<?php if($pedding_count%2==0){?> disabled<?php }?>>確認審查人</button>
 	<?php echo form_close()?>
 </div>

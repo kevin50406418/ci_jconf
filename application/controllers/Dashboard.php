@@ -24,6 +24,17 @@ class Dashboard extends MY_Conference {
 			if( !$this->user->is_conf() && !$this->user->is_sysop() ){
 				$this->conf->show_permission_deny($data);
 			}
+			
+			$this->assets->add_css(asset_url().'style/datepicker.css');
+			$this->assets->add_js(asset_url().'js/bootstrap-datepicker.js');
+
+			$this->load->view('common/header');
+			$this->load->view('common/nav',$data);
+
+			$this->load->view('conf/conf_nav',$data);
+			//$this->load->view('conf/conf_schedule',$data);
+			$this->load->view('conf/menu_conf',$data);
+
 			if( !is_null($this->input->post("do")) ){
 				$do = $this->input->post("do");
 				switch($do){
@@ -58,14 +69,32 @@ class Dashboard extends MY_Conference {
 							}
 						}
 					break;
+					case "schedule":
+						$this->form_validation->set_rules('hold[]', '會議舉行日期', 'required');
+						$this->form_validation->set_rules('submit[]', '論文徵稿', 'required');
+						$this->form_validation->set_rules('early_bird[]', '早鳥繳費', 'required');
+						$this->form_validation->set_rules('register[]', '線上註冊', 'required');
+						$this->form_validation->set_rules('finish', '上傳完稿截止', 'required');
+
+						if ($this->form_validation->run()){
+							$hold       = $this->input->post("hold");
+							$submit     = $this->input->post("submit");
+							$early_bird = $this->input->post("early_bird");
+							$register   = $this->input->post("register");
+							$finish     = $this->input->post("finish");
+
+							// need to check end time
+							$this->conf->update_schedule($conf_id,"hold",strtotime($hold['start']),strtotime($hold['end']));
+							$this->conf->update_schedule($conf_id,"submit",strtotime($submit['start']),strtotime($submit['end']));
+							$this->conf->update_schedule($conf_id,"early_bird",strtotime($early_bird['start']),strtotime($early_bird['end']));
+							$this->conf->update_schedule($conf_id,"register",strtotime($register['start']),strtotime($register['end']));
+							$this->conf->update_schedule($conf_id,"finish",strtotime($finish['start']),strtotime($finish['end']));
+						}
+	
+					break;
 				}
 			}
-			$this->load->view('common/header');
-			$this->load->view('common/nav',$data);
 
-			$this->load->view('conf/conf_nav',$data);
-			//$this->load->view('conf/conf_schedule',$data);
-			$this->load->view('conf/menu_conf',$data);
 			$this->load->view('conf/setting',$data);
 			$this->load->view('common/footer');
 		}
@@ -900,6 +929,10 @@ class Dashboard extends MY_Conference {
 			
 			if( !$this->user->is_conf() && !$this->user->is_sysop() ){
 				$this->conf->show_permission_deny($data);
+			}
+			if( empty($module_id) && $do=="all"){
+				$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
+				$this->assets->add_js(asset_url().'js/repeatable.js',true);
 			}
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);

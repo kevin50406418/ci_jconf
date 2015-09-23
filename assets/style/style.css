@@ -412,8 +412,8 @@ fieldset[disabled] .btn-olive.active {
 .input-group-btn .btn + .btn.btn-danger { border-color: #d1293a; }
 .input-group-addon {
 	color: white;
-	background-color: #aab2bd;
-	border-color: #96a0ad;
+	background-color: #aab2bd !important;
+	border-color: #96a0ad !important;
 }
 .input-group-addon .radio,
 .input-group-addon .checkbox { margin: -3px 0 -4px !important; }

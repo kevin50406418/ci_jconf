@@ -6,7 +6,7 @@
 			<li class="active"> <a href="#tab_info" data-toggle="tab"> 稿件資訊 </a> </li>
 			<li> <a href="#tab_author" data-toggle="tab"> 作者資訊 </a> </li>
 			<li> <a href="#tab_file" data-toggle="tab"> 稿件檔案 </a> </li>
-			<?php if( $paper->sub_status > 3){?><li> <a href="#tab_review" data-toggle="tab"> 審查資料 </a> </li><?php }?>
+			<?php if( $paper->sub_status >= 3){?><li> <a href="#tab_review" data-toggle="tab"> 審查資料 </a> </li><?php }?>
 			<?php if( $paper->sub_status == -1){?><a href="<?php echo get_url("submit",$conf_id,"edit",$paper->sub_id)?>" class="ui teal button pull-right">編輯稿件</a><?php }?>
 		</ul>
 		<div class="tab-content">
@@ -119,34 +119,58 @@
 					<?php }?>
 				</table>
 			</div>
-			<!--{if $paper.sub_status >= 3}-->
+			<?php if( $paper->sub_status >= 3 ){?>
 			<div class="tab-pane container-fluid" id="tab_review">
 				<h3>審查資料</h3>
+				<?php echo form_open(get_url("topic",$conf_id,"detail",$paper->sub_id))?>
 				<table class="table table-striped">
 					<thead>
 						<tr>
+							<th style="width:5%"> </th>
 							<th style="width:10%">審查人</th>
 							<th style="width:10%">審查狀態</th>
 							<th style="width:10%">審查時間</th>
-							<th style="width:70%">審查建議</th>
+							<th style="width:65%">審查建議</th>
 						</tr>
 					</thead>
-					<!--{foreach from=$paper_review key=i item=review}-->
+					<?php foreach ($reviewers as $key => $reviewer) {?>
 					<tr>
-						<td>審查人 </td>
-						<td><!--{sub_status($review.review_status,true)}--></td>
+						<td class="text-center">
+							<input type="checkbox" value="<?php echo $reviewer->user_login?>" name="user_login[]"<?php if( in_array($reviewer->review_status, array(-2,2,4)) ){?> disabled<?php }?>>
+						</td>
+						<td><?php echo $reviewer->user_login?></td>
 						<td>
-							
+							<?php echo $this->Submit->sub_status($reviewer->review_status,true)?>
 						</td>
 						<td>
-							
+							<?php
+								if( in_array($reviewer->review_status, array(-2,2,4)) ){
+									echo date('Y/m/d H:i', $reviewer->review_time);	
+								}
+							?>
+						</td>
+						<td>
+							<?php echo $reviewer->review_comment?>
 						</td>
 					</tr>
-					<!--{/foreach}-->
+					<?php }?>
 				</table>
+				<button class="ui button orange" name="type" value="remind">提醒審查</button>
+				<?php echo form_close()?>
 			</div>
-			<!--{/if}-->
+			<?php }?>
 		</div>
 	</div>
 </div>
 </div>
+<script>
+$(function() { 
+	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+		localStorage.setItem('topic_<?php echo $paper->sub_id?>', $(this).attr('href'));
+	});
+	var lastTab = localStorage.getItem('topic_<?php echo $paper->sub_id?>');
+	if (lastTab) {
+		$('[href="'+lastTab+'"]').tab('show');
+	}
+});
+</script>

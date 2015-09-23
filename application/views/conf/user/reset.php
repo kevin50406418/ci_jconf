@@ -1,11 +1,10 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
-<div class="col-md-<?php echo $col_right;?>">
 <div class="ui segment">
 	<div class="modal-header">
 		<h4 class="modal-title">重設 <?php echo $user_login;?>密碼</h4>
 	</div>
 	<div class="modal-body">
-		<?php echo form_open(base_url("sysop/user/reset/".$user_login),array("class"=>"form-horizontal"))?>
+		<?php echo form_open(get_url("dashboard",$conf_id,"user","edit",$user_login),array("class"=>"form-horizontal"))?>
 		<div class="form-group">
 			<label for="user_id" class="col-sm-2 control-label">新密碼</label>
 			<div class="col-sm-10">
@@ -20,5 +19,4 @@
 		<button class="ui button blue" type="submit" value="update" name="type">更新</button>
 		<?php echo form_close();?>
 	</div>
-</div>
 </div>

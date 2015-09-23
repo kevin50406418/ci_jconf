@@ -72,6 +72,7 @@ class Topic_model extends CI_Model {
 		$this->db->join('users','users.user_login = auth_reviewer.user_login');
 		$this->db->join('paper_review_pedding','paper_review_pedding.user_login = users.user_login');
 		$this->db->where('conf_id', $conf_id);
+		$this->db->where('paper_id', $paper_id);
 		$this->db->where_in('user_staus', $staus);
 		$query = $this->db->get();
 		return $query->result();
@@ -89,5 +90,13 @@ class Topic_model extends CI_Model {
 			"user_login"   => $user_login
 		);
 		return $this->db->insert('paper_review', $reviewer);
+	}
+
+	function get_reviewer($paper_id){
+		$this->db->from('paper_review');
+		$this->db->join('users','users.user_login = paper_review.user_login');
+		$this->db->where('paper_id', $paper_id);
+		$query = $this->db->get();
+		return $query->result();
 	}
 }

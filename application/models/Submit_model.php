@@ -318,6 +318,15 @@ class Submit_model extends CI_Model {
         $this->db->where("sub_id",$paper_id);
         return $this->db->update('paper', $paper);
     }
+    
+    function paper_to_reviewing($conf_id,$paper_id){
+        $paper = array(
+            "sub_status"=>3
+        );
+        $this->db->where("conf_id",$conf_id);
+        $this->db->where("sub_id",$paper_id);
+        return $this->db->update('paper', $paper);
+    }
 
     function is_editable($paper_id, $user_login){
         $this->db->from('paper');

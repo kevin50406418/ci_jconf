@@ -5,7 +5,10 @@ class Home extends MY_Controller {
 	public function __construct(){
 		parent::__construct();
 		$this->cinfo['show_confinfo'] = true;
+		/*$CI = & get_instance();
+		$CI->load->vars($data);*/
 	}
+	
 	public function index($conf_id=''){
 		$data['body_class'] = $this->body_class;
 		$data['conf_id'] = $conf_id;
@@ -31,10 +34,6 @@ class Home extends MY_Controller {
 				$conf_template=$data['conf_config']['conf_template'];
 				$template_dir = "template/".$conf_template;
 				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
-				
-				/*$this->module->get_module($conf_id,"sidebar-1","zhtw");
-				$this->module->get_module($conf_id,"sidebar-2","zhtw");
-				$this->module->get_module($conf_id,"content","zhtw");*/
 
 				if( $conf_template == "default"){
 					$this->load->view('common/header');
