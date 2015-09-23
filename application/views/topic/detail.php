@@ -136,7 +136,11 @@
 					<?php foreach ($reviewers as $key => $reviewer) {?>
 					<tr>
 						<td class="text-center">
+<<<<<<< HEAD
 							<input type="checkbox" value="<?php echo $reviewer->user_login?>" name="user_login[]"<?php if( in_array($reviewer->review_status, array(-2,2,4)) ){?> disabled<?php }?>>
+=======
+							<input type="checkbox" value="<?php echo $reviewer->user_login?>" name="user_login[]">
+>>>>>>> origin/master
 						</td>
 						<td><?php echo $reviewer->user_login?></td>
 						<td>
