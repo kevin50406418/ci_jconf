@@ -322,36 +322,37 @@ class Conf_model extends CI_Model {
 						"error" => "Database error! Contact System Adminstritor."
 					);
 		        }
+		        $now = time();
 		        $date = array(
 			        array(
 						'conf_id'     => $conf_id,
 						'date_type'   => 'hold',
-						'start_value' => 0,
-						'end_value'   => 0
+						'start_value' => $now,
+						'end_value'   => $now
 			        ),
 			        array(
 						'conf_id'     => $conf_id,
 						'date_type'   => 'submit',
-						'start_value' => 0,
-						'end_value'   => 0
+						'start_value' => $now,
+						'end_value'   => $now
 			        ),
 			        array(
 						'conf_id'     => $conf_id,
 						'date_type'   => 'early_bird',
-						'start_value' => 0,
-						'end_value'   => 0
+						'start_value' => $now,
+						'end_value'   => $now
 			        ),
 			        array(
 						'conf_id'     => $conf_id,
 						'date_type'   => 'register',
-						'start_value' => 0,
-						'end_value'   => 0
+						'start_value' => $now,
+						'end_value'   => $now
 			        ),
 			        array(
 						'conf_id'     => $conf_id,
 						'date_type'   => 'finish',
-						'start_value' => 0,
-						'end_value'   => 0
+						'start_value' => $now,
+						'end_value'   => $now
 			        )
 				);
 				if( $this->db->insert_batch('conf_date',$date) ){
@@ -584,5 +585,27 @@ class Conf_model extends CI_Model {
 		$this->db->where('conf_id', $conf_id);
 		$this->db->where('date_type', $date_type);
 		return $this->db->update('conf_date', $schedule);
+	}
+
+	function get_schedules($conf_id){
+		$this->db->from('conf_date');
+		$this->db->where('conf_id', $conf_id);
+		$query = $this->db->get();
+		$dates = $query->result();
+		$schedule =array();
+		foreach ($dates as $key => $date) {
+			$schedule[$date->date_type] = array();
+			$schedule[$date->date_type]['start'] = date("Y-m-d",$date->start_value);
+			$schedule[$date->date_type]['end'] = date("Y-m-d",$date->end_value);
+		}
+		return $schedule;
+	}
+
+	function get_schedule($conf_id,$date_type){
+		$this->db->from('conf_date');
+		$this->db->where('conf_id', $conf_id);
+		$this->db->where('date_type', $date_type);
+		$query = $this->db->get();
+		return $query->row();
 	}
 }

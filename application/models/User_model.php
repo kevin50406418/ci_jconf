@@ -49,16 +49,43 @@ class User_model extends CI_Model {
 		}
 	}
 
-	function is_conf(){
-		return false;
+	function is_conf($conf_id=''){
+		if(!empty($conf_id)){
+			return false;
+		}else{
+			if(!$this->is_sysop()){
+				$priv_conf = $this->session->priv_conf;
+				return in_array($conf_id,$priv_conf);
+			}else{
+				return true;
+			}
+		}
 	}
 
-	function is_topic(){
-		return false;
+	function is_topic($conf_id=''){
+		if(!empty($conf_id)){
+			return false;
+		}else{
+			if(!$this->is_sysop()){
+				$priv_topic = $this->session->priv_topic;
+				return in_array($conf_id,$priv_topic);
+			}else{
+				return true;
+			}
+		}
 	}
 
-	function is_reviewer(){
-		return false;
+	function is_reviewer($conf_id=''){
+		if(!empty($conf_id)){
+			return false;
+		}else{
+			if(!$this->is_sysop()){
+				$priv_reviewer = $this->session->priv_reviewer;
+				return in_array($conf_id,$priv_reviewer);
+			}else{
+				return true;
+			}
+		}
 	}
 
 	function username_exists($user_login){
@@ -396,5 +423,56 @@ class User_model extends CI_Model {
 	    return $password;
 	}
 
+	function get_auth($user_login){
+		$priv_conf = array();
+		$priv_topic = array();
+		$priv_reviewer = array();
+
+		//auth_conf
+		$this->db->from("auth_conf");
+		$this->db->where("user_login",$user_login);
+		$query = $this->db->get();
+        $auth_confs = $query->result();
+        if(is_array($auth_confs)){
+	        foreach ($auth_confs as $key => $auth_conf) {
+	        	if(!in_array($auth_conf->conf_id,$priv_conf)){
+	        		array_push($priv_conf,$auth_conf->conf_id);
+	        	}
+	        }
+        }
+
+        //auth_topic
+        $this->db->select("distinct(conf_id)");
+        $this->db->from("auth_topic");
+		$this->db->where("user_login",$user_login);
+		$query = $this->db->get();
+        $auth_topics = $query->result();
+        if(is_array($auth_topics)){
+	        foreach ($auth_topics as $key => $auth_topic) {
+	        	if(!in_array($auth_topic->conf_id,$priv_topic)){
+	        		array_push($priv_topic,$auth_topic->conf_id);
+	        	}
+	        }
+        }
+
+        //auth_reviewer
+        $this->db->from("auth_reviewer");
+		$this->db->where("user_login",$user_login);
+		$query = $this->db->get();
+        $auth_reviewers = $query->result();
+        if(is_array($auth_reviewers)){
+	        foreach ($auth_reviewers as $key => $auth_reviewer) {
+	        	if(!in_array($auth_reviewer->conf_id,$priv_reviewer)){
+	        		array_push($priv_reviewer,$auth_reviewer->conf_id);
+	        	}
+	        }
+        }
+		$_SESSION['priv_conf']     = $priv_conf;
+		$_SESSION['priv_topic']    = $priv_topic;
+		$_SESSION['priv_reviewer'] = $priv_reviewer;
+        $this->session->mark_as_temp('priv_conf', 600);
+        $this->session->mark_as_temp('priv_topic', 600);
+        $this->session->mark_as_temp('priv_reviewer', 600);
+	}
 }
 ?>

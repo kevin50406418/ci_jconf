@@ -259,4 +259,6 @@ class User extends MY_Controller {
 			redirect('/user/login', 'location', 301);
 		}
 	}
+
+	
 }

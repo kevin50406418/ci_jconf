@@ -140,9 +140,9 @@ $(function() {
 					<div class="col-sm-10">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="input-daterange input-group" id="datepicker">
-								<input type="text" class="input-sm form-control" name="hold[start]" value="">
+								<input type="text" class="input-sm form-control" name="hold[start]" value="<?php echo $schedule['hold']['start']?>">
 								<span class="input-group-addon">~</span>
-								<input type="text" class="input-sm form-control" name="hold[end]" value="">
+								<input type="text" class="input-sm form-control" name="hold[end]" value="<?php echo $schedule['hold']['end']?>">
 							</div>
 						</div>
 					</div>
@@ -153,9 +153,9 @@ $(function() {
 					<div class="col-sm-10">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="input-daterange input-group" id="datepicker">
-								<input type="text" class="input-sm form-control" name="submit[start]" value="">
+								<input type="text" class="input-sm form-control" name="submit[start]" value="<?php echo $schedule['submit']['start']?>">
 								<span class="input-group-addon">~</span>
-								<input type="text" class="input-sm form-control" name="submit[end]" value="">
+								<input type="text" class="input-sm form-control" name="submit[end]" value="<?php echo $schedule['submit']['end']?>">
 							</div>
 						</div>
 					</div>
@@ -166,9 +166,9 @@ $(function() {
 					<div class="col-sm-10">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="input-daterange input-group" id="datepicker">
-								<input type="text" class="input-sm form-control" name="early_bird[start]" value="">
+								<input type="text" class="input-sm form-control" name="early_bird[start]" value="<?php echo $schedule['early_bird']['start']?>">
 								<span class="input-group-addon">~</span>
-								<input type="text" class="input-sm form-control" name="early_bird[end]" value="">
+								<input type="text" class="input-sm form-control" name="early_bird[end]" value="<?php echo $schedule['early_bird']['end']?>">
 							</div>
 						</div>
 					</div>
@@ -179,9 +179,9 @@ $(function() {
 					<div class="col-sm-10">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="input-daterange input-group" id="datepicker">
-								<input type="text" class="input-sm form-control" name="register[start]" value="">
+								<input type="text" class="input-sm form-control" name="register[start]" value="<?php echo $schedule['register']['start']?>">
 								<span class="input-group-addon">~</span>
-								<input type="text" class="input-sm form-control" name="register[end]" value="">
+								<input type="text" class="input-sm form-control" name="register[end]" value="<?php echo $schedule['register']['end']?>">
 							</div>
 						</div>
 					</div>
@@ -192,7 +192,7 @@ $(function() {
 					<div class="col-sm-10">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="input-daterange input-group" id="datepicker">
-								<input type="text" class="input-sm form-control" name="finish[end]" value="">
+								<input type="text" class="input-sm form-control" name="finish[end]" value="<?php echo $schedule['finish']['end']?>">
 							</div>
 						</div>
 					</div>

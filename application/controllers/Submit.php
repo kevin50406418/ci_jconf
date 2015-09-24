@@ -62,7 +62,21 @@ class Submit extends MY_Conference {
 				$this->output->_display();
 				exit;
 			}	
-				
+			$schedule_submit = $this->conf->get_schedule($conf_id,"submit");
+			$now = time();
+			if( $now < $schedule_submit->start_value ){
+				$this->alert->js("尚未開放投稿",get_url("main",$conf_id));
+				$this->load->view('common/footer');
+				$this->output->_display();
+				exit;
+			}
+
+			if( $now > $schedule_submit->end_value ){
+				$this->alert->js("投稿截止",get_url("main",$conf_id));
+				$this->load->view('common/footer');
+				$this->output->_display();
+				exit;
+			}
 			switch ($step) {
 				default:
 				case 1:
@@ -349,6 +363,23 @@ class Submit extends MY_Conference {
 				$this->output->_display();
 				exit;
 			}
+
+			$schedule_submit = $this->conf->get_schedule($conf_id,"submit");
+			$now = time();
+			if( $now < $schedule_submit->start_value ){
+				$this->alert->js("尚未開放投稿",get_url("main",$conf_id));
+				$this->load->view('common/footer');
+				$this->output->_display();
+				exit;
+			}
+
+			if( $now > $schedule_submit->end_value ){
+				$this->alert->js("投稿截止",get_url("main",$conf_id));
+				$this->load->view('common/footer');
+				$this->output->_display();
+				exit;
+			}
+			
 			if( $this->Submit->is_editable($paper_id, $user_login) ){
 				$this->alert->js("稿件已送審，無法編輯",get_url("submit",$conf_id));
 				$this->load->view('common/footer');

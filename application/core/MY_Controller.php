@@ -5,6 +5,7 @@ class MY_Controller extends CI_Controller{
 	public $body_class;
 	public $_lang;
 	public $data = array();
+	public $conf_id;
     public function __construct(){
 		parent::__construct();
 		$this->cinfo['show_confinfo'] = false;
@@ -21,6 +22,23 @@ class MY_Controller extends CI_Controller{
 		$this->_lang = $this->user->get_clang();
 		$this->lang->load("conf_menu",$this->_lang);
 		$this->lang->load("paper_status",$this->_lang);
+		if( $this->user->is_login() ){
+			$bool_conf     = $this->session->has_userdata('priv_conf');
+			$bool_topic    = $this->session->has_userdata('priv_topic');
+			$bool_reviewer = $this->session->has_userdata('priv_reviewer');
+			
+			if( $bool_conf || $bool_topic || $bool_reviewer ){
+				$this->user->get_auth($this->session->user_login);
+			}
+			switch( $this->router->fetch_method() ){
+				default:
+					$this->conf_id = $this->uri->segment(3);
+				break;
+				case "index":
+					$this->conf_id = $this->uri->segment(2);
+				break;
+			}
+		}
     }
 }
 
