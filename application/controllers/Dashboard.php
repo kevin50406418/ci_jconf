@@ -10,12 +10,16 @@ class Dashboard extends MY_Conference {
 			$this->cinfo['show_confinfo'] = false;
 			$this->conf->show_404conf();
 		}
-		if( !$this->user->is_conf($this->conf_id) && !$this->user_sysop ){
+		$this->conf_config = $this->conf->conf_config($this->conf_id,$this->user_sysop);
+		if( $this->user->is_conf($this->conf_id) || $this->user_sysop ){
+			
+		}else{
 			$data['conf_id'] = $this->conf_id;
 			$data['body_class'] = $this->body_class;
+			$data['conf_config']=$this->conf_config;
 			$this->conf->show_permission_deny($data);
 		}
-		$this->conf_config = $this->conf->conf_config($this->conf_id,$this->user_sysop);
+		
 	}
 
 	public function index($conf_id=''){

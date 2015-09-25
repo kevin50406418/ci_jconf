@@ -19,7 +19,7 @@ class User_model extends CI_Model {
 			$this->add_login_log($username,1);
 			$this->session->set_userdata('user_login', $result['user_login']);
 			$this->session->set_userdata('user_sysop', $result['user_sysop']);
-
+			$this->get_auth($username);
 			return true;
 		}else{
 			$this->add_login_log($username,0);

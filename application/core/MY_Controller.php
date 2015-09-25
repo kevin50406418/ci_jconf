@@ -35,6 +35,9 @@ class MY_Controller extends CI_Controller{
 					$this->conf_id = $this->uri->segment(3);
 				break;
 				case "index":
+					$this->conf_id = $this->uri->segment(3);
+				break;
+				case "main":
 					$this->conf_id = $this->uri->segment(2);
 				break;
 			}
