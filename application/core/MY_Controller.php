@@ -27,7 +27,7 @@ class MY_Controller extends CI_Controller{
 			$bool_topic    = $this->session->has_userdata('priv_topic');
 			$bool_reviewer = $this->session->has_userdata('priv_reviewer');
 			
-			if( $bool_conf || $bool_topic || $bool_reviewer ){
+			if( !$bool_conf || !$bool_topic || !$bool_reviewer ){
 				$this->user->get_auth($this->session->user_login);
 			}
 			switch( $this->router->fetch_method() ){
@@ -72,7 +72,7 @@ class MY_Topic extends MY_Controller{
 		parent::__construct();
 		if( !$this->user->is_login() ){
 			redirect('/user/login', 'location', 301);
-			if( $this->user->is_topic() || $this->user->is_sysop()){
+			if( $this->user->is_topic($this->conf_id) || $this->user->is_sysop()){
 				
 			}else{
 				redirect(base_url(), 'location', 301);

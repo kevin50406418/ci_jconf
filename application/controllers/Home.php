@@ -103,9 +103,6 @@ class Home extends MY_Controller {
 				redirect('/user/login', 'location', 301);
 			}
 			$data['spage']=$this->config->item('spage');
-
-			
-
 			if( $this->conf->confid_exists($conf_id,$user_sysop) ){
 				$data['conf_config']=$this->conf->conf_config($conf_id,$user_sysop);
 				//$data['schedule']=$this->conf->conf_schedule($conf_id);
@@ -121,13 +118,13 @@ class Home extends MY_Controller {
 				//$this->load->view('conf/conf_schedule',$data);
 				if($this->user->is_login()){
 					$this->load->view('conf/menu_submit',$data);
-					if($this->user->is_conf() || $this->user->is_sysop()){
+					if($this->user->is_conf($conf_id) || $this->user->is_sysop()){
 						$this->load->view('conf/menu_conf',$data);
 					}
-					if($this->user->is_topic() || $this->user->is_sysop()){
+					if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
 						$this->load->view('conf/menu_topic',$data);
 					}
-					if($this->user->is_reviewer() || $this->user->is_sysop()){
+					if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
 						$this->load->view('conf/menu_reviewer',$data);
 					}
 				}
@@ -201,12 +198,14 @@ class Home extends MY_Controller {
 	}
 
 	public function ckeditor(){
-		$this->assets->add_js(asset_url().'ckeditor/ckeditor.js');
+		$data['body_class'] = $this->body_class;
+		$this->cinfo['show_confinfo'] = false;
+		$this->assets->add_js(base_url().'tinymce/tinymce.min.js');
 		//print_r($this->input->post(NULL,FALSE));
 		if ($this->form_validation->run() == FALSE){
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
-			//$this->load->view('ckeditor');
+			$this->load->view('ckeditor');
 			$this->load->view('common/footer');
         }else{
            // $ckeditor1 = $this->input->post('ckeditor1', TRUE);

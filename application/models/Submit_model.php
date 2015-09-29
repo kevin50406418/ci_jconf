@@ -112,7 +112,6 @@ class Submit_model extends CI_Model {
             "sub_sponsor" =>$sub_sponsor,
             "sub_time"    =>time(),
         );
-        sp($paper);
         $this->db->where('sub_id', $paper_id);
         $this->db->where('conf_id', $conf_id);
         if( $this->db->update('paper', $paper) ){

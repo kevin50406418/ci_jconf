@@ -50,7 +50,7 @@ class User_model extends CI_Model {
 	}
 
 	function is_conf($conf_id=''){
-		if(!empty($conf_id)){
+		if(empty($conf_id)){
 			return false;
 		}else{
 			if(!$this->is_sysop()){
@@ -63,7 +63,7 @@ class User_model extends CI_Model {
 	}
 
 	function is_topic($conf_id=''){
-		if(!empty($conf_id)){
+		if(empty($conf_id)){
 			return false;
 		}else{
 			if(!$this->is_sysop()){
@@ -76,12 +76,12 @@ class User_model extends CI_Model {
 	}
 
 	function is_reviewer($conf_id=''){
-		if(!empty($conf_id)){
+		if(empty($conf_id)){
 			return false;
 		}else{
 			if(!$this->is_sysop()){
 				$priv_reviewer = $this->session->priv_reviewer;
-				return in_array($conf_id,$priv_reviewer);
+				return in_array($conf_id,$this->session->priv_reviewer);
 			}else{
 				return true;
 			}

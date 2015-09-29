@@ -11,6 +11,7 @@ class Dashboard extends MY_Conference {
 			$this->conf->show_404conf();
 		}
 		$this->conf_config = $this->conf->conf_config($this->conf_id,$this->user_sysop);
+		
 		if( $this->user->is_conf($this->conf_id) || $this->user_sysop ){
 			
 		}else{
