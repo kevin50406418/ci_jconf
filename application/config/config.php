@@ -17,7 +17,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | environments.
 |
 */
-$config['base_url'] = 'https://210.70.80.80/';
+$config['base_url'] = 'https://120.108.113.38/';
 
 /*
 |--------------------------------------------------------------------------

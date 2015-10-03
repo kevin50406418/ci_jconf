@@ -52,29 +52,39 @@ class Dashboard extends MY_Conference {
 					$this->form_validation->set_rules('conf_email', '聯絡信箱', 'required');
 					$this->form_validation->set_rules('conf_phone', '聯絡電話', 'required');
 					$this->form_validation->set_rules('conf_address', '通訊地址', 'required');
+					$this->form_validation->set_rules('conf_host', '主辦單位', 'required');
 					$this->form_validation->set_rules('conf_desc', '簡介', 'required');
-					
 					if ($this->form_validation->run()){
 						$conf_name    = $this->input->post('conf_name');
 						$conf_master  = $this->input->post('conf_master');
 						$conf_email   = $this->input->post('conf_email');
 						$conf_phone   = $this->input->post('conf_phone');
+						$conf_host    = $this->input->post('conf_host');
 						$conf_fax     = $this->input->post('conf_fax');
 						$conf_address = $this->input->post('conf_address');
 						$conf_desc    = $this->input->post('conf_desc');
-						if( $this->conf->update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_desc) ){
+						
+						if( $this->conf->update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_host,$conf_desc) ){
 							$this->alert->js("更新成功");
+						}else{
+							$this->alert->js("更新失敗");
 						}
+						$this->alert->refresh(1);
 					}
 				break;
 				case "func":
 					$this->form_validation->set_rules('conf_col', '首頁排版', 'required');
+					$this->form_validation->set_rules('conf_most', '科技部成果發表', 'required');
 					if ($this->form_validation->run()){
 						$conf_col    = $this->input->post('conf_col');
+						$conf_most    = $this->input->post('conf_most');
 						if( $this->conf->update_confcol($conf_id,$conf_col) ){
-							$this->alert->js("更新成功");
-							$this->alert->refresh(0);
+							$this->alert->show("s","首頁排版更新成功");
 						}
+						if( $this->conf->update_confmost($conf_id,$conf_most) ){
+							$this->alert->show("s","科技部成果發表更新成功");
+						}
+						$this->alert->refresh(1);
 					}
 				break;
 				case "schedule":
@@ -964,6 +974,195 @@ class Dashboard extends MY_Conference {
 		$this->load->view('common/footer');
 		
 	}
+
+	public function most($conf_id='',$act=''){
+		$data['conf_id'] = $conf_id;
+		$data['body_class'] = $this->body_class;
+		
+		$data['spage']=$this->config->item('spage');
+		$data['conf_config']=$this->conf_config;
+		//$data['schedule']=$this->conf->conf_schedule($conf_id);
+		$data['conf_content']=$this->conf->conf_content($conf_id);
+		
+		$this->load->view('common/header');
+		$this->load->view('common/nav',$data);
+
+		$this->load->view('conf/conf_nav',$data);
+		//$this->load->view('conf/conf_schedule',$data);
+
+		$this->load->view('conf/menu_conf',$data);
+		
+		switch($act){
+			case "edit":
+				if( !empty( $this->input->get('id') ) ){
+					$most_id = $this->input->get('id');
+					$most = $this->conf->get_most($conf_id,$most_id);
+					if( !empty($most) ){
+						$data['most'] = $most;
+						$report = $this->Submit->get_most_report($most_id);
+						$mostfile = $this->Submit->get_most_file($conf_id,$most_id);
+						$data['report'] = $report;
+						$data['most_file'] = $mostfile;
+						$do = $this->input->get('do');
+						$can_empty = array("most_status");
+						switch($do){
+							case "submit":
+								foreach ($most as $key => $m) {
+									if( !in_array($key,$can_empty) ){
+										if( empty($m) ){$this->alert->show("d","計畫資料不齊全",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);$this->output->_display();exit;}
+									}
+								}
+								foreach ($report as $key => $r) {
+									if( empty($r) ){$this->alert->show("d","發表者資料不齊全",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);$this->output->_display();exit;}
+								}
+								if( empty($mostfile->most_auth) ){
+									$this->alert->show("d","授權同意書未上傳",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+									$this->output->_display();
+									exit;
+								}
+								if( empty($mostfile->most_result) ){
+									$this->alert->show("d","成果資料表未上傳",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+									$this->output->_display();
+									exit;
+								}
+								if( $most->most_method == "P" ){
+									if( empty($mostfile->most_poster) ){
+										$this->alert->show("d","成果海報電子檔未上傳",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+										$this->output->_display();
+										exit;
+									}
+								}
+								if( $this->Submit->submit_most($conf_id,$most_id,$this->user_login) ){
+									$this->alert->js("成功送出資料",get_url("dashboard",$conf_id,"most"));
+				                }else{
+									$this->alert->js("送出資料失敗",get_url("dashboard",$conf_id,"most"));
+								}
+								
+							break;
+							case "info":
+								$this->Submit->most_valid();
+								if ($this->form_validation->run()){
+									$most_method     = $this->input->post('most_method');
+									$most_number     = $this->input->post('most_number');
+									$most_name       = $this->input->post('most_name');
+									$most_name_eng   = $this->input->post('most_name_eng');
+									$most_uni        = $this->input->post('most_uni');
+									$most_dept       = $this->input->post('most_dept');
+									$most_host       = $this->input->post('most_host');
+
+									$report_name     = $this->input->post('report_name');
+									$report_uni      = $this->input->post('report_uni');
+									$report_dept     = $this->input->post('report_dept');
+									$report_title    = $this->input->post('report_title');
+									$report_email    = $this->input->post('report_email');
+									$report_phone    = $this->input->post('report_phone');
+									$report_meal     = $this->input->post('report_meal');
+									$report_mealtype = $this->input->post('report_mealtype');
+									$update_most = $this->Submit->update_most($conf_id,$this->user_login,$most_id,$most_method,$most_number,$most_name,$most_name_eng,$most_host,$most_uni,$most_dept);
+									$update_most_report = $this->Submit->update_most_report($most_id,$report_name,$report_uni,$report_dept,$report_title,$report_email,$report_phone,$report_meal,$report_mealtype);
+									if( $update_most && $update_most_report){
+										$this->alert->js("更新成功",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+									}else{
+										$this->alert->js("更新失敗",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+									}
+								}
+							break;
+							case "file":
+								$config['upload_path']= $this->conf->get_mostdir($conf_id);
+								$config['allowed_types']= 'pdf|doc|docx';
+				                $config['encrypt_name']= true;
+				                $this->load->library('upload', $config);
+
+				                $file = $this->input->post('file');
+				                switch($file){
+				                	case "auth":
+				                		if ( $this->upload->do_upload('most_auth')){
+							                $most_file  = $this->upload->data();
+							                if( $this->conf->update_most_file($most_id,"auth",$most_file['file_name'],$most_file['client_name']) ){
+												$this->alert->js("更新成功",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+							                }else{
+												$this->alert->js("更新失敗",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+											}
+							            }else{
+											$this->alert->js("更新失敗",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+							            }
+						            break;
+						            case "result":
+						            	if ( $this->upload->do_upload('most_result')){
+							            	$most_file  = $this->upload->data();
+							            	if( $this->Submit->update_most_file($most_id,"result",$most_file['file_name'],$most_file['client_name']) ){
+												$this->alert->js("更新成功",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+							                }else{
+												$this->alert->js("更新失敗",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+											}
+							            }else{
+											$this->alert->js("更新失敗",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+							            }
+						            break;
+						            case "poster":
+						            	if ( $this->upload->do_upload('most_poster')){
+							                $most_file  = $this->upload->data();
+							                if( $this->Submit->update_most_file($most_id,"poster",$most_file['file_name'],$most_file['client_name']) ){
+												$this->alert->js("更新成功",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+							                }else{
+												$this->alert->js("更新失敗",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+											}
+							            }else{
+											$this->alert->js("更新失敗",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+							            }
+						            break;
+				                }
+							break;
+						}
+						$this->load->view("conf/most/edit",$data);
+					}
+				}else{
+					$this->alert->js("找不到上傳資料");
+				}
+			break;
+			case "detail":
+				$most_id = $this->input->get('id');
+				$most = $this->conf->get_most($conf_id,$most_id);
+				if( !empty($most) ){
+					$data['most'] = $most;
+					$data['most_file'] = $this->Submit->get_most_file($conf_id,$most_id);
+					$data['report'] = $this->Submit->get_most_report($most_id);
+					if( $most->most_status == 1 ){
+						$this->form_validation->set_rules('options', '操作選項', 'required');
+						if ($this->form_validation->run()){
+							$options = $this->input->post('options');
+							if( $options == 1 ){
+								if( $this->conf->most_review($conf_id,$most_id,2) ){
+									$this->alert->js("操作成功，接受本報名資料");
+								}else{
+									$this->alert->js("操作失敗，無法接受本報名資料");
+								}
+							}else if( $options == 0 ){
+								if( $this->conf->most_review($conf_id,$most_id,-1) ){
+									$this->alert->js("操作成功，拒絕本報名資料");
+								}else{
+									$this->alert->js("操作失敗，無法拒絕本報名資料");
+								}
+							}else{
+								$this->alert->js("無效操作");
+							}
+							$this->alert->refresh(1);
+						}
+						$this->load->view("conf/most/reviewer",$data);
+					}
+					$this->load->view("conf/most/detail",$data);
+				}
+			break;
+			case "list":
+			default:
+				$data['mosts'] = $this->conf->get_mosts($conf_id);
+				$this->load->view('conf/most/list',$data);
+			break;
+		}
+		$this->load->view('common/footer');
+		
+	}
+
 	// Template
 	private function _temp($conf_id=''){
 		$data['conf_id'] = $conf_id;

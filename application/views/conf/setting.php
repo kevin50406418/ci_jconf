@@ -72,6 +72,12 @@ $(function() {
 						</div>
 					</div>
 					<div class="form-group">
+						<label for="conf_fax" class="col-sm-2 control-label">主辦單位</label>
+						<div class="col-sm-10">
+							<input name="conf_host" type="text" class="form-control" id="conf_host" value="<?php echo $conf_config['conf_host'];?>">
+						</div>
+					</div>
+					<div class="form-group">
 						<label for="conf_fax" class="col-sm-2 control-label">傳真</label>
 						<div class="col-sm-10">
 							<input name="conf_fax" type="text" class="form-control" id="conf_fax" value="<?php echo $conf_config['conf_fax'];?>">
@@ -122,6 +128,19 @@ $(function() {
 					<div class="col-sm-1 text-center">
 						<img src="<?php echo asset_url()?>img/col/col-3cr.png" class="img-thumbnail">
 						<input name="conf_col" type="radio" id="conf_col" value="3cr"<?php if($conf_config['conf_col'] == "3cr" ){?> checked<?php }?>>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="conf_most" class="col-sm-2 control-label">科技部成果發表</label>
+					<div class="col-sm-10">
+						<div class="btn-group" data-toggle="buttons">
+							<label class="btn btn-success<?php if($conf_config['conf_most'] == 1 ){?> active<?php }?>">
+								<input type="radio" name="conf_most" id="conf_most1" autocomplete="off" value="1"<?php if($conf_config['conf_most'] == 1 ){?> checked<?php }?>> 啟動
+							</label>
+							<label class="btn btn-danger<?php if($conf_config['conf_most'] == 0 ){?> active<?php }?>">
+								<input type="radio" name="conf_most" id="conf_most2" autocomplete="off" value="0"<?php if($conf_config['conf_most'] == 0 ){?> checked<?php }?>> 關閉
+							</label>
+						</div>
 					</div>
 				</div>
 				<div class="form-group">
@@ -193,6 +212,17 @@ $(function() {
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="input-daterange input-group" id="datepicker">
 								<input type="text" class="input-sm form-control" name="finish[end]" value="<?php echo $schedule['finish']['end']?>">
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-2 control-label">科技部成果發表</label>
+					<div class="col-sm-10">
+						<div class="col-sm-offset-2 col-sm-10">
+							<div class="input-daterange input-group" id="datepicker">
+								<input type="text" class="input-sm form-control" name="most[end]" value="<?php //echo $schedule['finish']['end']?>">
 							</div>
 						</div>
 					</div>

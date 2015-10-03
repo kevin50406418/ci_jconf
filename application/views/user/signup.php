@@ -2,7 +2,7 @@
 <?php echo validation_errors('<div class="ui message red">', '</div>');?>
 <div class="ui segment">
 	<div class="ui message info" role="alert">
-		已經擁有帳號? <a href="<?php echo base_url('user/login');?>">登入帳號</a>。
+		已經擁有帳號? <a href="<?php echo base_url('user/login');?>" class="btn btn-default btn-xs">登入帳號</a>。
 	</div>
 	<?php echo form_open(base_url('user/signup'),array("class"=>"form-horizontal","id"=>"register"))?>
 		<div class="form-group">
@@ -101,13 +101,18 @@
 		<div class="form-group">
 			<label for="user_postadd" class="col-sm-2 control-label">聯絡地址</label>
 			<div class="col-sm-10">
-				<div id="addr_6" class="row form-inline">
-					<div data-role="zipcode" data-readonly="true" class="col-sm-3" data-value="<?php echo set_value('user_postcode'); ?>"></div>
-					<div data-role="county" class="col-sm-2"></div>
-					<div data-role="district" class="col-sm-2"></div>
+				<div id="addr_6" class="row">
+					<div class="form-group">
+						<label class="col-sm-2 control-label">郵遞區號:</label>
+						<div data-role="zipcode" class="col-sm-2" data-readonly="true" data-value="<?php echo set_value('user_postcode'); ?>"></div>
+					</div>
+					<div>
+						<div data-role="county" class="col-sm-2"></div>
+						<div data-role="district" class="col-sm-2"></div>
+					</div>
 				</div>
-				<div class="help-block">
-					<input name="user_postadd" type="text" required="required" id="user_postadd" size="20" maxlength="100" class="form-control col-sm-5" autocomplete="off" value="<?php echo set_value('user_postadd'); ?>">
+				<div>
+					街道地址:<input name="user_postadd" type="text" required="required" id="user_postadd" size="20" maxlength="100" class="form-control col-sm-5" autocomplete="off" value="<?php echo set_value('user_postadd'); ?>">
 				</div>
 			</div>
 		</div>

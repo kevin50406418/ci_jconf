@@ -209,7 +209,7 @@ class Conf_model extends CI_Model {
         }
 	}
 	
-	function update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_desc){
+	function update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_host,$conf_desc=''){
 		$conf = array(
 			"conf_name"    =>$conf_name,
 			"conf_master"  =>$conf_master,
@@ -217,6 +217,7 @@ class Conf_model extends CI_Model {
 			"conf_phone"   =>$conf_phone,
 			"conf_fax"     =>$conf_fax,
 			"conf_address" =>$conf_address,
+			"conf_host"    =>$conf_host,
 			"conf_desc"    =>$conf_desc
         );
         $this->db->where("conf_id", $conf_id);
@@ -227,7 +228,7 @@ class Conf_model extends CI_Model {
         }
 	}
 
-	function sysop_updateconf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$conf_lang,$conf_fax,$conf_desc){
+	function sysop_updateconf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$conf_lang,$conf_host,$conf_fax,$conf_desc=''){
 		$conf_lang = implode(",",$conf_lang);
 		$conf = array(
 			"conf_name"    =>$conf_name,
@@ -236,13 +237,13 @@ class Conf_model extends CI_Model {
 			"conf_phone"   =>$conf_phone,
 			"conf_fax"     =>$conf_fax,
 			"conf_address" =>$conf_address,
+			"conf_host"    =>$conf_host,
 			"conf_lang"    =>$conf_lang,
 			"conf_staus"   =>$conf_staus,
 			"conf_desc"    =>$conf_desc
         );
         $this->db->where("conf_id", $conf_id);
         if( $this->db->update('conf', $conf) ){
-        	sp($conf_desc);
             return true;
         }else{
             return false;
@@ -254,6 +255,10 @@ class Conf_model extends CI_Model {
 
 	function get_regdir($conf_id){
 		return './upload/registration/'.$conf_id.'/';
+	}
+
+	function get_mostdir($conf_id){
+		return './upload/most/'.$conf_id.'/';
 	}
 
 	function mkconf_dir($conf_id){
@@ -282,11 +287,21 @@ class Conf_model extends CI_Model {
 				"error" => "Directory '".$this->get_regdir($conf_id)."' exists."
 			);
 		}
+
+		if( !file_exists ( $this->get_mostdir($conf_id) ) ){
+			mkdir($this->get_mostdir($conf_id), 0755);
+			write_file($this->get_mostdir($conf_id)."index.html", $data);
+		}else{
+			$return = array(
+				"status" => false,
+				"error" => "Directory '".$this->get_mostdir($conf_id)."' exists."
+			);
+		}
 		$return['status'] = true;
 		return $return;
 	}
 
-	function add_conf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$conf_lang,$conf_fax="",$conf_desc=""){
+	function add_conf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$conf_lang,$conf_host,$conf_fax="",$conf_desc=""){
 		$return = array(
 			"status" => false,
 			"error" => ""
@@ -300,16 +315,17 @@ class Conf_model extends CI_Model {
 				$return["error"] = $mkdir['error'];
 			}else{
 				$conf = array(
-					"conf_id" => $conf_id,
-					"conf_name" => $conf_name,
-					"conf_master" => $conf_master,
-					"conf_email" => $conf_email,
-					"conf_phone" => $conf_phone,
+					"conf_id"      => $conf_id,
+					"conf_name"    => $conf_name,
+					"conf_master"  => $conf_master,
+					"conf_email"   => $conf_email,
+					"conf_phone"   => $conf_phone,
 					"conf_address" => $conf_address,
-					"conf_staus" => $conf_staus,
-					"conf_lang" => $conf_lang,
-					"conf_fax" => $conf_fax,
-					"conf_desc" => $conf_desc
+					"conf_host"    => $conf_host,
+					"conf_staus"   => $conf_staus,
+					"conf_lang"    => $conf_lang,
+					"conf_fax"     => $conf_fax,
+					"conf_desc"    => $conf_desc
 				);
 				if( $this->db->insert('conf', $conf) ){
 					$return = array(
@@ -568,6 +584,14 @@ class Conf_model extends CI_Model {
 		return $this->db->update('conf', $conf_col);
 	}
 
+	function update_confmost($conf_id,$conf_most){
+		$conf_col = array(
+			"conf_most" => $conf_most
+		);
+		$this->db->where('conf_id', $conf_id);
+		return $this->db->update('conf', $conf_col);
+	}
+
 	function get_module($conf_id,$module_lang){
 		$this->db->from('module');
 		$this->db->where('module_lang', $module_lang);
@@ -608,4 +632,52 @@ class Conf_model extends CI_Model {
 		$query = $this->db->get();
 		return $query->row();
 	}
+
+	function get_mosts($conf_id){
+        $this->db->from('most');
+        $this->db->where('conf_id', $conf_id);
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    function most_review($conf_id,$most_id,$most_status){
+    	$most  = array(
+            "most_status" => $most_status
+        );
+        $this->db->where('conf_id', $conf_id);
+        $this->db->where('most_id', $most_id);
+        if( $this->db->update('most', $most) ){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    function get_most($conf_id,$most_id){
+        $this->db->from('most');
+        $this->db->where('conf_id', $conf_id);
+        $this->db->where('most_id', $most_id);
+        $query = $this->db->get();
+        return $query->row();
+    }
+
+    function update_most($conf_id,$most_id,$most_method,$most_number,$most_name,$most_name_eng,$most_host,$most_uni,$most_dept){
+        $most  = array(
+            "most_method"   => $most_method,
+            "most_number"   => $most_number,
+            "most_name"     => $most_name,
+            "most_name_eng" => $most_name_eng,
+            "most_host"     => $most_host,
+            "most_uni"      => $most_uni,
+            "most_dept"     => $most_dept
+        );
+        $this->db->where('most_id', $most_id);
+        $this->db->where('conf_id', $conf_id);
+
+        if( $this->db->update('most', $most) ){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }

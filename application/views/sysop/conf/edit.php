@@ -51,6 +51,12 @@
 						</div>
 					</div>
 					<div class="form-group">
+						<label for="conf_fax" class="col-sm-2 control-label text-info">主辦單位</label>
+						<div class="col-sm-10">
+							<input name="conf_host" type="text" class="form-control" id="conf_host" value="<?php echo $conf_config['conf_host'];?>">
+						</div>
+					</div>
+					<div class="form-group">
 						<label for="conf_lang" class="col-sm-2 control-label text-info">語言</label>
 						<div class="col-sm-10">
 							<div class="btn-group" data-toggle="buttons">

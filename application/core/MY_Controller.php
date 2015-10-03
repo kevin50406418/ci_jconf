@@ -2,14 +2,18 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 class MY_Controller extends CI_Controller{
 	public $cinfo = array();
+	public $data = array();
 	public $body_class;
 	public $_lang;
-	public $data = array();
 	public $conf_id;
+	public $spage;
+	public $user_login;
     public function __construct(){
 		parent::__construct();
 		$this->cinfo['show_confinfo'] = false;
-		$this->body_class ="container";
+		$this->body_class = "container";
+		$this->spage = $this->config->item('spage');
+
 		$this->assets->add_css(asset_url().'style/bootstrap.min.css');
 		$this->assets->add_css(asset_url().'style/label.min.css');
 		$this->assets->add_css(asset_url().'style/segment.min.css');
@@ -23,6 +27,7 @@ class MY_Controller extends CI_Controller{
 		$this->lang->load("conf_menu",$this->_lang);
 		$this->lang->load("paper_status",$this->_lang);
 		if( $this->user->is_login() ){
+			$this->user_login = $this->session->userdata('user_login');
 			$bool_conf     = $this->session->has_userdata('priv_conf');
 			$bool_topic    = $this->session->has_userdata('priv_topic');
 			$bool_reviewer = $this->session->has_userdata('priv_reviewer');
@@ -35,7 +40,11 @@ class MY_Controller extends CI_Controller{
 					$this->conf_id = $this->uri->segment(3);
 				break;
 				case "index":
-					$this->conf_id = $this->uri->segment(3);
+					if( $this->uri->total_segments() == 2){
+						$this->conf_id = $this->uri->segment(2);
+					}else{
+						$this->conf_id = $this->uri->segment(3);
+					}
 				break;
 				case "main":
 					$this->conf_id = $this->uri->segment(2);

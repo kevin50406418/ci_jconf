@@ -203,9 +203,9 @@ class User extends MY_Controller {
 		    	$user_postaddr = $user_addcounty."|".$user_area."|".$user_postaddr;
 		    	$res = $this->user->adduser($user_login,$user_pass,$user_title,$user_email,$user_firstname,$user_lastname,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research);
 		    	if( $res['status'] ){
-		    		$this->alert->js("Signup Success");
+		    		$this->alert->js("Signup Success",base_url("user/login"));
 		    		$this->form_validation->set_message('signup_success', 'Signup Success');
-		    		//redirect($redirect, 'refresh');
+		    		
 		    	}else{
 		    		$this->alert->js($res['error']);
 		    		$this->form_validation->set_message('signup_error', $res['error']);

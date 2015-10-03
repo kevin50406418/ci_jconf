@@ -62,17 +62,12 @@ class Home extends MY_Controller {
 			$this->load->view('common/index',$data);
 			$this->load->view('common/footer');
 		}else{
-			if( !$this->user->is_login() ){
-				redirect('/user/login', 'location', 301);
-			}
 			$data['spage']=$this->config->item('spage');
-
-			
 			if( $this->conf->confid_exists($conf_id,$user_sysop) ){
 				$data['conf_config']=$this->conf->conf_config($conf_id,$user_sysop);
 				//$data['schedule']=$this->conf->conf_schedule($conf_id);
 				$data['conf_content']=$this->conf->conf_content($conf_id);
-
+				$data['conf_news'] = $this->conf->get_news($conf_id);
 				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
 				$this->assets->add_css(asset_url().'style/statistic.min.css');
 
@@ -81,6 +76,7 @@ class Home extends MY_Controller {
 				$this->load->view('conf/index');
 				$this->load->view('conf/conf_nav',$data);
 				//$this->load->view('conf/conf_schedule',$data);
+				$this->load->view('conf/news',$data);
 				$this->load->view('common/footer');
 			}else{
 				$this->cinfo['show_confinfo'] = false;
@@ -146,18 +142,12 @@ class Home extends MY_Controller {
 			$this->load->view('common/index',$data);
 			$this->load->view('common/footer');
 		}else{
-			if( !$this->user->is_login() ){
-				redirect('/user/login', 'location', 301);
-			}
 			$data['spage']=$this->config->item('spage');
-
-			
-
 			if( $this->conf->confid_exists($conf_id,$user_sysop) ){
 				$data['conf_config']=$this->conf->conf_config($conf_id,$user_sysop);
 				//$data['schedule']=$this->conf->conf_schedule($conf_id);
 				$data['conf_content']=$this->conf->conf_content($conf_id);
-
+				$data['content']=$this->conf->get_content($conf_id,$page_id,$this->_lang);
 				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
 				$this->assets->add_css(asset_url().'style/statistic.min.css');
 
@@ -166,6 +156,12 @@ class Home extends MY_Controller {
 				$this->load->view('conf/index');
 				$this->load->view('conf/conf_nav',$data);
 				//$this->load->view('conf/conf_schedule',$data);
+				if($data['content']->page_show == 1){
+					$this->load->view('conf/about',$data);
+				}else{
+					$this->cinfo['show_confinfo'] = false;
+					$this->conf->show_404conf();
+				}
 				$this->load->view('common/footer');
 			}else{
 				$this->cinfo['show_confinfo'] = false;
