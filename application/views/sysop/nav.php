@@ -13,7 +13,6 @@
 		</div>
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
-				<!--<li><a href="<?php echo base_url("sysop/setting");?>">系統設定</a></li>-->
 				<li class="dropdown<?php if($active=="conf"){?> open<?php }?>">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-university pull-right"></i> 研討會 <span class="caret"></span></a>
 					<ul class="dropdown-menu">

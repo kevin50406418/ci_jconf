@@ -1,10 +1,9 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
-?>
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <div class="row">
 	<div class="col-md-2"></div>
 	<div class="ui segment col-md-8">
 		<div class="ui message info" role="alert">
-			還不是使用者？請在此網站 <a href="<?php echo base_url('user/signup');?>" class="btn btn-default btn-xs">建立</a> 一個帳號。
+			還不是使用者？請在此網站<a href="<?php echo base_url('user/signup');?>">建立</a>一個帳號。
 		</div>
 		<?php echo form_open('user/login',array('class'=>"form-horizontal")) ?>
 			<div class="form-group">

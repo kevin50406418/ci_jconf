@@ -16,8 +16,7 @@
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">您好，<?php echo $this->session->user_login;?> <span class="caret"></span></a>
 					<ul class="dropdown-menu" role="menu">
-						<li><a href="<?php echo base_url('user/index');?>">編輯個人資料</a></li>
-						<li><a href="<?php echo base_url('user/passwd');?>">更改密碼</a></li>
+						<li><a href="#">編輯個人資料</a></li>
 						<li><a href="<?php echo base_url('user/log');?>">個人登入紀錄</a></li>
 						<li class="divider"></li>
 						<li><a href="<?php echo base_url('user/logout');?>">登出</a></li>

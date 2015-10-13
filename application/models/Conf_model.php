@@ -24,13 +24,10 @@ class Conf_model extends CI_Model {
 		}
 	}
 
-    function conf_config($conf_id,$user_sysop=false){
-    	if(!$user_sysop){
-    		$user_sysop=0;
-    	}else{
-    		$user_sysop=1;
-    	}
+    function conf_config($conf_id){
+		$user_sysop=$this->session->has_userdata('user_sysop')?0:1;
 		if($this->conf->confid_exists( $conf_id , $user_sysop)){
+			$this->db->select('*');
 			$this->db->from('conf');
 			$this->db->where('conf_id', $conf_id);
 			$query = $this->db->get();
@@ -42,12 +39,10 @@ class Conf_model extends CI_Model {
 		}
 	}
 
-	function all_conf_config($sysop=false){
+	function all_conf_config(){
 		$this->db->select('*');
 		$this->db->from('conf');
-		if(!$sysop){
-			$this->db->where('conf_staus', 0);
-		}
+		$this->db->where('conf_staus', 0);
 		$query = $this->db->get();
 		return $query->result();
 	}
@@ -209,7 +204,7 @@ class Conf_model extends CI_Model {
         }
 	}
 	
-	function update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_host,$conf_desc=''){
+	function update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_desc){
 		$conf = array(
 			"conf_name"    =>$conf_name,
 			"conf_master"  =>$conf_master,
@@ -217,7 +212,6 @@ class Conf_model extends CI_Model {
 			"conf_phone"   =>$conf_phone,
 			"conf_fax"     =>$conf_fax,
 			"conf_address" =>$conf_address,
-			"conf_host"    =>$conf_host,
 			"conf_desc"    =>$conf_desc
         );
         $this->db->where("conf_id", $conf_id);
@@ -228,8 +222,7 @@ class Conf_model extends CI_Model {
         }
 	}
 
-	function sysop_updateconf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$conf_lang,$conf_host,$conf_fax,$conf_desc=''){
-		$conf_lang = implode(",",$conf_lang);
+	function sysop_updateconf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$default_lang,$conf_fax,$conf_desc){
 		$conf = array(
 			"conf_name"    =>$conf_name,
 			"conf_master"  =>$conf_master,
@@ -237,13 +230,13 @@ class Conf_model extends CI_Model {
 			"conf_phone"   =>$conf_phone,
 			"conf_fax"     =>$conf_fax,
 			"conf_address" =>$conf_address,
-			"conf_host"    =>$conf_host,
-			"conf_lang"    =>$conf_lang,
+			"default_lang" =>$default_lang,
 			"conf_staus"   =>$conf_staus,
 			"conf_desc"    =>$conf_desc
         );
         $this->db->where("conf_id", $conf_id);
         if( $this->db->update('conf', $conf) ){
+        	sp($conf_desc);
             return true;
         }else{
             return false;
@@ -255,10 +248,6 @@ class Conf_model extends CI_Model {
 
 	function get_regdir($conf_id){
 		return './upload/registration/'.$conf_id.'/';
-	}
-
-	function get_mostdir($conf_id){
-		return './upload/most/'.$conf_id.'/';
 	}
 
 	function mkconf_dir($conf_id){
@@ -287,26 +276,15 @@ class Conf_model extends CI_Model {
 				"error" => "Directory '".$this->get_regdir($conf_id)."' exists."
 			);
 		}
-
-		if( !file_exists ( $this->get_mostdir($conf_id) ) ){
-			mkdir($this->get_mostdir($conf_id), 0755);
-			write_file($this->get_mostdir($conf_id)."index.html", $data);
-		}else{
-			$return = array(
-				"status" => false,
-				"error" => "Directory '".$this->get_mostdir($conf_id)."' exists."
-			);
-		}
 		$return['status'] = true;
 		return $return;
 	}
 
-	function add_conf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$conf_lang,$conf_host,$conf_fax="",$conf_desc=""){
+	function add_conf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$default_lang,$conf_fax="",$conf_desc=""){
 		$return = array(
 			"status" => false,
 			"error" => ""
 		);
-		$conf_lang = implode(",",$conf_lang);
 		if( $this->confid_exists( $conf_id , 1) ){
 			$return["error"] = "研討會ID: '".$conf_id."' 已存在";
 		}else{
@@ -315,17 +293,16 @@ class Conf_model extends CI_Model {
 				$return["error"] = $mkdir['error'];
 			}else{
 				$conf = array(
-					"conf_id"      => $conf_id,
-					"conf_name"    => $conf_name,
-					"conf_master"  => $conf_master,
-					"conf_email"   => $conf_email,
-					"conf_phone"   => $conf_phone,
+					"conf_id" => $conf_id,
+					"conf_name" => $conf_name,
+					"conf_master" => $conf_master,
+					"conf_email" => $conf_email,
+					"conf_phone" => $conf_phone,
 					"conf_address" => $conf_address,
-					"conf_host"    => $conf_host,
-					"conf_staus"   => $conf_staus,
-					"conf_lang"    => $conf_lang,
-					"conf_fax"     => $conf_fax,
-					"conf_desc"    => $conf_desc
+					"conf_staus" => $conf_staus,
+					"default_lang" => $default_lang,
+					"conf_fax" => $conf_fax,
+					"conf_desc" => $conf_desc
 				);
 				if( $this->db->insert('conf', $conf) ){
 					$return = array(
@@ -336,50 +313,6 @@ class Conf_model extends CI_Model {
 		           $return = array(
 						"status" => false,
 						"error" => "Database error! Contact System Adminstritor."
-					);
-		        }
-		        $now = time();
-		        $date = array(
-			        array(
-						'conf_id'     => $conf_id,
-						'date_type'   => 'hold',
-						'start_value' => $now,
-						'end_value'   => $now
-			        ),
-			        array(
-						'conf_id'     => $conf_id,
-						'date_type'   => 'submit',
-						'start_value' => $now,
-						'end_value'   => $now
-			        ),
-			        array(
-						'conf_id'     => $conf_id,
-						'date_type'   => 'early_bird',
-						'start_value' => $now,
-						'end_value'   => $now
-			        ),
-			        array(
-						'conf_id'     => $conf_id,
-						'date_type'   => 'register',
-						'start_value' => $now,
-						'end_value'   => $now
-			        ),
-			        array(
-						'conf_id'     => $conf_id,
-						'date_type'   => 'finish',
-						'start_value' => $now,
-						'end_value'   => $now
-			        )
-				);
-				if( $this->db->insert_batch('conf_date',$date) ){
-					$return = array(
-						"status" => true,
-						"error" => "Success Add Conference Schedule"
-					);
-		        }else{
-		           $return = array(
-						"status" => false,
-						"error" => "Database error! Contact System Adminstritor.(Schedule)"
 					);
 		        }
 			}
@@ -487,197 +420,4 @@ class Conf_model extends CI_Model {
 		$query = $this->db->get();
 		return $query->result();
 	}
-
-	function count_editor($conf_id){
-		$this->db->select('topic_id,count(*) as cnt');
-		$this->db->from('auth_topic');
-		$this->db->where('conf_id', $conf_id);
-		$this->db->group_by('topic_id');
-		$query = $this->db->get();
-		$count=$query->result();
-		$count_editor = array();
-		foreach ($count as $key => $v) {
-			$count_editor[$v->topic_id]=$v->cnt;
-		}
-		return $count_editor;
-	}
-
-	function get_contents($conf_id,$page_lang){
-		$this->db->from('conf_content');
-		$this->db->where('conf_id', $conf_id);
-		$this->db->where('page_lang', $page_lang);
-		$this->db->order_by("page_show","DESC");
-		$this->db->order_by("page_order","ASC");
-		$query = $this->db->get();
-		return $query->result();
-	}
-
-	function get_content($conf_id,$page_id,$page_lang){
-		$this->db->from('conf_content');
-		$this->db->where('conf_id', $conf_id);
-		$this->db->where('page_lang', $page_lang);
-		$this->db->where('page_id', $page_id);
-		$query = $this->db->get();
-		return $query->row();
-	}
-
-	function add_content($conf_id,$page_id,$page_title,$page_content,$page_lang){
-		if( !in_array($page_lang,array("zhtw","eng")) ){
-			return false;
-		}
-		$content = array(
-			"conf_id"      => $conf_id,
-			"page_id"      => $page_id,
-			"page_title"   => $page_title,
-			"page_content" => $page_content,
-			"page_lang"    => $page_lang,
-			"page_order"   => 99,
-			"page_show"    => 0
-		);
-		return $this->db->insert('conf_content', $content);
-	}
-
-	function update_contents($conf_id,$page_id,$page_lang,$page_order,$page_show){
-		$contents = array(
-			"page_order" => $page_order,
-			"page_show"  => $page_show
-		);
-		$this->db->where('conf_id', $conf_id);
-		$this->db->where('page_id', $page_id);
-		$this->db->where('page_lang', $page_lang);
-		return $this->db->update('conf_content', $contents);
-	}
-
-	function update_content($conf_id,$page_id,$page_lang,$page_title,$page_content){
-		$content = array(
-			"page_title" => $page_title,
-			"page_content"  => $page_content
-		);
-		$this->db->where('conf_id', $conf_id);
-		$this->db->where('page_id', $page_id);
-		$this->db->where('page_lang', $page_lang);
-		return $this->db->update('conf_content', $content);
-	}
-
-	function del_contents($conf_id,$page_id){
-		$this->db->where('conf_id', $conf_id);
-		$this->db->where('page_id', $page_id);
-		return $this->db->delete('conf_content');
-	}
-
-	function get_reviewer($conf_id){
-		$staus = array(0, 2);
-		
-		$this->db->from('auth_reviewer');
-		$this->db->join('users','users.user_login = auth_reviewer.user_login');
-		$this->db->where('conf_id', $conf_id);
-		$this->db->where_in('user_staus', $staus);
-		$query = $this->db->get();
-		return $query->result();
-	}
-
-	function update_confcol($conf_id,$conf_col){
-		$conf_col = array(
-			"conf_col" => $conf_col
-		);
-		$this->db->where('conf_id', $conf_id);
-		return $this->db->update('conf', $conf_col);
-	}
-
-	function update_confmost($conf_id,$conf_most){
-		$conf_col = array(
-			"conf_most" => $conf_most
-		);
-		$this->db->where('conf_id', $conf_id);
-		return $this->db->update('conf', $conf_col);
-	}
-
-	function get_module($conf_id,$module_lang){
-		$this->db->from('module');
-		$this->db->where('module_lang', $module_lang);
-		$this->db->order_by("module_position","DESC");
-		$this->db->order_by("module_order","DESC");
-		$query = $this->db->get();
-		return $query->result();
-	}
-
-	function update_schedule($conf_id,$date_type,$start_value,$end_value){
-		$schedule = array(
-			"start_value" => $start_value,
-			"end_value" => $end_value
-		);
-		$this->db->where('conf_id', $conf_id);
-		$this->db->where('date_type', $date_type);
-		return $this->db->update('conf_date', $schedule);
-	}
-
-	function get_schedules($conf_id){
-		$this->db->from('conf_date');
-		$this->db->where('conf_id', $conf_id);
-		$query = $this->db->get();
-		$dates = $query->result();
-		$schedule =array();
-		foreach ($dates as $key => $date) {
-			$schedule[$date->date_type] = array();
-			$schedule[$date->date_type]['start'] = date("Y-m-d",$date->start_value);
-			$schedule[$date->date_type]['end'] = date("Y-m-d",$date->end_value);
-		}
-		return $schedule;
-	}
-
-	function get_schedule($conf_id,$date_type){
-		$this->db->from('conf_date');
-		$this->db->where('conf_id', $conf_id);
-		$this->db->where('date_type', $date_type);
-		$query = $this->db->get();
-		return $query->row();
-	}
-
-	function get_mosts($conf_id){
-        $this->db->from('most');
-        $this->db->where('conf_id', $conf_id);
-        $query = $this->db->get();
-        return $query->result();
-    }
-
-    function most_review($conf_id,$most_id,$most_status){
-    	$most  = array(
-            "most_status" => $most_status
-        );
-        $this->db->where('conf_id', $conf_id);
-        $this->db->where('most_id', $most_id);
-        if( $this->db->update('most', $most) ){
-            return true;
-        }else{
-            return false;
-        }
-    }
-
-    function get_most($conf_id,$most_id){
-        $this->db->from('most');
-        $this->db->where('conf_id', $conf_id);
-        $this->db->where('most_id', $most_id);
-        $query = $this->db->get();
-        return $query->row();
-    }
-
-    function update_most($conf_id,$most_id,$most_method,$most_number,$most_name,$most_name_eng,$most_host,$most_uni,$most_dept){
-        $most  = array(
-            "most_method"   => $most_method,
-            "most_number"   => $most_number,
-            "most_name"     => $most_name,
-            "most_name_eng" => $most_name_eng,
-            "most_host"     => $most_host,
-            "most_uni"      => $most_uni,
-            "most_dept"     => $most_dept
-        );
-        $this->db->where('most_id', $most_id);
-        $this->db->where('conf_id', $conf_id);
-
-        if( $this->db->update('most', $most) ){
-            return true;
-        }else{
-            return false;
-        }
-    }
 }

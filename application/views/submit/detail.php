@@ -2,11 +2,11 @@
 <div class="ui segment raised">
 <div class="tabbable-panel">
 	<div class="tabbable-line">
-		<ul class="nav nav-tabs nav-tabs-center">
+		<ul class="nav nav-tabs ">
 			<li class="active"> <a href="#tab_info" data-toggle="tab"> 稿件資訊 </a> </li>
 			<li> <a href="#tab_author" data-toggle="tab"> 作者資訊 </a> </li>
 			<li> <a href="#tab_file" data-toggle="tab"> 稿件檔案 </a> </li>
-			<?php if( in_array($paper->sub_status,array(-2,4,5)) ){?><li> <a href="#tab_review" data-toggle="tab"> 審查資料 </a> </li><?php }?>
+			<?php if( $paper->sub_status > 3){?><li> <a href="#tab_review" data-toggle="tab"> 審查資料 </a> </li><?php }?>
 			<?php if( $paper->sub_status == -1){?><a href="<?php echo get_url("submit",$conf_id,"edit",$paper->sub_id)?>" class="ui teal button pull-right">編輯稿件</a><?php }?>
 		</ul>
 		<div class="tab-content">
@@ -119,7 +119,7 @@
 					<?php }?>
 				</table>
 			</div>
-			<?php if( $paper->sub_status >= 3 ){?>
+			<!--{if $paper.sub_status >= 3}-->
 			<div class="tab-pane container-fluid" id="tab_review">
 				<h3>審查資料</h3>
 				<table class="table table-striped">
@@ -131,39 +131,22 @@
 							<th style="width:70%">審查建議</th>
 						</tr>
 					</thead>
-					<<?php foreach ($reviewers as $key => $reviewer) {?>
+					<!--{foreach from=$paper_review key=i item=review}-->
 					<tr>
-						<td>審查人<?php echo $key+1?></td>
+						<td>審查人 <!--{$i+1}--></td>
+						<td><!--{sub_status($review.review_status,true)}--></td>
 						<td>
-							<?php echo $this->Submit->sub_status($reviewer->review_status,true)?>
+							
 						</td>
 						<td>
-							<?php
-								if( in_array($reviewer->review_status, array(-2,2,4)) ){
-									echo date('Y/m/d H:i', $reviewer->review_time);	
-								}
-							?>
-						</td>
-						<td>
-							<?php echo $reviewer->review_comment?>
+							
 						</td>
 					</tr>
-					<?php }?>
+					<!--{/foreach}-->
 				</table>
 			</div>
-			<?php }?>
+			<!--{/if}-->
 		</div>
 	</div>
 </div>
 </div>
-<script>
-$(function() { 
-	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-		localStorage.setItem('paper_<?php echo $paper->sub_id?>', $(this).attr('href'));
-	});
-	var lastTab = localStorage.getItem('paper_<?php echo $paper->sub_id?>');
-	if (lastTab) {
-		$('[href="'+lastTab+'"]').tab('show');
-	}
-});
-</script>

@@ -3,12 +3,10 @@
 <div class="ui inverted segment">
 
 <div class="ui inverted secondary pointing menu">
-	<a class="item" href="<?php echo get_url("index",$conf_config['conf_id']);?>">
-		首頁
-	</a>
 	<a class="item" href="<?php echo get_url("main",$conf_config['conf_id']);?>">
 		<?php echo lang('submit_system')?>
 	</a>
+	
 	<a class="item" href="<?php echo get_url("news",$conf_config['conf_id']);?>">
 		<?php echo lang('submit_news')?>
 	</a>
@@ -16,7 +14,7 @@
 		<?php if(in_array($content->page_id,$spage)){?>
 		<a class="item" href="<?php echo get_url($content->page_id,$conf_config['conf_id']);?>"><?php echo $content->page_title?></a>
 		<?php }else{?>
-		<a class="item" href="<?php echo get_url("about",$content->page_id,$conf_config['conf_id']);?>"><?php echo $content->page_title?></a>
+		<a class="item" href="<?php echo get_url("about",$conf_config['conf_id'],$content->page_id);?>"><?php echo $content->page_title?></a>
 		<?php }?>
 	<?php }?>
 	<div class="right menu">
