@@ -57,4 +57,15 @@ class Alert_model extends CI_Model {
 		$data['text']    = $text;
 		$this->load->view('common/js_alert',$data);
     }
+
+    function refresh($refresh){
+    	$data['refresh'] = $refresh;
+    	$this->load->view('common/refresh',$data);
+    }
+
+    function file_notfound($refresh){
+    	$this->js("查無稿件檔案",$refresh);
+		$this->output->_display();
+		exit;
+    }
 }

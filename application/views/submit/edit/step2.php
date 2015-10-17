@@ -32,6 +32,7 @@
 	<h2>作者資訊</h2>
 	<div class="author">
 		<div id="container">
+			<span class="add ui green button">新增作者</span>
 			<div class="ui vertical segment template row">
 				<?php include(dirname(dirname(__FILE__))."/author_template.php");?>
 			</div>

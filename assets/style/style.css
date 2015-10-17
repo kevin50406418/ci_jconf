@@ -1,7 +1,8 @@
 body {
-	font-family: "微軟正黑體", "Arial Unicode MS", sans-serif !important;
+	font-family: "Microsoft JhengHei UI", "Microsoft JhengHei", sans-serif;
 	background-color: #eee;
 	padding-top: 70px; 
+	font-size: 15px;
 }
 ::selection {
 	background-color: #3b83c0;
@@ -412,8 +413,8 @@ fieldset[disabled] .btn-olive.active {
 .input-group-btn .btn + .btn.btn-danger { border-color: #d1293a; }
 .input-group-addon {
 	color: white;
-	background-color: #aab2bd;
-	border-color: #96a0ad;
+	background-color: #aab2bd !important;
+	border-color: #96a0ad !important;
 }
 .input-group-addon .radio,
 .input-group-addon .checkbox { margin: -3px 0 -4px !important; }
@@ -928,3 +929,11 @@ fieldset[disabled] .btn-olive.active {
 #conf_date .ui.statistic .value{
 	margin-bottom: 1em;
 }
+.nav-tabs.nav-tabs-center > li, .nav-pills.nav-tabs-center > li {
+    float:none;
+    display:inline-block;
+    *display:inline;
+	zoom:1;
+}
+.nav-tabs-center {text-align:center;}
+.text-bold{font-weight: bold;}

@@ -138,10 +138,13 @@ $autoload['language'] = array();
 */
 
 $autoload['model'] = array(
-	'user_model'   => 'user',
-	'conf_model'   => 'conf',
-	'submit_model' => 'Submit',
-	'sysop_model'  => 'sysop',
-	'alert_model'  => 'alert',
-	'topic_model'  => 'topic'
+	'user_model'     => 'user',
+	'conf_model'     => 'conf',
+	'submit_model'   => 'Submit',
+	'sysop_model'    => 'sysop',
+	'alert_model'    => 'alert',
+	'topic_model'    => 'topic',
+	'module_model'   => 'module',
+	'reviewer_model' => 'reviewer'
 );
+

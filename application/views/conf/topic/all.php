@@ -21,7 +21,11 @@
 				<span title="<?php echo $topic->topic_info?>"><?php echo $topic->topic_name?> (<?php echo $topic->topic_name_eng?>)</span>
 			</td>
 			<td class="text-center">
-				
+				<?php if( array_key_exists($topic->topic_id, $count_editor) ){
+					echo $count_editor[$topic->topic_id];
+				}else{
+					echo 0;
+				}?>
 			</td>
 			<td>
 				<?php echo $topic->topic_abbr?>

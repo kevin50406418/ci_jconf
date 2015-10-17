@@ -52,9 +52,24 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['default_controller'] = 'home';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
-$route['index/(:any)'] = 'home/index/$1';
-$route['news/(:any)'] = 'home/news/$1';
-$route['main/(:any)'] = 'home/main/$1';
-$route['dashboard/(:any)'] = 'dashboard/index/$1';
-$route['submit/(:any)'] = 'submit/index/$1';
-$route['about/(:any)/(:any)'] = 'home/about/$1/$2';
+$route['clang/(:any)'] = 'home/change_lang/$1';
+$route['(:any)/index'] = 'home/index/$1';
+$route['(:any)/news'] = 'home/news/$1';
+$route['(:any)/main'] = 'home/main/$1';
+
+$route['(:any)/dashboard'] = 'dashboard/index/$1';
+$route['(:any)/dashboard/(:any)'] = 'dashboard/$2/$1';
+$route['(:any)/dashboard/(:any)/(:any)'] = 'dashboard/$2/$1/$3';
+$route['(:any)/dashboard/(:any)/(:any)/(:any)'] = 'dashboard/$2/$1/$3/$4';
+
+$route['(:any)/submit'] = 'submit/index/$1';
+$route['(:any)/submit/(:any)'] = 'submit/$2/$1';
+$route['(:any)/submit/(:any)/(:any)'] = 'submit/$2/$1/$3';
+
+$route['(:any)/topic/(:any)'] = 'topic/$2/$1';
+$route['(:any)/topic/(:any)/(:any)'] = 'topic/$2/$1/$3';
+
+$route['(:any)/reviewer/(:any)'] = 'reviewer/$2/$1';
+$route['(:any)/reviewer/(:any)/(:any)'] = 'reviewer/$2/$1/$3';
+
+$route['(:any)/about/(:any)'] = 'home/about/$1/$2';

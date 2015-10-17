@@ -5,18 +5,22 @@
 	<?php foreach ($confs as $key => $conf) {?>
 	<div class="col-xs-12 col-md-6">
 		<div class="ui segment">
-			<a href="#collapse<?php echo $conf->conf_id?>" aria-expanded="false" data-toggle="collapse" class="pull-right ui icon button orange"><i class="fa fa-chevron-down fa-lg"></i></a>
-			<h3><?php echo $conf->conf_name?></h3>
+			<h3 class="text-bold">
+				<?php if( $this->user->is_sysop() ){?>
+					<?php if( $conf->conf_staus == 1 ){?>
+					<span class="ui basic label pink">隱藏</span>
+					<?php }?>
+				<?php }?>
+				<?php echo $conf->conf_name?>
+			</h3>
 			<p>
-				<?php echo mb_substr( $conf->conf_desc,0,120,"utf-8")?><?php if(mb_strlen($conf->conf_desc)>120){?>...<?php }?>
+				<?php echo mb_substr( $conf->conf_desc,0,135,"utf-8")?><?php if(mb_strlen($conf->conf_desc)>135){?>...<?php }?>
 			</p>
-			<div id="collapse<?php echo $conf->conf_id?>" class="collapse">
-				<div class="ui fluid four item menu teal inverted large">
-					<a class="item" href="<?php echo get_url("main",$conf->conf_id);?>"><i class="fa fa-pencil-square-o icon fa-lg"></i> 投稿系統</a>
-					<a class="item" href="<?php echo get_url("index",$conf->conf_id);?>"><i class="fa fa-home icon fa-lg"></i> 首頁</a>
-					<a class="item" href="<?php echo get_url("mews",$conf->conf_id);?>"><i class="fa fa-bullhorn icon fa-lg"></i> 最新消息</a>
-					<a class="item" href="<?php echo get_url("about",$conf->conf_id,"program");?>"><i class="fa fa-calendar-o icon fa-lg"></i> 議程</a>
-				</div>
+			<?php if( !empty($conf->conf_place) ){?><p><i class="fa fa-map-marker"></i> <?php echo $conf->conf_place?></p><?php }?>
+			<div class="ui fluid three item menu teal large">
+				<a class="item" href="<?php echo get_url("main",$conf->conf_id);?>"><i class="fa fa-pencil-square-o icon fa-lg"></i> 投稿系統</a>
+				<a class="item" href="<?php echo get_url("index",$conf->conf_id);?>"><i class="fa fa-home icon fa-lg"></i> 首頁</a>
+				<a class="item" href="<?php echo get_url("news",$conf->conf_id);?>"><i class="fa fa-bullhorn icon fa-lg"></i> 最新消息</a>
 			</div>
 		</div>
 	</div>

@@ -21,16 +21,16 @@ function sp($text){
 function get_url($page='',$conf_id='',$act='',$id='',$step=''){
 	$url=array();
 	$return="";
-
+	if(!empty($conf_id)){
+		$url['conf_id']=$conf_id;
+	}
 	if(!empty($page)){
 		$url['page']=$page;
 	}
 	if(!empty($act) && !empty($page)){
 		$url['act']=$act;
 	}
-	if(!empty($conf_id)){
-		$url['conf_id']=$conf_id;
-	}
+	
 	if(!empty($id) && !empty($act) && !empty($page)){
 		$url['id']=$id;
 	}

@@ -2,7 +2,12 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 //$config['assets_url'] = "http://120.108.113.38/conf/assets/";
+$config['site_name'] = "亞大研討會系統";
 $config['spage']=array("index","news");
+
+$config['developer'] = array("jingxun"); // developer account: can not cancel sysop group
+$config['ban'] = array(""); // ban user: can not add sysop group
+
 $config['insert_id_expire'] = 30; // minitutes
 $config['country_list']['zhtw']=array(
 	"RE"=>"Reunion",
@@ -251,7 +256,7 @@ $config['country_list']['zhtw']=array(
 	"LB"=>"黎巴嫩"
 );
 
-$config['country_list']['eng']=array(
+$config['country_list']['en']=array(
 	"AF"=>"Afghanistan",
 	"AL"=>"Albania",
 	"DZ"=>"Algeria",

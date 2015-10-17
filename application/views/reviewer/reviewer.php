@@ -4,6 +4,7 @@
 		<h4 class="modal-title">審查稿件</h4>
 	</div>
 	<div class="modal-body">
+		<?php echo validation_errors('<div class="ui message red">', '</div>');?>
 		<div class="form-horizontal">
 			<div class="form-group">
 				<label class="col-sm-2 control-label">審查人</label>

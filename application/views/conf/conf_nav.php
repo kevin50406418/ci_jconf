@@ -3,10 +3,14 @@
 <div class="ui inverted segment">
 
 <div class="ui inverted secondary pointing menu">
+	<a class="item" href="<?php echo get_url("index",$conf_config['conf_id']);?>">
+		首頁
+	</a>
+	<?php if( $this->user->is_login() ){?>
 	<a class="item" href="<?php echo get_url("main",$conf_config['conf_id']);?>">
 		<?php echo lang('submit_system')?>
 	</a>
-	
+	<?php }?>
 	<a class="item" href="<?php echo get_url("news",$conf_config['conf_id']);?>">
 		<?php echo lang('submit_news')?>
 	</a>

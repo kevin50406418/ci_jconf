@@ -41,14 +41,26 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="default_lang" class="col-sm-2 control-label text-info">默認語言</label>
+			<label for="conf_fax" class="col-sm-2 control-label text-info">主辦單位</label>
+			<div class="col-sm-10">
+				<input name="conf_host" type="text" class="form-control" id="conf_host" value="<?php echo set_value('conf_host');?>">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="conf_place" class="col-sm-2 control-label">大會地點</label>
+			<div class="col-sm-10">
+				<input name="conf_place" type="text" class="form-control" id="conf_place" value="<?php echo set_value('conf_place');?>">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="conf_lang" class="col-sm-2 control-label text-info">語言</label>
 			<div class="col-sm-10">
 				<div class="btn-group" data-toggle="buttons">
-					<label class="btn btn-success<?php if(set_value('default_lang') == "zhtw"){?> active<?php }?>">
-						<input type="radio" name="default_lang" id="option1" autocomplete="off" value="zhtw"<?php if(set_value('default_lang') == "zhtw"){?> checked<?php }?>> 繁體中文(Traditional Chinese)
+					<label class="btn btn-success active">
+						<input type="checkbox" name="conf_lang[]" autocomplete="off" value="zhtw" checked> 繁體中文(Traditional Chinese)
 					</label>
-					<label class="btn btn-warning<?php if(set_value('default_lang') == "eng"){?> active<?php }?>">
-						<input type="radio" name="default_lang" id="option2" autocomplete="off" value="eng"<?php if(set_value('default_lang') == "eng"){?> checked<?php }?>> 英文(English)
+					<label class="btn btn-warning">
+						<input type="checkbox" name="conf_lang[]" autocomplete="off" value="eng"> 英文(English)
 					</label>
 				</div>
 			</div>

@@ -113,8 +113,11 @@
 			<tr>
 				<th class="col-sm-2 control-label">餐券</th>
 				<td class="col-sm-10">
-					<label class="checkbox-inline"><input name="report_mealtype" type="radio" value="2"<?php if( $report->report_mealtype == 2 ){?> checked<?php }?>>自理</label>
-					<label class="checkbox-inline"><input name="report_mealtype" type="radio" value="1"<?php if( $report->report_mealtype == 1 ){?> checked<?php }?>>成果發表當天(隨議程而定)</label>
+					<?php foreach ($hold_day as $key => $day) {?>
+					<label class="checkbox-inline"><input name="report_mealtype" type="radio" value="<?php echo $day?>"<?php if( $report->report_mealtype == $day ){?> checked<?php }?>> <?php echo $day?></label>
+					<?php }?>
+					<label class="checkbox-inline"><input name="report_mealtype" type="radio" value="S"<?php if( $report->report_mealtype == "S" ){?> checked<?php }?>>自理</label>
+					<label class="checkbox-inline"><input name="report_mealtype" type="radio" value="P"<?php if( $report->report_mealtype == "P" ){?> checked<?php }?>>成果發表當天(隨議程而定)</label>
 				</td>
 			</tr>
 		</table>

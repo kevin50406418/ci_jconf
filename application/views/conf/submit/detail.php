@@ -7,7 +7,7 @@
 			<li> <a href="#tab_author" data-toggle="tab"> 作者資訊 </a> </li>
 			<li> <a href="#tab_file" data-toggle="tab"> 稿件檔案 </a> </li>
 			<?php if( $paper->sub_status >= 3 || $paper->sub_status == -2){?><li> <a href="#tab_review" data-toggle="tab"> 審查資料 </a> </li><?php }?>
-			<?php if( $paper->sub_status == -1){?><a href="<?php echo get_url("submit",$conf_id,"edit",$paper->sub_id)?>" class="ui teal button pull-right">編輯稿件</a><?php }?>
+			<a href="<?php echo get_url("dashboard",$conf_id,"submit","edit",$paper->sub_id)?>" class="ui teal button pull-right">編輯稿件</a>
 		</ul>
 		<div class="tab-content">
 			<div class="tab-pane active container-fluid" id="tab_info">
@@ -90,15 +90,15 @@
 						<td>投稿資料</td>
 						<td>
 							<?php if(!empty($otherfile)){?>
-							<a href="<?php echo get_url("topic",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" target="_blank"><?php echo $otherfile->file_name?></a>
+							<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" target="_blank"><?php echo $otherfile->file_name?></a>
 							<?php }else{?>
 							<span class="ui label red">尚未上傳</span>
 							<?php }?>
 						</td>
 						<td>
 							<?php if(!empty($otherfile)){?>
-								<a href="<?php echo get_url("topic",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
-								<a href="<?php echo get_url("topic",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
+								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
+								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
 							<?php }?>
 						</td>
 					</tr>
@@ -108,11 +108,11 @@
 						<td><?php echo $otherfile->fid;?></td>
 						<td>補充資料</td>
 						<td>
-							<a href="<?php echo get_url("topic",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" target="_blank"><?php echo $otherfile->file_name?></a>
+							<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" target="_blank"><?php echo $otherfile->file_name?></a>
 						</td>
 						<td>
-							<a href="<?php echo get_url("topic",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
-							<a href="<?php echo get_url("topic",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
+							<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
+							<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
 						</td>
 					</tr>
 					<?php }?>
@@ -122,24 +122,18 @@
 			<?php if( $paper->sub_status >= 3 || $paper->sub_status == -2){?>
 			<div class="tab-pane container-fluid" id="tab_review">
 				<h3>審查資料</h3>
-				<?php $cnt = 0;?>
-				<?php echo form_open(get_url("topic",$conf_id,"detail",$paper->sub_id))?>
-				<?php echo form_hidden('do', 'notice');?>
 				<table class="table table-striped">
 					<thead>
 						<tr>
-							<th style="width:5%"> </th>
 							<th style="width:10%">審查人</th>
 							<th style="width:10%">審查狀態</th>
-							<th style="width:10%">審查時間</th>
+							<th style="width:15%">審查時間</th>
 							<th style="width:65%">審查建議</th>
 						</tr>
 					</thead>
 					<?php foreach ($reviewers as $key => $reviewer) {?>
 					<tr>
-						<td class="text-center">
-							<input type="checkbox" value="<?php echo $reviewer->user_login?>" name="user_login[]"<?php if( in_array($reviewer->review_status, array(-2,2,4)) ){ $cnt++;?> disabled<?php }?>>
-						</td>
+						
 						<td><?php echo $reviewer->user_login?></td>
 						<td>
 							<?php echo $this->Submit->sub_status($reviewer->review_status,true)?>
@@ -156,9 +150,7 @@
 						</td>
 					</tr>
 					<?php }?>
-				</table>
-				<?php if($cnt != count($reviewers)){?><button class="ui button orange" name="type" value="remind">提醒審查</button><?php }?>
-				<?php echo form_close()?>				
+				</table>			
 			</div>
 			<?php }?>
 		</div>
@@ -168,44 +160,11 @@
 <script>
 $(function() { 
 	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-		localStorage.setItem('topic_<?php echo $paper->sub_id?>', $(this).attr('href'));
+		localStorage.setItem('dashboard_<?php echo $paper->sub_id?>', $(this).attr('href'));
 	});
-	var lastTab = localStorage.getItem('topic_<?php echo $paper->sub_id?>');
+	var lastTab = localStorage.getItem('dashboard_<?php echo $paper->sub_id?>');
 	if (lastTab) {
 		$('[href="'+lastTab+'"]').tab('show');
 	}
 });
 </script>
-<?php if( $paper->sub_status == 3 ){?>
-<?php if($cnt == count($reviewers)){?>
-<div class="ui segment raised">
-	<div class="modal-header">
-		<h3 class="modal-title">主編審查</h3>
-	</div>
-	<div class="modal-body">
-		<?php echo validation_errors('<div class="ui message red">', '</div>');?>
-		<?php echo form_open(get_url("topic",$conf_id,"detail",$paper->sub_id))?>
-		<?php echo form_hidden('do', 'topic');?>
-		<div class="form-horizontal">
-			<div class="form-group">
-				<label class="col-sm-2 control-label">審查狀態</label>
-				<div class="col-sm-10">
-					<select class="form-control" name="status">
-						<option>請選擇</option>
-						<option value="-2">拒絕</option>
-						<option value="2">大會待決</option>
-						<option value="4">接受</option>
-					</select>
-				</div>
-			</div>
-			<div class="form-group">
-				<div class="col-sm-offset-2 col-sm-10">
-					<button type="submit" class="ui button blue">送出</button>
-				</div>
-			</div>
-		</div>
-		<?php echo form_close()?>
-	</div>
-</div>
-<?php }?>
-<?php }?>

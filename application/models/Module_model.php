@@ -23,6 +23,16 @@ class Module_model extends CI_Model {
         }
     }
 
+    function del_module($conf_id,$module_id){
+        $this->db->where('conf_id', $conf_id);
+        $this->db->where('module_id', $module_id);
+        if( $this->db->delete('module') ){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     function module_news($conf_id,$module_title,$module_showtitle){
     	$data['news'] = $this->conf->get_news($conf_id);
     	$data['module_title'] = $module_title;
@@ -39,7 +49,7 @@ class Module_model extends CI_Model {
 
     function add_text($conf_id,$module_title,$module_position,$module_showtitle,$module_lang,$module_content){
         $text = array(
-            "conf_id"          =>$conf_id,
+            "conf_id"          => $conf_id,
             "module_title"     => $module_title,
             "module_position"  => $module_position,
             "module_type"      => "text",
@@ -49,10 +59,29 @@ class Module_model extends CI_Model {
         );
         return $this->db->insert('module', $text);
     }
+
+    function update_text($conf_id,$module_id,$module_title,$module_position,$module_showtitle,$module_lang,$module_content){
+        $text = array(
+            "module_title"     => $module_title,
+            "module_position"  => $module_position,
+            "module_showtitle" => $module_showtitle,
+            "module_lang"      => $module_lang,
+            "module_content"   => $module_content
+        );
+        $this->db->where('module_type', "text");
+        $this->db->where('module_id', $module_id);
+        $this->db->where('conf_id', $conf_id);
+
+        if( $this->db->update('module', $text) ){
+            return true;
+        }else{
+            return false;
+        }
+    }
     
     function add_news($conf_id,$module_title,$module_position,$module_showtitle,$module_lang){
         $news = array(
-            "conf_id"          =>$conf_id,
+            "conf_id"          => $conf_id,
             "module_title"     => $module_title,
             "module_position"  => $module_position,
             "module_type"      => "news",
@@ -60,5 +89,23 @@ class Module_model extends CI_Model {
             "module_lang"      => $module_lang,
         );
         return $this->db->insert('module', $news);
+    }
+
+    function update_news($conf_id,$module_id,$module_title,$module_position,$module_showtitle,$module_lang){
+        $news = array(
+            "module_title"     => $module_title,
+            "module_position"  => $module_position,
+            "module_showtitle" => $module_showtitle,
+            "module_lang"      => $module_lang,
+        );
+        $this->db->where('module_type', "news");
+        $this->db->where('module_id', $module_id);
+        $this->db->where('conf_id', $conf_id);
+
+        if( $this->db->update('module', $text) ){
+            return true;
+        }else{
+            return false;
+        }
     }
 }

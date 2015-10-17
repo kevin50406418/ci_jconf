@@ -20,9 +20,9 @@
 				<?php echo $this->Submit->sub_status($list->sub_status,true)?>
 			</td>
 			<td data-order="0">
-				<div class="small icon ui buttons"><?php //echo get_url("submit",$conf_id,"edit",$list->sub_id)?>
-					<a href="#" class="tiny ui blue button basic">查看</a>
-					<a href="#" class="tiny ui teal button basic">編輯</a>
+				<div class="small icon ui buttons">
+					<a href="<?php echo get_url("dashboard",$conf_id,"submit","detail",$list->sub_id)?>" class="tiny ui blue button basic">查看</a>
+					<a href="<?php echo get_url("dashboard",$conf_id,"submit","edit",$list->sub_id)?>" class="tiny ui teal button basic">編輯</a>
 				</div>
 			</td>
 		</tr>

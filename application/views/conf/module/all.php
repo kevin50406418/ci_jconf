@@ -42,8 +42,8 @@
 							<td><?php echo $module->module_type?></td>
 							<td><?php echo $module->module_lang?></td>
 							<td>
-								<a href="#" class="ui button blue basic">編輯</a>
-								<a href="#" class="ui button red basic" onclick="return confirm('是否刪除模組?')">刪除</a>
+								<a href="<?php echo get_url("dashboard",$conf_id,"modules","edit",$module->module_id)?>" class="ui button blue basic">編輯</a>
+								<a href="<?php echo get_url("dashboard",$conf_id,"modules","del",$module->module_id)?>" class="ui button red basic" onclick="return confirm('是否刪除模組?')">刪除</a>
 							</td>
 						</tr>
 						<?php }?>

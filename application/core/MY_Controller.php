@@ -2,12 +2,18 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 class MY_Controller extends CI_Controller{
 	public $cinfo = array();
+	public $data = array();
 	public $body_class;
 	public $_lang;
+	public $conf_id;
+	public $spage;
+	public $user_login;
     public function __construct(){
 		parent::__construct();
 		$this->cinfo['show_confinfo'] = false;
-		$this->body_class ="container";
+		$this->body_class = "container";
+		$this->spage = $this->config->item('spage');
+
 		$this->assets->add_css(asset_url().'style/bootstrap.min.css');
 		$this->assets->add_css(asset_url().'style/label.min.css');
 		$this->assets->add_css(asset_url().'style/segment.min.css');
@@ -17,26 +23,35 @@ class MY_Controller extends CI_Controller{
 		$this->assets->add_css(asset_url().'style/font-awesome.min.css');
 		$this->assets->add_css(asset_url().'style/style.css');
 		$this->assets->add_css(asset_url().'style/statistic.min.css');
-
-		if( !$this->session->has_userdata('lang') ){
-			$languages = $this->agent->languages();
-			switch($languages[0]){
-				case "zh-tw":
-				case "zh":
-					$lang = "zhtw";
-				break;
-				default:
-				case "en-us":
-				case "en":
-					$lang = "en";
-				break;
+		$this->_lang = $this->user->get_clang();
+		$this->lang->load("conf_menu",$this->_lang);
+		$this->lang->load("paper_status",$this->_lang);
+		if( $this->user->is_login() ){
+			$this->user_login = $this->session->userdata('user_login');
+			$bool_conf     = $this->session->has_userdata('priv_conf');
+			$bool_topic    = $this->session->has_userdata('priv_topic');
+			$bool_reviewer = $this->session->has_userdata('priv_reviewer');
+			
+			if( !$bool_conf || !$bool_topic || !$bool_reviewer ){
+				$this->user->get_auth($this->session->user_login);
 			}
-			$this->_lang = $lang;
-			$this->session->set_userdata('lang', $lang);
-		}else{//"en"
-			$this->_lang = $this->session->lang;
+			/*switch( $this->router->fetch_method() ){
+				default:
+					$this->conf_id = $this->uri->segment(3);
+				break;
+				case "index":
+					if( $this->uri->total_segments() == 2){
+						$this->conf_id = $this->uri->segment(2);
+					}else{
+						$this->conf_id = $this->uri->segment(3);
+					}
+				break;
+				case "main":
+					$this->conf_id = $this->uri->segment(2);
+				break;
+			}*/
+			$this->conf_id = $this->uri->segment(1);
 		}
-		$this->lang->load("conf_menu",$this->_lang);	
     }
 }
 
@@ -67,7 +82,7 @@ class MY_Topic extends MY_Controller{
 		parent::__construct();
 		if( !$this->user->is_login() ){
 			redirect('/user/login', 'location', 301);
-			if( $this->user->is_topic() || $this->user->is_sysop()){
+			if( $this->user->is_topic($this->conf_id) || $this->user->is_sysop()){
 				
 			}else{
 				redirect(base_url(), 'location', 301);
