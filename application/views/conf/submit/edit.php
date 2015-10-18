@@ -74,10 +74,9 @@
 				<table class="table table-bordered author">
 					<thead>
 						<tr>
-							<td colspan="7"><span class="add ui green button"><i class="fa fa-plus"></i></span></td>
+							<td colspan="6"><span class="add ui green button"><i class="fa fa-plus"></i></span></td>
 						</tr>
 						<tr>
-							<th></th>
 							<th>主要</th>
 							<th>姓名</th>
 							<th>電子信箱</th>
@@ -88,7 +87,7 @@
 					</thead>
 
 					<tbody>
-						<tr class="template row">
+						<tr class="template trow">
 							<td class="text-center">
 								<label>
 								<input name="main_contact" type="radio" required id="main_contact" value="{{row-count-placeholder}}">
@@ -112,7 +111,7 @@
 						</tr>
 						<?php if(!empty($authors)){?>
 						<?php foreach ($authors as $key => $author) {?>
-						<tr class="row">
+						<tr class="trow">
 							<td class="text-center">
 								<label>
 								<input name="main_contact" type="radio" required id="main_contact" value="<?php echo $key?>"<?php if($author->main_contract == 1){?> checked<?php }?>>
@@ -301,7 +300,7 @@ $(function() {
 		$(this).repeatable_fields({
 			wrapper: ".author",
 			container: "tbody",
-			row: "tr",
+			row: ".trow",
 			cell: "td",
 			row_count_placeholder: "{{row-count-placeholder}}",
 		});

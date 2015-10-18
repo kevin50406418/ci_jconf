@@ -4,7 +4,11 @@
 		$(".repeat").each(function() {
 			$(this).repeatable_fields({
 				wrapper: ".author",
-				container: "#container"
+				container: "#container",
+				row: '.trow',
+				add: '.add',
+				remove: '.remove',
+				move: '.move',
 			});
 		});
 	});
@@ -33,10 +37,10 @@
 	<div class="author">
 		<div id="container">
 			<span class="add ui green button">新增作者</span>
-			<div class="ui vertical segment template row">
+			<div class="ui vertical segment template trow">
 				<?php include(dirname(dirname(__FILE__))."/author_template.php");?>
 			</div>
-			<div class="ui vertical segment row">
+			<div class="ui vertical segment trow">
 				<?php include("author.php");?>
 			</div>
 		</div>

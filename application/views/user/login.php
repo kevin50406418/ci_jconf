@@ -3,8 +3,14 @@
 <div class="row">
 	<div class="col-md-2"></div>
 	<div class="ui segment col-md-8">
-		<div class="ui message info large" role="alert">
-			<div class="header">還不是使用者？請在此網站 <a href="<?php echo base_url('user/signup');?>" class="ui red button">建立帳號</a></div>
+		<div class="ui icon message blue">
+			<i class="fa fa-info-circle icon"></i>
+			<div class="content">
+				<div class="header">
+					尚未建立冊帳號？
+				</div>
+				<p>請在此網站 <a href="<?php echo base_url('user/signup');?>" class="ui red button">建立帳號</a></p>
+			</div>
 		</div>
 		<?php echo form_open('user/login',array('class'=>"form-horizontal")) ?>
 			<div class="form-group">

@@ -72,7 +72,7 @@
 
 				$(wrapper).on('click', settings.remove, function(event) {
 					
-					if($(settings.row).length-1 >2){
+					if($(settings.row).length >2){
 						event.stopImmediatePropagation();
 	
 						var row = $(this).parents(settings.row).first();

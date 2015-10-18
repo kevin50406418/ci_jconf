@@ -68,4 +68,8 @@ class Alert_model extends CI_Model {
 		$this->output->_display();
 		exit;
     }
+
+    function js_refresh(){
+    	$this->load->view('common/js_refresh');
+    }
 }

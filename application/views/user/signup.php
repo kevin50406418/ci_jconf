@@ -1,8 +1,14 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <?php echo validation_errors('<div class="ui message red">', '</div>');?>
 <div class="ui segment">
-	<div class="ui message info huge" role="alert">
-		<div class="header">已經擁有帳號? <a href="<?php echo base_url('user/login');?>" class="ui red button">登入帳號</a></div>
+	<div class="ui icon message blue">
+		<i class="fa fa-info-circle icon"></i>
+		<div class="content">
+			<div class="header">
+				已經擁有帳號?
+			</div>
+			<p>請先 <a href="<?php echo base_url('user/login');?>" class="ui red button">登入</a></p>
+		</div>
 	</div>
 	<?php echo form_open(base_url('user/signup'),array("class"=>"form-horizontal","id"=>"register"))?>
 		<div class="form-group">

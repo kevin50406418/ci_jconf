@@ -96,12 +96,13 @@ class Submit extends MY_Conference {
 					$this->load->view('submit/add/step',$data);
 					$this->load->view('submit/add/step2',$data);
 				}else{
-					$this->alert->show("d",'<p>尚未選擇分類</p><p><a href="javascript:history.back();">返回上一頁</a></p>');
+					$this->alert->show("d",'<p>請勾選檢核清單</p><p><a href="javascript:history.back();">返回上一頁</a></p>');
 				}
 			break;
 			case 3:
 				$data['step_class']=array(1=>"completed",2=>"completed",3=>"active",4=>"disabled",5=>"disabled",6=>"disabled");
 				$data['show_file'] = false;
+				$show_upload = false;
 				if(is_null($this->input->get("upload"))){
 					//author
 					$this->form_validation->set_rules('user_fname[]', '名字', 'required');
@@ -154,6 +155,7 @@ class Submit extends MY_Conference {
             				}
             				$this->Submit->add_author($insert_id,$user_login,$user_fname[$key],$user_lname[$key],$user_email[$key],$user_org[$key],$user_country[$key],$contact_author,$key+1);
             			}
+            			$show_upload = true;
             		}
         		}else{
         			if(!$this->session->has_userdata($conf_id.'_insert_id') ){
@@ -189,10 +191,12 @@ class Submit extends MY_Conference {
                     	}
 	                	$data['show_file'] = true;
 	                	$data['otherfile'] = $this->Submit->get_otherfile($paper_id);
+
 	                }
+	                $show_upload = true;
 	            }
 	            $this->load->view('submit/add/step',$data);
-        		$this->load->view('submit/add/step3',$data);
+        		if($show_upload){$this->load->view('submit/add/step3',$data);}else{echo validation_errors('<div class="ui message red">', '<a href="javascript:history.back();">返回上一頁</a></div>');}
 			break;
 			case 4:
 				$data['step_class']=array(1=>"completed",2=>"completed",3=>"completed",4=>"active",5=>"disabled",6=>"disabled");
@@ -1046,6 +1050,8 @@ class Submit extends MY_Conference {
 			break;
 			case "add":
 				$data['user'] =  $this->user->get_user_info($this->user_login);
+				$data['register_meals'] = $this->conf->get_register_meals($conf_id);
+				$data['papers'] = $this->Submit->show_mypaper($this->user_login,$conf_id);
 				$this->load->view('submit/register/add',$data);
 			break;
 			case "list":

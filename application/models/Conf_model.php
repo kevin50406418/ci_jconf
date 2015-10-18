@@ -108,10 +108,12 @@ class Conf_model extends CI_Model {
 	}
 
 	function show_permission_deny($data){
+		$this->user->get_auth($this->user_login);
 		$data['body_class'] = "container";
 		$this->output->set_status_header('404');
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
+		//$this->alert->refresh(10);
 		$this->load->view('common/permission_deny');
 		$this->load->view('common/footer');
 		$this->output->_display();
@@ -673,11 +675,7 @@ class Conf_model extends CI_Model {
         );
         $this->db->where('conf_id', $conf_id);
         $this->db->where('most_id', $most_id);
-        if( $this->db->update('most', $most) ){
-            return true;
-        }else{
-            return false;
-        }
+        return $this->db->update('most', $most);
     }
 
     function get_most($conf_id,$most_id){
@@ -700,12 +698,7 @@ class Conf_model extends CI_Model {
         );
         $this->db->where('most_id', $most_id);
         $this->db->where('conf_id', $conf_id);
-
-        if( $this->db->update('most', $most) ){
-            return true;
-        }else{
-            return false;
-        }
+        return $this->db->update('most', $most);
     }
 
     function module_form_valid($module_type){
@@ -731,4 +724,42 @@ class Conf_model extends CI_Model {
         $query = $this->db->get();
         return $query->row();
     }
+
+    function add_register_meal($conf_id,$meal_name){
+		$conf_meal = array(
+			"conf_id"      => $conf_id,
+			"meal_name"    => $meal_name
+		);
+		return $this->db->insert('conf_meal', $conf_meal);
+	}
+
+	function get_register_meals($conf_id){
+		$this->db->from('conf_meal');
+		$this->db->where("conf_id",$conf_id);
+		$query = $this->db->get();
+		return $query->result();
+	}
+
+	function get_register_meal($conf_id,$meal_id){
+		$this->db->from('conf_meal');
+		$this->db->where("conf_id",$conf_id);
+		$this->db->where("meal_id",$meal_id);
+		$query = $this->db->get();
+		return $query->row();
+	}
+
+	function update_register_meal($conf_id,$meal_id,$meal_name){
+		$conf_meal = array(
+			"meal_name"    => $meal_name
+		);
+		$this->db->where("conf_id",$conf_id);
+		$this->db->where("meal_id",$meal_id);
+		return $this->db->update('conf_meal', $conf_meal);
+	}
+
+	function del_register_meal($conf_id,$meal_id){
+		$this->db->where("conf_id",$conf_id);
+		$this->db->where("meal_id",$meal_id);
+		return $this->db->delete('conf_meal');
+	}
 }

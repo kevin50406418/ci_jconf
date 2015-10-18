@@ -1,8 +1,8 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');?>
 <div class="ui raised segment">
 	<div class="modal-header">
-		<a href="#" class="pull-right ui button orange"><i class="fa fa-2x fa-cutlery"></i> 餐點管理</a>
-		<a href="#" class="pull-right ui button teal"><i class="fa fa-2x fa-credit-card"></i> 註冊費用</a>
+		<a href="<?php echo get_url("dashboard",$conf_id,"register","meal")?>" class="pull-right ui button orange"><i class="fa fa-2x fa-cutlery"></i> 餐點管理</a>
+		<!--<a href="<?php echo get_url("dashboard",$conf_id,"register","price")?>" class="pull-right ui button teal"><i class="fa fa-2x fa-credit-card"></i> 註冊費用</a>-->
 		<h3 class="modal-title">註冊管理</h3>
 	</div>
 	<div class="modal-body">

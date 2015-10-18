@@ -10,7 +10,7 @@ class Topic_model extends CI_Model {
 		$this->db->join('paper', 'paper.sub_topic = topic.topic_id');
 		$this->db->where('user_login', $user_login);
 		$this->db->where('auth_topic.conf_id', $conf_id);
-		$this->db->where('sub_status >', 0);
+		$this->db->where('sub_status !=', -1);
 		if(!empty($topic_id)){
 			$this->db->where('auth_topic.topic_id', $topic_id);
 		}

@@ -1038,7 +1038,7 @@ class Dashboard extends MY_Conference {
 		
 	}
 
-	public function register($conf_id='',$act=''){
+	public function register($conf_id='',$act='',$do=''){
 		$data['conf_id'] = $conf_id;
 		$data['body_class'] = $this->body_class;
 		
@@ -1058,8 +1058,71 @@ class Dashboard extends MY_Conference {
 			case "price": // 價格管理
 				
 			break;
-			case "meal": 
-				
+			case "meal":
+				$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
+				$this->assets->add_js(asset_url().'js/repeatable-fields.js',true);
+				switch($do){
+					default:
+						$data['register_meals'] = $this->conf->get_register_meals($conf_id);
+						$opt = $this->input->post("opt");
+
+						if(!empty($this->input->get("id"))){
+							$id = $this->input->get("id");
+							$meal = $this->conf->get_register_meal($conf_id,$id);
+						}
+						switch($opt){
+							case "add":
+								$this->form_validation->set_rules('meal_name[]', '餐點名稱', 'required');
+								if ($this->form_validation->run()){
+									$meal_name = $this->input->post('meal_name');
+									foreach ($meal_name as $key => $name) {
+										if( $this->conf->add_register_meal($conf_id,$name) ){
+											$this->alert->show("s","成功新增：<strong>".$name."</strong>");
+										}else{
+											$this->alert->show("d","新增失敗：<strong>".$name."</strong>");
+										}
+									}
+									$this->alert->refresh(2);
+								}
+							break;
+							case "update":
+								if(!empty($meal)){
+									$this->form_validation->set_rules('meal_name', '餐點名稱', 'required');
+									if ($this->form_validation->run()){
+										$meal_name = $this->input->post('meal_name');
+										if( $this->conf->update_register_meal($conf_id,$id,$meal_name) ){
+											$this->alert->show("s","成功更新：<strong>".$meal_name."</strong>",get_url("dashboard",$conf_id,"register","meal"));
+										}else{
+											$this->alert->show("d","更新失敗：<strong>".$meal_name."</strong>",get_url("dashboard",$conf_id,"register","meal"));
+										}
+									}
+								}else{
+									$this->alert->show("d","更新失敗：查無此餐點",get_url("dashboard",$conf_id,"register","meal"));
+								}
+							break;
+							case "del":
+								$this->form_validation->set_rules('meal_id[]', '餐點', 'required');
+								if ($this->form_validation->run()){
+									$meal_ids = $this->input->post('meal_id');
+									foreach ($meal_ids as $key => $meal_id) {
+										if( $this->conf->del_register_meal($conf_id,$meal_id) ){
+											$this->alert->show("s","成功刪除：<strong>餐點#".$meal_id."</strong>");
+										}else{
+											$this->alert->show("d","刪除失敗：<strong>餐點#".$meal_id."</strong>");
+										}
+									}
+									$this->alert->refresh(2);
+								}
+							break;
+						}
+						$this->load->view('conf/register/meal_list',$data);
+						if(!empty($meal)){
+							$data['meal'] = $meal;
+							$this->load->view('conf/register/meal_edit',$data);
+						}
+						$this->load->view('conf/register/meal_add',$data);
+					break;
+				}
 			break;
 			default:
 				$this->load->view('conf/register/list',$data);

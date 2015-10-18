@@ -361,7 +361,7 @@ $config['sess_cookie_name'] = 'ccs_conf';
 $config['sess_expiration'] = 7200;
 $config['sess_save_path'] = 'users_sessions';
 $config['sess_match_ip'] = false;
-$config['sess_time_to_update'] = 3600;
+$config['sess_time_to_update'] = 0;
 $config['sess_regenerate_destroy'] = false;
 
 /*
@@ -380,7 +380,7 @@ $config['sess_regenerate_destroy'] = false;
 |
 */
 $config['cookie_prefix']	= '';
-$config['cookie_domain']	= '210.70.80.80';
+$config['cookie_domain']	= '120.108.113.38';
 $config['cookie_path']		= '/';
 $config['cookie_secure']	= FALSE;
 $config['cookie_httponly'] 	= true;

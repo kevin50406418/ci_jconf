@@ -53,7 +53,13 @@ $route['default_controller'] = 'home';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 $route['clang/(:any)'] = 'home/change_lang/$1';
-$route['(:any)/index'] = 'home/index/$1';
+$route['(:any)/index'] = function ($conf_id){
+	if( in_array($conf_id,array("user","sysop")) ){
+		return $conf_id."/index/";
+	}else{
+		return 'home/index/'.$conf_id;
+	}
+};
 $route['(:any)/news'] = 'home/news/$1';
 $route['(:any)/main'] = 'home/main/$1';
 

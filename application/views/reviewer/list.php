@@ -41,7 +41,11 @@
 				<?php }?>
 			</td>
 			<td class="text-center">
+				<?php if($paper->review_status != 3){?>
+				<a href="<?php echo get_url("reviewer",$conf_id,"detail",$paper->sub_id)?>" class="ui button basic">查看審查</a>
+				<?php }else{?>
 				<a href="<?php echo get_url("reviewer",$conf_id,"detail",$paper->sub_id)?>" class="ui blue button basic">進行審查</a>
+				<?php }?>
 			</td>
 		</tr>
 		<?php }?>

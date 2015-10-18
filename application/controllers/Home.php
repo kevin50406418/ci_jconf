@@ -184,7 +184,7 @@ class Home extends MY_Controller {
 			}
 			$this->_lang = $lang;
 			$this->session->set_userdata('lang', $lang);
-			$this->alert->refresh(0);
+			$this->alert->js_refresh();
 		}else{
 			$this->alert->js("No direct script access allowed",base_url());
 		}

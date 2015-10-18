@@ -92,7 +92,7 @@ class Reviewer extends MY_Conference {
 			$this->load->view('reviewer/detail',$data);
 
 			$paper_is_review = $this->reviewer->is_review($paper_id,$user_login);
-			//if( $paper_is_review->review_status == 3 ){
+			if( $paper_is_review->review_status == 3 ){
 				$data['review']  = $paper_is_review;
 				$this->form_validation->set_rules('review_status', '審查狀態', 'required');
 			    $this->form_validation->set_rules('review_comment', '審查建議', 'required');
@@ -119,7 +119,7 @@ class Reviewer extends MY_Conference {
 					$this->alert->refresh(2);
 			    }
 				$this->load->view('reviewer/reviewer',$data);
-			//}
+			}
 		}else{
 			$this->alert->js("由於您為本篇稿件作者之一，無法審查本篇稿件",get_url("reviewer",$conf_id,"index"));
 		}

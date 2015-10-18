@@ -24,8 +24,10 @@ class MY_Controller extends CI_Controller{
 		$this->assets->add_css(asset_url().'style/style.css');
 		$this->assets->add_css(asset_url().'style/statistic.min.css');
 		$this->_lang = $this->user->get_clang();
+
 		$this->lang->load("conf_menu",$this->_lang);
 		$this->lang->load("paper_status",$this->_lang);
+
 		if( $this->user->is_login() ){
 			$this->user_login = $this->session->userdata('user_login');
 			$bool_conf     = $this->session->has_userdata('priv_conf');

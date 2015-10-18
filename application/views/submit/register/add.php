@@ -73,7 +73,47 @@
 			<tr>
 				<th class="col-sm-2 control-label">研討會用餐</th>
 				<td class="col-sm-10">
-					 <!-- // check conf meal type-->
+					<?php foreach ($register_meals as $key => $register_meal) {?>
+					<label class="checkbox-inline text-bold">
+						<input type="checkbox" name="meal_id[]" value="<?php echo $register_meal->meal_id;?>"> <?php echo $register_meal->meal_name;?>
+					</label>
+					<?php }?>
+				</td>
+			</tr>
+			<tr>
+				<th class="col-sm-2 control-label">繳費稿件</th>
+				<td class="col-sm-10">
+					<table class="table table-bordered">
+						<?php $i=0;foreach ($papers as $key => $paper) {?>
+						<?php if(in_array($paper->sub_status,array(4))){$i++;?>
+							<tr>
+								<td class="text-center">
+									<input type="checkbox" name="meal_id[]" value="<?php echo $paper->sub_id?>">
+								</td>
+								<td>
+									<?php echo $paper->sub_title?>
+								</td>
+								<td>
+									<span title="<?php echo $paper->topic_info?>"><?php echo $paper->topic_name?></span>
+								</td>
+								<td class="text-center">
+									<?php echo $this->Submit->sub_status($paper->sub_status,true)?>
+								</td>
+							</tr>
+						<?php }?>
+						<?php }?>
+					</table>
+					<?php if($i == 0){?>
+					<div class="ui icon message orange">
+						<i class="fa fa-exclamation-triangle icon"></i>
+						<div class="content">
+							<div class="header">
+								提示
+							</div>
+							<p>稿件狀態被設為 成功 才能對稿件註冊繳費</p>
+						</div>
+					</div>
+					<?php }?>
 				</td>
 			</tr>
 		</table>
