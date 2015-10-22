@@ -74,7 +74,11 @@
 					$assign_count[$paper->sub_id] = isset($assign_count[$paper->sub_id])?$assign_count[$paper->sub_id]:0;
 					if( $had_count[$paper->sub_id] == $assign_count[$paper->sub_id] && $assign_count[$paper->sub_id] != 0){
 				?>
+					<?php if($paper->sub_status == 3){?>
 					<span class="ui green label basic"><i class="fa fa-check-circle-o"></i> 完成審查</span>
+					<?php }else{?>
+						
+					<?php }?>
 				<?php }else{?>
 					<?php echo $had_count[$paper->sub_id]?>
 					/

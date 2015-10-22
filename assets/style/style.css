@@ -252,7 +252,7 @@ fieldset[disabled] .btn-olive.active {
 	-moz-border-radius: 4px 4px 0 0;
 }
 .panel-title {
-	font-size: 14px;
+	font-size: 16px;
 	font-weight: normal;
 	color: #434a54;
 }
@@ -937,3 +937,4 @@ fieldset[disabled] .btn-olive.active {
 }
 .nav-tabs-center {text-align:center;}
 .text-bold{font-weight: bold;}
+#conf_nav a{font-size: 14px; font-family: "Microsoft JhengHei UI", "Microsoft JhengHei", sans-serif;}

@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-$lang['submit_system'] = "論文投稿";
+$lang['submit_system'] = "投稿系統";
 $lang['submit_add'] = "投稿";
 $lang['submit_list'] = "投稿清單";
 $lang['submit_signup'] = "研討會註冊";

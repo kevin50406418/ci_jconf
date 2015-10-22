@@ -1038,6 +1038,11 @@ class Submit extends MY_Conference {
 		$data['conf_config'] = $this->conf_config;
 		$data['conf_content']= $this->conf->conf_content($conf_id);
 
+		if($act == "edit" || $act =="add"){
+			$this->assets->add_js(asset_url().'js/fileinput/fileinput.min.js');
+			$this->assets->add_js(asset_url().'js/fileinput/fileinput_locale_zh-TW.js');
+			$this->assets->add_css(asset_url().'style/fileinput.min.css');
+		}
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
 
@@ -1046,16 +1051,147 @@ class Submit extends MY_Conference {
 		$this->load->view('conf/menu_submit',$data);
 		switch ($act) {
 			case "edit":
-				
+				$register_id = $this->input->get("id");
+				if(!empty($register_id)){
+					$register = $this->Submit->get_register($this->conf_id,$this->user_login,$register_id);
+					$data['register'] = $register;
+					if( !empty($register) ){
+						if( $register->register_status > 0){
+							$this->alert->js("無法編輯註冊資料",get_url("submit",$conf_id,"register"));
+							$this->output->_display();
+							exit();
+						}
+						$register_meals = $this->conf->get_register_meals($conf_id);
+						$my_papers = $this->Submit->show_mypaper($this->user_login,$conf_id);
+						$user_register_meal = $this->Submit->get_user_register_meal($register_id);
+						$user_register_paper = $this->Submit->get_user_register_paper($register_id,$this->user_login);
+
+						$data['register_meals'] = $register_meals;
+						$data['papers'] = $my_papers;
+
+						$user_register_meals = array();
+						$user_register_papers = array();
+						$conf_meal = array();
+						$conf_paper = array();
+						
+						foreach ($register_meals as $key => $register_meal) {
+							array_push($conf_meal, $register_meal->meal_id);
+						}
+						foreach ($my_papers as $key => $my_paper) {
+							array_push($conf_paper, $my_paper->sub_id);
+						}
+						foreach ($user_register_meal as $key => $user_meal) {
+							array_push($user_register_meals, $user_meal->meal_id);
+							$data["meal_type"] = $user_meal->meal_type;
+						}
+						foreach ($user_register_paper as $key => $user_paper) {
+							array_push($user_register_papers, $user_paper->paper_id);
+						}
+						$data['user_register_meals'] = $user_register_meals;
+						$data['user_register_papers'] = $user_register_papers;
+
+						$do = $this->input->post("do");
+						switch($do){
+							case "update":
+								
+							break;
+							case "upload":
+								$config['upload_path']= $this->conf->get_regdir($conf_id);
+				                $config['allowed_types']= 'pdf|jpg|png';
+				                $config['encrypt_name']= true;
+
+				                $this->load->library('upload', $config);
+				                //sp($this->input->post());
+				                if ( $this->upload->do_upload('register_file')){
+			                        $upload_data = $this->upload->data();
+			                        if( $this->Submit->update_register_pay_bill($upload_data["file_name"],$this->conf_id,$this->user_login,$register_id) ){
+			                       		$this->Submit->update_register_status(0,$conf_id,$register_id);
+			                       		$this->alert->show("s","收據檔案 <strong>".$upload_data["orig_name"]."</strong> 上傳成功");
+			                        }else{
+			                       		$this->alert->show("y","收據檔案 <strong>".$upload_data["orig_name"]."</strong> 更新發生錯誤");
+			                        }
+				                }else{
+			                        $this->alert->show("d","收據檔案 <strong>".$upload_data["orig_name"]."</strong> 上傳失敗");
+				                }
+				                $this->alert->refresh(2);
+							break;
+						}
+						$this->load->view('submit/register/edit',$data);
+						$this->load->view('submit/register/upload',$data);
+					}else{
+						$this->alert->js("找不到註冊資訊",get_url("submit",$conf_id,"register"));
+					}
+				}else{
+					$this->alert->js("找不到註冊資訊",get_url("submit",$conf_id,"register"));
+				}
 			break;
 			case "add":
 				$data['user'] =  $this->user->get_user_info($this->user_login);
-				$data['register_meals'] = $this->conf->get_register_meals($conf_id);
-				$data['papers'] = $this->Submit->show_mypaper($this->user_login,$conf_id);
+				$register_meals = $this->conf->get_register_meals($conf_id);
+				$my_papers = $this->Submit->show_mypaper($this->user_login,$conf_id);
+				$data['register_meals'] = $register_meals;
+				$data['papers'] = $my_papers;
+				
+				$conf_meal = array();
+				$conf_paper = array();
+				foreach ($register_meals as $key => $register_meal) {
+					array_push($conf_meal, $register_meal->meal_id);
+				}
+				foreach ($my_papers as $key => $my_paper) {
+					array_push($conf_paper, $my_paper->sub_id);
+				}
+				$this->form_validation->set_rules('user_name', '註冊人姓名', 'required');
+				$this->form_validation->set_rules('user_org', '所屬機構', 'required');
+				$this->form_validation->set_rules('user_phone', '聯絡電話', 'required');
+				$this->form_validation->set_rules('user_email', 'E-mail', 'required|valid_email');
+				$this->form_validation->set_rules('pay_name', '匯款人', 'required');
+				$this->form_validation->set_rules('pay_date', '匯款日期', 'required');
+				$this->form_validation->set_rules('pay_account', '匯款後5碼', 'required|max_length[5]|numeric');
+				$this->form_validation->set_rules('pay_date', '匯款日期', 'required');
+				$this->form_validation->set_rules('meal_type', '餐券類型', 'required');
+				$this->form_validation->set_rules('meal_id[]', '研討會用餐', 'required');
+
+			    if ( $this->form_validation->run() ){
+					$user_name      = $this->input->post('user_name', TRUE);
+					$user_org       = $this->input->post('user_org', TRUE);
+					$user_phone     = $this->input->post('user_phone', TRUE);
+					$user_email     = $this->input->post('user_email', TRUE);
+					$pay_name       = $this->input->post('pay_name', TRUE);
+					$pay_date       = $this->input->post('pay_date', TRUE);
+					$pay_account    = $this->input->post('pay_account', TRUE);
+					$bill_title     = $this->input->post('bill_title', TRUE);
+					$uniform_number = $this->input->post('uniform_number', TRUE);
+					$meal_ids       = $this->input->post('meal_id', TRUE);
+					$paper_ids      = $this->input->post('paper_id', TRUE);
+
+					$register_id = $this->Submit->add_register($this->conf_id,$this->user_login,$user_name,$user_org,$user_phone,$user_email,$pay_name,$pay_date,$pay_account,"",$uniform_number);
+					if( $register_id ){
+						if( is_array($meal_ids) ){
+							foreach ($meal_ids as $key => $meal_id) {
+								if( in_array($meal_id,$conf_meal) ){
+									$this->Submit->add_register_meal($register_id,$meal_id,$meal_type);
+								}
+							}
+						}
+						if( is_array($paper_ids) ){
+							foreach ($paper_ids as $key => $paper_id) {
+								if( in_array($paper_id,$conf_paper) ){
+									$this->Submit->add_register_paper($this->user_login,$paper_id,$register_id);
+								}
+							}
+						}
+						$this->alert->show("s","成功新增研討會註冊資料，請上傳匯款單據");
+						$this->alert->js("請上傳匯款單據");
+					}else{
+						$this->alert->show("d","新增研討會註冊資料失敗");
+					}
+				}
+				
 				$this->load->view('submit/register/add',$data);
 			break;
 			case "list":
 			default:
+				$data['registers'] = $this->Submit->get_registers($this->conf_id,$this->user_login);
 				$this->load->view('submit/register/list',$data);
 			break;
 		}

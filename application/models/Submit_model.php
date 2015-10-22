@@ -581,11 +581,7 @@ class Submit_model extends CI_Model {
             break;
         }
         $this->db->where('most_id', $most_id);
-        if( $this->db->update('most_file', $most_file) ){
-            return true;
-        }else{
-            return false;
-        }
+        return $this->db->update('most_file', $most_file);
     }
 
     function submit_most($conf_id,$most_id,$user_login){
@@ -600,5 +596,134 @@ class Submit_model extends CI_Model {
         }else{
             return false;
         }
+    }
+
+    function get_registers($conf_id,$user_login){
+        $this->db->from('register');
+        $this->db->where('conf_id', $conf_id);
+        $this->db->where('user_login', $user_login);
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    function get_register($conf_id,$user_login,$register_id){
+        $this->db->from('register');
+        $this->db->where('conf_id', $conf_id);
+        $this->db->where('user_login', $user_login);
+        $this->db->where('register_id', $register_id);
+        $query = $this->db->get();
+        return $query->row();
+    }
+
+    function get_user_register_meal($register_id){
+        $this->db->from('register_meal');
+        $this->db->where('register_id', $register_id);
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    function get_user_register_paper($register_id,$user_login){
+        $this->db->from('register_paper');
+        $this->db->where('register_id', $register_id);
+        $this->db->where('user_login', $user_login);
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    function add_register($conf_id,$user_login,$user_name,$user_org,$user_phone,$user_email,$pay_name,$pay_date,$pay_account,$pay_bill,$uniform_number){
+        $register = array(
+            "conf_id"        => $conf_id,
+            "user_login"     => $user_login,
+            "user_name"      => $user_name,
+            "user_org"       => $user_org,
+            "user_phone"     => $user_phone,
+            "user_email"     => $user_email,
+            "pay_name"       => $pay_name,
+            "pay_date"       => $pay_date,
+            "pay_account"    => $pay_account,
+            "pay_bill"       => $pay_bill,
+            "uniform_number" => $uniform_number,
+            "register_time"  => time()
+        );
+        if( $this->db->insert('register', $register) ){
+            return $this->db->insert_id();
+        }else{
+            return false;
+        }
+    }
+
+    function add_register_meal($register_id,$meal_id,$meal_type){
+        $register_meal = array(
+            "register_id" => $register_id,
+            "meal_id"     => $meal_id,
+            "meal_type"   => $meal_type
+        );
+        return $this->db->insert('register_meal', $register_meal);
+    }
+
+    function add_register_paper($user_login,$paper_id,$register_id){
+        $register_paper = array(
+            "register_id" => $register_id,
+            "user_login"  => $user_login,
+            "paper_id"   => $paper_id
+        );
+        return $this->db->insert('register_paper', $register_paper);
+    }
+
+    function register_status($register_status,$style=false){
+        $html_class="";
+        $staus_text="";
+        switch($register_status){
+            case -1:
+                $staus_text="尚未上傳收據";
+                $html_class="grey";
+            break;
+            case 0:
+                $staus_text="編輯中";
+                $html_class="teal";
+            break;
+            case 1:
+                $staus_text="核對中";
+                $html_class="yellow";
+            break;
+            case 2:
+                $staus_text="成功註冊";
+                $html_class="green";
+            break;
+            case 3:
+                $staus_text="註冊失敗";
+                $html_class="red";
+            break;
+            default:
+                $staus_text="-";
+                $html_class="";
+            break;
+        }
+
+        if($style){
+            return '<span class="ui label '.$html_class.'">'.$staus_text.'</span>';
+        }else{
+            return $staus_text;
+        }
+    }
+
+    function update_register_pay_bill($pay_bill,$conf_id,$user_login,$register_id){
+        $pay = array(
+            "pay_bill" => $pay_bill
+        );
+        $this->db->where('conf_id', $conf_id);
+        $this->db->where('user_login', $user_login);
+        $this->db->where('register_id', $register_id);
+        return $this->db->update('register', $pay);
+    }
+
+    function update_register_status($register_status,$conf_id,$register_id){
+        $pay = array(
+            "register_status" => $register_status,
+            "register_time" => time()
+        );
+        $this->db->where('conf_id', $conf_id);
+        $this->db->where('register_id', $register_id);
+        return $this->db->update('register', $pay);
     }
 }

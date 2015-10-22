@@ -2,7 +2,7 @@
 <h1 style="font-weight: bold;"><?php echo $conf_config['conf_name']?></h1>
 <div class="ui inverted segment">
 
-<div class="ui inverted secondary pointing menu">
+<div class="ui inverted secondary pointing menu" id="conf_nav">
 	<a class="item" href="<?php echo get_url("index",$conf_config['conf_id']);?>">
 		首頁
 	</a>

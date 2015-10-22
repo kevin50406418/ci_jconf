@@ -343,7 +343,7 @@ class Dashboard extends MY_Conference {
 		}
 
 		if( $do=="edit" || $do=="add" ){
-			$this->assets->add_js(base_url('ckeditor/ckeditor.js'));
+			$this->assets->add_js(base_url().'tinymce/tinymce.min.js');
 		}
 
 		$this->load->view('common/header');
@@ -432,6 +432,7 @@ class Dashboard extends MY_Conference {
 						}
 						$this->alert->refresh(2);
 					}
+					$this->load->view('common/tinymce',$data);
 					$this->load->view('conf/content/add',$data);
 				break;
 			}
@@ -456,6 +457,7 @@ class Dashboard extends MY_Conference {
 							$this->alert->refresh(2);
 						}
 					}
+					$this->load->view('common/tinymce',$data);
 					$this->load->view('conf/content/edit',$data);
 				break;
 				case "del":
