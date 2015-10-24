@@ -402,6 +402,175 @@ class Conf_model extends CI_Model {
 						"error" => "Database error! Contact System Adminstritor.(Schedule)"
 					);
 		        }
+
+		        $conf_content = array(
+			        array(
+						'conf_id'     => $conf_id,
+						'page_id'     => 'index',
+						'page_title'  => "首頁",
+						'page_lang'   => "zhtw",
+						'page_show'   => 1,
+						"page_order"  => 0,
+						"page_edit"   => 0,
+						"page_hidden" => 0,
+						"page_del"    => 0
+			        ),
+			        array(
+						'conf_id'     => $conf_id,
+						'page_id'     => 'index',
+						'page_title'  => "Home",
+						'page_lang'   => "en",
+						'page_show'   => 1,
+						"page_order"  => 0,
+						"page_edit"   => 0,
+						"page_hidden" => 0,
+						"page_del"    => 0
+			        ),
+			        array(
+						'conf_id'     => $conf_id,
+						'page_id'     => 'main',
+						'page_title'  => "研討會系統",
+						'page_lang'   => "zhtw",
+						'page_show'   => 1,
+						"page_order"  => 1,
+						"page_edit"   => 0,
+						"page_hidden" => 0,
+						"page_del"    => 0
+			        ),
+			        array(
+						'conf_id'     => $conf_id,
+						'page_id'     => 'main',
+						'page_title'  => "Conference System",
+						'page_lang'   => "en",
+						'page_show'   => 1,
+						"page_order"  => 1,
+						"page_edit"   => 0,
+						"page_hidden" => 0,
+						"page_del"    => 0
+			        ),
+			        array(
+						'conf_id'     => $conf_id,
+						'page_id'     => 'news',
+						'page_title'  => "最新公告",
+						'page_lang'   => "zhtw",
+						'page_show'   => 1,
+						"page_order"  => 2,
+						"page_edit"   => 0,
+						"page_hidden" => 0,
+						"page_del"    => 0
+			        ),
+			        array(
+						'conf_id'     => $conf_id,
+						'page_id'     => 'news',
+						'page_title'  => "News",
+						'page_lang'   => "en",
+						'page_show'   => 1,
+						"page_order"  => 2,
+						"page_edit"   => 0,
+						"page_hidden" => 0,
+						"page_del"    => 0
+			        ),
+			        array(
+						'conf_id'     => $conf_id,
+						'page_id'     => 'program',
+						'page_title'  => "會議議程",
+						'page_lang'   => "zhtw",
+						'page_show'   => 0,
+						"page_order"  => 3,
+						"page_edit"   => 1,
+						"page_hidden" => 1,
+						"page_del"    => 1
+			        ),
+			        array(
+						'conf_id'     => $conf_id,
+						'page_id'     => 'program',
+						'page_title'  => "Program",
+						'page_lang'   => "en",
+						'page_show'   => 0,
+						"page_order"  => 3,
+						"page_edit"   => 1,
+						"page_hidden" => 1,
+						"page_del"    => 1
+			        ),
+			        array(
+						'conf_id'     => $conf_id,
+						'page_id'     => 'submission',
+						'page_title'  => "論文投稿",
+						'page_lang'   => "zhtw",
+						'page_show'   => 0,
+						"page_order"  => 4,
+						"page_edit"   => 1,
+						"page_hidden" => 1,
+						"page_del"    => 1
+			        ),
+			        array(
+						'conf_id'     => $conf_id,
+						'page_id'     => 'submission',
+						'page_title'  => "Submission",
+						'page_lang'   => "en",
+						'page_show'   => 0,
+						"page_order"  => 4,
+						"page_edit"   => 1,
+						"page_hidden" => 1,
+						"page_del"    => 1
+			        ),
+			        array(
+						'conf_id'     => $conf_id,
+						'page_id'     => 'org',
+						'page_title'  => "大會組織",
+						'page_lang'   => "zhtw",
+						'page_show'   => 0,
+						"page_order"  => 5,
+						"page_edit"   => 1,
+						"page_hidden" => 1,
+						"page_del"    => 1
+			        ),
+			        array(
+						'conf_id'     => $conf_id,
+						'page_id'     => 'org',
+						'page_title'  => "Organization",
+						'page_lang'   => "en",
+						'page_show'   => 0,
+						"page_order"  => 5,
+						"page_edit"   => 1,
+						"page_hidden" => 1,
+						"page_del"    => 1
+			        ),
+			        array(
+						'conf_id'     => $conf_id,
+						'page_id'     => 'supplier',
+						'page_title'  => "協辦及贊助單位",
+						'page_lang'   => "zhtw",
+						'page_show'   => 0,
+						"page_order"  => 6,
+						"page_edit"   => 1,
+						"page_hidden" => 1,
+						"page_del"    => 1
+			        ),
+			        array(
+						'conf_id'     => $conf_id,
+						'page_id'     => 'supplier',
+						'page_title'  => "Supplier",
+						'page_lang'   => "en",
+						'page_show'   => 0,
+						"page_order"  => 6,
+						"page_edit"   => 1,
+						"page_hidden" => 1,
+						"page_del"    => 1
+			        ),
+
+			    );
+				if( $this->db->insert_batch('conf_content',$conf_content) ){
+					$return = array(
+						"status" => true,
+						"error" => "Success Add Conference Website Content"
+					);
+		        }else{
+		           $return = array(
+						"status" => false,
+						"error" => "Database error! Contact System Adminstritor.(Website Content)"
+					);
+		        }
 			}
 		}
 		return $return;
@@ -444,6 +613,7 @@ class Conf_model extends CI_Model {
 	function get_topic($conf_id){
 		$this->db->from('topic');
 		$this->db->where('conf_id', $conf_id);
+		$this->db->order_by('topic_order', 'ASC');
 		$query = $this->db->get();
 		return $query->result();
 	}
@@ -467,6 +637,16 @@ class Conf_model extends CI_Model {
 			"topic_name_eng" =>$topic_name_eng
 		);
 		return $this->db->insert('topic', $topic);
+	}
+
+	function del_topic($conf_id,$topic_id){
+		$count_paper = $this->topic->count_paper($conf_id,$topic_id);
+		if( $count_paper->cnt > 0){
+			return 2;
+		}
+		$this->db->where('topic_id', $topic_id);
+		$this->db->where('conf_id', $conf_id);
+		return $this->db->delete('topic');
 	}
 
 	function update_topic($topic_id,$conf_id,$topic_name,$topic_abbr,$topic_info,$topic_name_eng){
@@ -576,12 +756,14 @@ class Conf_model extends CI_Model {
 		$this->db->where('conf_id', $conf_id);
 		$this->db->where('page_id', $page_id);
 		$this->db->where('page_lang', $page_lang);
+		$this->db->where('page_edit', 1);
 		return $this->db->update('conf_content', $content);
 	}
 
 	function del_contents($conf_id,$page_id){
 		$this->db->where('conf_id', $conf_id);
 		$this->db->where('page_id', $page_id);
+		$this->db->where('page_del', 1);
 		return $this->db->delete('conf_content');
 	}
 
@@ -761,5 +943,22 @@ class Conf_model extends CI_Model {
 		$this->db->where("conf_id",$conf_id);
 		$this->db->where("meal_id",$meal_id);
 		return $this->db->delete('conf_meal');
+	}
+
+	function sort_topic($conf_id,$topic_array){
+		if(!is_array($topic_array)) return false;
+		foreach ($topic_array as $key => $topic_id) {
+			$this->update_sort_topic($conf_id,$topic_id,$key);
+		}
+		return true;
+	}
+
+	function update_sort_topic($conf_id,$topic_id,$topic_order){
+		$topic_order = array(
+			"topic_order"    => $topic_order
+		);
+		$this->db->where("conf_id",$conf_id);
+		$this->db->where("topic_id",$topic_id);
+		return $this->db->update('topic', $topic_order);
 	}
 }

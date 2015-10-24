@@ -32,7 +32,7 @@ class Sysop extends MY_Sysop {
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
 		$this->load->view('sysop/nav',$data);
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 	}
 
 	public function conf($type="all",$conf_id=""){
@@ -165,7 +165,7 @@ class Sysop extends MY_Sysop {
 				break;
 			}
 		}
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 	}
 
 	public function user($do="all",$user_login=""){
@@ -406,7 +406,7 @@ class Sysop extends MY_Sysop {
 			}
 		}
 		if( empty($user_login) && $do != "manage" ){
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 		}
 	}
 
@@ -429,7 +429,7 @@ class Sysop extends MY_Sysop {
 	    	}
 	    }
 		$this->load->view('sysop/setting/index',$data);
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 	}
 	public function login(){
 		if( $this->sysop->is_sysop_login() ){
@@ -450,7 +450,7 @@ class Sysop extends MY_Sysop {
 			}
 		}
 		$this->load->view('sysop/login');
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 	}
 
 	public function logout(){
@@ -459,6 +459,6 @@ class Sysop extends MY_Sysop {
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
 		$this->alert->show("i","Logout Success",base_url("sysop/login"));
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 	}
 }

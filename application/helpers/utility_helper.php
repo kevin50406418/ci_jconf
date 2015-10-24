@@ -1,10 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-if ( ! function_exists('asset_url')){
-	function asset_url(){
-		return base_url().'assets/';
-	}
+function asset_url($dir = ""){
+	return base_url().'assets/'.$dir;
 }
 
+function template_url($template,$script){
+	return asset_url('template/'.$template."/".$script);
+}
 
 if ( ! function_exists('schedule_dates')){
 	function schedule_dates($timestamp){
@@ -124,3 +125,25 @@ function arrayLevel($arr){
     aL($arr,$al); 
     return max($al); 
 } 
+
+function active_confnav($now_page_id,$page_id,$active){
+	$sys_submit = array("dashboard","main","submit","topic","reviewer");
+	$sys_index = array("index");
+	$sys_news = array("news");
+
+	if( in_array($now_page_id, $sys_submit) ){
+		foreach ($sys_submit as $key => $sys_submits) {
+			if($page_id == "main"){return $active;}
+		}
+	}else if( in_array($now_page_id, $sys_index) ){
+		foreach ($sys_index as $key => $sys_indexs) {
+			if( $now_page_id == $page_id) return $active;
+		}
+	}else if( in_array($now_page_id, $sys_news) ){
+		foreach ($sys_news as $key => $sys_newss) {
+			if( $now_page_id == $page_id) return $active;
+		}
+	}else{
+		if( $now_page_id == $page_id) return $active;
+	}
+}

@@ -53,7 +53,7 @@
 	</div>
 	<?php }?>
 	<div class="text-center">
-		<input type="submit" id="add" value="更新" class="ui button teal">
+		<input type="submit" id="add" value="新增網頁" class="ui button blue">
 	</div>
 </div>
 

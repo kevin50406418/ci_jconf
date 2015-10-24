@@ -3,6 +3,13 @@
 <?php echo form_open(get_url("dashboard",$conf_id,"website","edit")."?id=".$content->page_id."&lang=".$content->page_lang,array("class"=>"form-horizontal"))?>
 <div class="ui segment">
 	<div class="modal-header">
+		<?php if(in_array("zhtw",$conf_lang)){?>
+			<div class="ui buttons pull-right">
+				<a class="ui button orange<?php if($content->page_lang != "zhtw"){?> basic<?php }?>" href="<?php echo get_url("dashboard",$conf_id,"website","edit")."?id=".$content->page_id."&lang=zhtw"?>">中文</a>
+				<a class="ui button orange<?php if($content->page_lang != "en"){?> basic<?php }?>" href="<?php echo get_url("dashboard",$conf_id,"website","edit")."?id=".$content->page_id."&lang=en"?>">English</a>
+			</div>
+		<?php }?>
+		<a class="pull-left ui button blue" href="<?php echo get_url("dashboard",$conf_id,"website")?>"><i class="fa fa-chevron-circle-left fa-lg"></i></a>
 		<h4 class="modal-title">編輯網頁 - <?php echo $content->page_title?>(<?php echo $content->page_id?>)</h4>
 	</div>
 	<div class="modal-body">

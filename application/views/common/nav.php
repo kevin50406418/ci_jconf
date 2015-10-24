@@ -26,7 +26,7 @@
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 			<?php if($this->cinfo['show_confinfo']){?>
-				<li><a href="<?php echo base_url();?>"><i class="fa fa-home fa-lg"></i> 首頁</a></li>
+				<li><a href="<?php echo base_url();?>"><i class="fa fa-home fa-lg"></i> 所有研討會</a></li>
 			<?php }?>
 			<?php if($this->user->is_sysop()){?>
 				<li><a href="<?php echo base_url("sysop");?>">系統管理</a></li>

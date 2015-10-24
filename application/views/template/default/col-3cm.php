@@ -1,10 +1,10 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <div class="col-md-3">
-	<?php $this->module->get_module($conf_id,"sidebar-1","zhtw")?>
+	<?php foreach ($col_sidebar_1 as $key => $col_s1) {include("conf/".$col_s1.".php");}?>
 </div>
 <div class="col-md-6">
-	<?php $this->module->get_module($conf_id,"content","zhtw")?>
+	<?php foreach ($col_index as $key => $col_i) { include("conf/".$col_i.".php");}?>
 </div>
 <div class="col-md-3">
-	<?php $this->module->get_module($conf_id,"sidebar-2","zhtw")?>
+	<?php foreach ($col_sidebar_2 as $key => $col_s2) {include("conf/".$col_s2.".php");}?>
 </div>

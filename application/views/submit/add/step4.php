@@ -13,13 +13,9 @@ if(!is_null($this->input->get("upload"))){
 	<h2>上傳補充資料</h2>
 	<div id="alert"></div>
 	<div class="form-group">
-		<label for="inputPassword3" class="col-sm-2 control-label">投稿資料</label>
-		<div class="col-sm-8">
+		<div class="col-sm-12">
 			<input name="paper_file[]" type="file" multiple id="paper_file" accept=".pdf">
 			<p class="help-block">只限PDF上傳投稿資料(一次可多個上傳檔案)</p>
-		</div>
-		<div class="col-sm-2">
-			<input name="check2" type="submit" class="ui teal button" id="check2" value="上傳" >
 		</div>
 	</div>
 	<?php echo form_close()?>
@@ -60,3 +56,20 @@ if(!is_null($this->input->get("upload"))){
 		<div class="ui message info">目前無補充任何文件</div>
 	<?php }?>
 </div>
+<script>
+$("#paper_file").fileinput({
+	language: "zh-TW",
+    autoReplace: true,
+    allowedFileExtensions: ["pdf"],
+    removeIcon: '<i class="fa fa-trash"></i>',
+    
+    browseIcon: '<i class="fa fa-folder-open"></i>',
+    cancelIcon: '<i class="fa fa-ban"></i>',
+    uploadIcon: '<i class="fa fa-upload"></i>',
+    previewFileIcon: '<i class="fa fa-file"></i>',
+
+    previewFileIconSettings: {
+        'pdf': '<i class="fa fa-file-pdf-o text-danger"></i>',
+    }
+});
+</script>

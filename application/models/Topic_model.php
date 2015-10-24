@@ -114,6 +114,9 @@ class Topic_model extends CI_Model {
 	}
 
 	function count_reviewer($conf_id,$topic_id){
+		if(empty($topic_id)){
+			return ;
+		}
 		$this->db->select('paper_id,count(*) as cnt');
 		$this->db->from('paper_review');
 		$this->db->join('paper','paper.sub_id = paper_review.paper_id');
@@ -125,6 +128,9 @@ class Topic_model extends CI_Model {
 	}
 
 	function count_had_review($conf_id,$topic_id){
+		if(empty($topic_id)){
+			return ;
+		}
 		$this->db->select('paper_id,count(*) as cnt');
 		$this->db->from('paper_review');
 		$this->db->join('paper','paper.sub_id = paper_review.paper_id');
@@ -148,5 +154,18 @@ class Topic_model extends CI_Model {
 		}else{
 			return false;
 		}
+	}
+
+	function count_paper($conf_id,$topic_id){
+		if(empty($topic_id)){
+			return ;
+		}
+		$this->db->select('count(*) as cnt');
+		$this->db->from('paper');
+        $this->db->join('topic', 'paper.sub_topic = topic.topic_id');
+		$this->db->where_in('sub_topic', $topic_id);
+		$this->db->where('paper.conf_id', $conf_id);
+		$query = $this->db->get();
+		return $query->row();
 	}
 }

@@ -49,7 +49,7 @@ class Reviewer extends MY_Conference {
 		//$this->load->view('conf/conf_schedule',$data);
 		$this->load->view('conf/menu_reviewer',$data);
 		$this->load->view('reviewer/list',$data);
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 	}
 
 	public function detail($conf_id='',$paper_id=''){
@@ -63,7 +63,7 @@ class Reviewer extends MY_Conference {
 
 		if( empty($paper_id) ){
 			$this->alert->js("稿件不存在",get_url("topic",$conf_id,"index"));
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 			$this->output->_display();
 			exit;
 		}
@@ -123,7 +123,7 @@ class Reviewer extends MY_Conference {
 		}else{
 			$this->alert->js("由於您為本篇稿件作者之一，無法審查本篇稿件",get_url("reviewer",$conf_id,"index"));
 		}
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 	}
 }
 ?>

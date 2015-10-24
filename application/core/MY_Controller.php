@@ -6,6 +6,7 @@ class MY_Controller extends CI_Controller{
 	public $body_class;
 	public $_lang;
 	public $conf_id;
+	public $pg_id;
 	public $spage;
 	public $user_login;
     public function __construct(){
@@ -27,6 +28,7 @@ class MY_Controller extends CI_Controller{
 
 		$this->lang->load("conf_menu",$this->_lang);
 		$this->lang->load("paper_status",$this->_lang);
+		$this->lang->load("conf",$this->_lang);
 
 		if( $this->user->is_login() ){
 			$this->user_login = $this->session->userdata('user_login');
@@ -53,6 +55,7 @@ class MY_Controller extends CI_Controller{
 				break;
 			}*/
 			$this->conf_id = $this->uri->segment(1);
+			$pg_id = $this->uri->segment(2);
 		}
     }
 }

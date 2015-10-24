@@ -1,12 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
-<?php echo form_open(get_url("dashboard",$conf_id,"user"),array("class"=>"ui segment"))?>
+<?php echo form_open(get_url("topic",$conf_id,"users"),array("class"=>"ui segment"))?>
 	<div class="ui inverted segment">
-		<a href="<?php echo get_url("dashboard",$conf_id,"user","add")?>" class="ui blue inverted button">新增使用者</a>
-		<div class="ui buttons">
-			<button class="ui teal button action" name="type" value="add_admin">設為研討會管理員</button>
-			<button class="ui pink button action" name="type" value="del_admin">取消研討會管理員</button>
-		</div>
-
 		<div class="ui buttons">
 			<button class="ui orange button action" name="type" value="add_review">設為審查人</button>
 			<button class="ui purple button action" name="type" value="del_review">取消審查人</button>
@@ -20,7 +14,6 @@
 				<th>帳號(姓名)</th>
 				<th>信箱</th>
 				<th>所屬機構</th>
-				<th>操作</th>
 			</tr>
 		</thead>
 		<?php foreach ($users as $key => $user) {?>
@@ -46,11 +39,6 @@
 			</td>
 			<td><?php echo $user->user_email?></td>
 			<td><?php echo $user->user_org?></td>
-			<td>
-				<a href="<?php echo get_url("dashboard",$conf_id,"user","edit",$user->user_login)?>" class="ui button blue tiny"><i class="fa fa-pencil-square-o"></i> 編輯</a>
-				<!--<a href="#" class="ui button teal tiny">查看</a>
-				<a href="#" class="ui button orange tiny">重設密碼</a>-->
-			</td>
 		</tr>
 		<?php }?>
 	</table>
@@ -61,7 +49,6 @@ $(document).ready(function() {
 		"order": [[ 1, "desc" ]],
 		columnDefs: [
 			{ orderable: false, "targets": 0 },
-			{ orderable: false, "targets": -1 },
 		],
 		stateSave: true,
         "language": {
@@ -85,7 +72,7 @@ $(document).ready(function() {
 		var table = $('.datatable_users').dataTable();
 		$.ajax({
 			type: "POST",
-			url: "<?php echo get_url("dashboard",$conf_id,"user")?>",
+			url: "<?php echo get_url("topic",$conf_id,"users")?>",
 			data: table.$('input').serialize()+"&type="+$(this).val()+"&<?php echo $this->security->get_csrf_token_name(); ?>=<?php echo $this->security->get_csrf_hash(); ?>" ,
 			success: function(response){$("#alert").html(response);},
 			error:function(xhr){$("#alert").html(data);},

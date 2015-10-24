@@ -23,7 +23,7 @@ $(function() {
 			<!--<li> <a href="#tab_style" data-toggle="tab"> <i class="fa fa-magic fa-lg"></i> 研討會樣式 </a> </li>-->
 			<li> <a href="#tab_function" data-toggle="tab"> <i class="fa fa-cog fa-lg"></i> 功能設定 </a> </li>
 			<li> <a href="#tab_schedule" data-toggle="tab"> <i class="fa fa-calendar fa-lg"></i> 時間安排 </a> </li>
-			<li> <a href="#tab_org" data-toggle="tab"> <i class="fa fa-users fa-lg"></i> 大會組織 </a> </li>
+			<!--<li> <a href="#tab_org" data-toggle="tab"> <i class="fa fa-users fa-lg"></i> 大會組織 </a> </li>-->
 			<?php echo form_open(get_url("dashboard",$conf_id,"setting"),array("class"=>"pull-right"))?>
 			<?php echo form_hidden('do', 'status');?>
 			<?php if( $conf_config['conf_staus']==0 ){?>
@@ -225,17 +225,18 @@ $(function() {
 						</div>
 					</div>
 				</div>
-
+				<?php if($conf_config['conf_most'] == 1 ){?>
 				<div class="form-group">
 					<label class="col-sm-2 control-label">科技部成果發表</label>
 					<div class="col-sm-10">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="input-daterange input-group" id="datepicker">
-								<input type="date" class="input-sm form-control" name="most[end]" value="<?php //echo $schedule['finish']['end']?>">
+								<input type="date" class="input-sm form-control" name="most[end]" value="<?php echo $schedule['most']['end']?>">
 							</div>
 						</div>
 					</div>
 				</div>
+				<?php }?>
 				<div class="form-group">
 					<input type="submit" name="submit_1" value="修改" class="ui button blue">
 				</div>

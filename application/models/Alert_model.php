@@ -58,8 +58,9 @@ class Alert_model extends CI_Model {
 		$this->load->view('common/js_alert',$data);
     }
 
-    function refresh($refresh){
+    function refresh($refresh,$to =''){
     	$data['refresh'] = $refresh;
+    	$data['to'] = $to;
     	$this->load->view('common/refresh',$data);
     }
 

@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 //$config['assets_url'] = "http://120.108.113.38/conf/assets/";
 $config['site_name'] = "亞大研討會系統";
-$config['spage']=array("index","news");
+$config['spage']=array("index","news","main","dashboard","submit","topic","reviewer");
 
 $config['developer'] = array("jingxun"); // developer account: can not cancel sysop group
 $config['ban'] = array(""); // ban user: can not add sysop group

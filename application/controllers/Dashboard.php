@@ -112,7 +112,9 @@ class Dashboard extends MY_Conference {
 					$this->form_validation->set_rules('early_bird[]', '早鳥繳費', 'required');
 					$this->form_validation->set_rules('register[]', '線上註冊', 'required');
 					$this->form_validation->set_rules('finish[]', '上傳完稿截止', 'required');
-
+					/*if( $this->conf_config['conf_most'] == 1){
+						$this->form_validation->set_rules('most[]', '上傳完稿截止', 'required');
+					}*/
 					if ($this->form_validation->run()){
 						$hold       = $this->input->post("hold");
 						$submit     = $this->input->post("submit");
@@ -184,7 +186,7 @@ class Dashboard extends MY_Conference {
 			}
 		}
 		$this->load->view('conf/setting',$data);
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 	}
 
 	
@@ -208,6 +210,12 @@ class Dashboard extends MY_Conference {
 			$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
 			$this->assets->add_js(asset_url().'js/dataTables.bootstrap.js',true);
 		}
+
+		if( $type == "all" || empty($type) ){
+			$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
+			$this->assets->add_js(asset_url().'js/repeatable.js',true);
+		}
+
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
 		$this->load->view('conf/conf_nav',$data);
@@ -219,6 +227,16 @@ class Dashboard extends MY_Conference {
 			switch($type){
 				default:
 				case "all":
+					$this->form_validation->set_rules('topic_id[]', '研討會主題', 'required');
+					if ($this->form_validation->run()){
+						$topic_array = $this->input->post("topic_id");
+						if( $this->conf->sort_topic($conf_id,$topic_array) ){
+							$this->alert->show("s","研討會主題順序調整成功");
+						}else{
+							$this->alert->show("d","研討會主題順序調整失敗");
+						}
+						$this->alert->refresh(2);
+					}
 					$data['topics'] = $this->conf->get_topic($conf_id);
 					$this->load->view('conf/topic/all',$data);
 				break;
@@ -246,7 +264,23 @@ class Dashboard extends MY_Conference {
 			$topic_id=$this->input->get('id', TRUE);
 			switch($type){
 				case "remove":
-
+					$topic_array = $this->conf->get_topic_info($this->conf_id,$topic_id);
+					if(is_array($topic_array)){
+						switch( $this->conf->del_topic($this->conf_id,$topic_id) ){
+							case "0":
+								$this->alert->js("主題刪除失敗");
+							break;
+							case "1":
+								$this->alert->js("主題刪除成功");
+							break;
+							case "2":
+								$this->alert->js("主題刪除失敗(失敗資訊：存在投稿資料)");
+							break;
+						}
+					}else{
+						$this->alert->js("查無此主題");
+					}
+					$this->alert->refresh(1,get_url("dashboard",$conf_id,"topic"));
 				break;
 				case "edit":
 					$this->form_validation->set_rules('topic_name', '主題名稱(中)', 'required');
@@ -317,10 +351,8 @@ class Dashboard extends MY_Conference {
 					}
 				break;
 			}
-			
-			
-			$this->load->view('common/footer');
 		}
+		$this->load->view('common/footer',$data);
 	}
 
 	public function website($conf_id='',$do='all'){
@@ -383,7 +415,7 @@ class Dashboard extends MY_Conference {
 					}
 					if(in_array("eng",$data['conf_lang'])){
 						$this->form_validation->set_rules('eng[]', '', 'required');
-						$data['contents']['eng'] = $this->conf->get_contents($conf_id,"eng");
+						$data['contents']['eng'] = $this->conf->get_contents($conf_id,"en");
 						
 						if($this->form_validation->run()){
 							$eng=$this->input->post('eng');
@@ -469,7 +501,7 @@ class Dashboard extends MY_Conference {
 				break;
 			}			
 		}
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 	}
 
 	public function filter($conf_id='',$type=''){
@@ -538,7 +570,7 @@ class Dashboard extends MY_Conference {
 			}
 		}
 		//$this->load->view('conf/setting',$data);
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 		
 	}
 
@@ -565,13 +597,19 @@ class Dashboard extends MY_Conference {
 			$this->assets->add_js(asset_url().'js/jquery.twzipcode.min.js');
 			$this->assets->add_js(asset_url().'js/chosen.jquery.js');
 		}
-		$this->load->view('common/header');
-		$this->load->view('common/nav',$data);
+		if( ( empty($user_login) && $do=="all" ) ){
+			$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
+			$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
+			$this->assets->add_js(asset_url().'js/dataTables.bootstrap.js',true);
+		}
+		if( !$this->input->is_ajax_request() ){
+			$this->load->view('common/header');
+			$this->load->view('common/nav',$data);
 
-		$this->load->view('conf/conf_nav',$data);
-		//$this->load->view('conf/conf_schedule',$data);
-		$this->load->view('conf/menu_conf',$data);
-
+			$this->load->view('conf/conf_nav',$data);
+			//$this->load->view('conf/conf_schedule',$data);
+			$this->load->view('conf/menu_conf',$data);
+		}
 		if( empty($user_login) ){
 			switch($do){
 				case "add":
@@ -620,52 +658,55 @@ class Dashboard extends MY_Conference {
 					$data['confs']=$this->user->get_conf_array($conf_id);
 					$data['reviewers']=$this->user->get_reviewer_array($conf_id);
 					
-					$this->form_validation->set_rules('type', '操作', 'required');
-					$this->form_validation->set_rules('user_login[]', '帳號', 'required');
-				    if ($this->form_validation->run()){
-				    	$type = $this->input->post('type');
-				    	$user_logins = $this->input->post('user_login');
-				    	switch($type){
-				    		case "add_admin":
-				    			foreach ($user_logins as $key => $user_login) {
-				    				if( $this->user->add_conf($conf_id,$user_login) ){
-				    					$this->alert->show("s","成功將使用者 <strong>".$user_login."<strong> 設為研討會管理員");
-				    				}else{
-				    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 設為研討會管理員失敗");
-				    				}
-				    			}
-				    		break;
-				    		case "del_admin":
-				    			foreach ($user_logins as $key => $user_login) {
-				    				if( $this->user->del_conf($conf_id,$user_login) ){
-				    					$this->alert->show("s","將使用者 <strong>".$user_login."<strong> 取消設為研討會管理員");
-				    				}else{
-				    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 取消研討會管理員失敗");
-				    				}
-				    			}
-				    		break;
-				    		case "add_review":
-				    			foreach ($user_logins as $key => $user_login) {
-				    				if( $this->user->add_reviewer($conf_id,$user_login) ){
-				    					$this->alert->show("s","成功將使用者 <strong>".$user_login."<strong> 設為審查人");
-				    				}else{
-				    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 設為審查人失敗");
-				    				}
-				    			}
-				    		break;
-				    		case "del_review":
-				    			foreach ($user_logins as $key => $user_login) {
-				    				if( $this->user->del_reviewer($conf_id,$user_login) ){
-				    					$this->alert->show("s","將使用者 <strong>".$user_login."<strong> 取消設為審查人失敗");
-				    				}else{
-				    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 取消審查人失敗");
-				    				}
-				    			}
-				    		break;
-				    	}
-				    	$this->alert->refresh(2);
-				    }
-					$this->load->view('conf/user/all',$data);
+					if( $this->input->is_ajax_request() ){
+						$this->form_validation->set_rules('type', '操作', 'required');
+						$this->form_validation->set_rules('user_login[]', '帳號', 'required');
+					    if ($this->form_validation->run()){
+					    	$type = $this->input->post('type');
+					    	$user_logins = $this->input->post('user_login');
+					    	switch($type){
+					    		case "add_admin":
+					    			foreach ($user_logins as $key => $user_login) {
+					    				if( $this->user->add_conf($conf_id,$user_login) ){
+					    					$this->alert->show("s","成功將使用者 <strong>".$user_login."<strong> 設為研討會管理員");
+					    				}else{
+					    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 設為研討會管理員失敗");
+					    				}
+					    			}
+					    		break;
+					    		case "del_admin":
+					    			foreach ($user_logins as $key => $user_login) {
+					    				if( $this->user->del_conf($conf_id,$user_login) ){
+					    					$this->alert->show("s","將使用者 <strong>".$user_login."<strong> 取消設為研討會管理員");
+					    				}else{
+					    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 取消研討會管理員失敗");
+					    				}
+					    			}
+					    		break;
+					    		case "add_review":
+					    			foreach ($user_logins as $key => $user_login) {
+					    				if( $this->user->add_reviewer($conf_id,$user_login) ){
+					    					$this->alert->show("s","成功將使用者 <strong>".$user_login."<strong> 設為審查人");
+					    				}else{
+					    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 設為審查人失敗");
+					    				}
+					    			}
+					    		break;
+					    		case "del_review":
+					    			foreach ($user_logins as $key => $user_login) {
+					    				if( $this->user->del_reviewer($conf_id,$user_login) ){
+					    					$this->alert->show("s","成功將使用者 <strong>".$user_login."<strong> 取消設為審查人");
+					    				}else{
+					    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 取消審查人失敗");
+					    				}
+					    			}
+					    		break;
+					    	}
+					    	$this->alert->refresh(2);
+					    }
+					}else{
+						$this->load->view('conf/user/all',$data);
+					}
 				break;
 				case "import":
 					
@@ -721,7 +762,9 @@ class Dashboard extends MY_Conference {
 				}
 			}
 		}
-		$this->load->view('common/footer');
+		if( !$this->input->is_ajax_request() ){
+			$this->load->view('common/footer',$data);
+		}
 		
 	}
 
@@ -813,7 +856,7 @@ class Dashboard extends MY_Conference {
 				break;
 			}
 		}
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 		
 	}
 
@@ -834,7 +877,7 @@ class Dashboard extends MY_Conference {
 
 		$this->load->view('conf/menu_conf',$data);
 		//$this->load->view('conf/setting',$data);
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 		
 	}
 
@@ -883,6 +926,8 @@ class Dashboard extends MY_Conference {
 						$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
 						$this->assets->add_js(asset_url().'js/repeatable.js',true);
 						$this->assets->add_js(asset_url().'js/chosen.jquery.js',true);
+						$data['topics'] = $this->conf->get_topic($conf_id);
+						
 						$country_list = config_item('country_list');
 						$data['country_list'] = $country_list[$this->_lang];
 						$update = $this->input->post("update");
@@ -897,11 +942,11 @@ class Dashboard extends MY_Conference {
 									$sub_title    = $this->input->post('sub_title');
 									$sub_summary  = $this->input->post('sub_summary');
 									$sub_keyword  = $this->input->post('sub_keywords');
-									$sub_topic    = $paper->topic_id;
+									$sub_topic    = in_array($paper->sub_status,array(-1,1))?$this->input->post('sub_topic'):$paper->topic_id;
 									$sub_lang     = $this->input->post('sub_lang');
 									$sub_sponsor  = $this->input->post('sub_sponsor');
 									if( $this->Submit->update_paper($paper_id,$conf_id,$sub_title,$sub_summary,$sub_keyword,$sub_topic,$sub_lang,$sub_sponsor) ){
-										$this->alert->show("s","稿件資訊更新成功");
+										$this->alert->show("s",$sub_topic ."稿件資訊更新成功");
 									}else{
 										$this->alert->show("d","稿件資訊更新失敗");
 									}
@@ -1036,7 +1081,7 @@ class Dashboard extends MY_Conference {
 				$this->alert->js("查無本篇稿件",get_url("dashboard",$conf_id,"submit"));
 			}
 		}
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 		
 	}
 
@@ -1130,7 +1175,7 @@ class Dashboard extends MY_Conference {
 				$this->load->view('conf/register/list',$data);
 			break;
 		}
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 		
 	}
 
@@ -1151,7 +1196,7 @@ class Dashboard extends MY_Conference {
 
 		$this->load->view('conf/menu_conf',$data);
 		//$this->load->view('conf/setting',$data);
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 		
 	}
 
@@ -1172,7 +1217,7 @@ class Dashboard extends MY_Conference {
 
 		$this->load->view('conf/menu_conf',$data);
 		//$this->load->view('conf/setting',$data);
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 		
 	}
 
@@ -1308,7 +1353,7 @@ class Dashboard extends MY_Conference {
 				break;
 			}
 		}
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 		
 	}
 
@@ -1510,7 +1555,7 @@ class Dashboard extends MY_Conference {
 				$this->load->view('conf/most/list',$data);
 			break;
 		}
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 		
 	}
 
@@ -1532,7 +1577,7 @@ class Dashboard extends MY_Conference {
 
 		$this->load->view('conf/menu_conf',$data);
 		//$this->load->view('conf/setting',$data);
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 		
 	}
 }

@@ -62,7 +62,7 @@ class User extends MY_Controller {
 		    }
 			$this->load->view('user/edit',$data);
 			$this->load->view('js/edit');
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 		}
 		
 	}
@@ -102,7 +102,7 @@ class User extends MY_Controller {
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
 		$this->load->view('user/login',$data);
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 	}
 
 	public function logout($conf_id=""){
@@ -114,7 +114,7 @@ class User extends MY_Controller {
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
 			$this->load->view('user/logout');
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 		}else{
 			redirect('/user/login', 'location', 301);
 		}
@@ -128,7 +128,7 @@ class User extends MY_Controller {
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
 			$this->load->view('user/log',$data);
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 		}else{
 			redirect('/user/login', 'location', 301);
 		}
@@ -216,7 +216,7 @@ class User extends MY_Controller {
 
 			
 			$this->load->view('user/signup',$data);
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 		}else{
 			redirect('/user/login', 'location', 301);
 		}
@@ -256,7 +256,7 @@ class User extends MY_Controller {
 			}
 			
 			$this->load->view('user/passwd',$data);
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 		}else{
 			redirect('/user/login', 'location', 301);
 		}

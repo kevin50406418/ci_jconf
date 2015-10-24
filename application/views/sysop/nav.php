@@ -26,7 +26,7 @@
 					<ul class="dropdown-menu">
 						<li><a href="<?php echo base_url("sysop/user/all");?>">使用者管理</a></li>
 						<li><a href="<?php echo base_url("sysop/user/add");?>">新增使用者</a></li>
-						<li><a href="<?php echo base_url("sysop/user/import");?>">匯入使用者</a></li>
+						<!--<li><a href="<?php echo base_url("sysop/user/import");?>">匯入使用者</a></li>-->
 					</ul>
 				</li>
 				<li><a href="<?php echo base_url("sysop/logout");?>"><i class="fa fa-sign-out pull-right"></i> 登出</a></li>

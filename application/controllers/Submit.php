@@ -31,7 +31,7 @@ class Submit extends MY_Conference {
 		$this->load->view('conf/menu_submit',$data);
 		$data['lists'] = $this->Submit->show_mypaper($this->user_login,$conf_id);
 		$this->load->view('submit/list',$data);
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 		
 	}
 
@@ -43,8 +43,14 @@ class Submit extends MY_Conference {
 		$data['conf_config'] = $this->conf_config;
 		$data['conf_content']= $this->conf->conf_content($conf_id);
 		//$data['schedule']=$this->conf->conf_schedule($conf_id);
-
+		
 		$step = $this->input->get("step");
+		if( $step == 3 || $step == 4 ){
+			$this->assets->add_js(asset_url().'js/fileinput/fileinput.min.js');
+			$this->assets->add_js(asset_url().'js/fileinput/fileinput_locale_zh-TW.js');
+			$this->assets->add_css(asset_url().'style/fileinput.min.css');
+		}
+
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
 
@@ -54,7 +60,7 @@ class Submit extends MY_Conference {
 		$this->load->view('conf/menu_submit',$data);
 		if( !$this->conf->conf_hastopic($conf_id) ){
 			$this->alert->js("尚未建立研討會主題，請洽研討會會議管理人員",get_url("main",$conf_id));
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 			$this->output->_display();
 			exit;
 		}	
@@ -62,14 +68,14 @@ class Submit extends MY_Conference {
 		$now = time();
 		if( $now < $schedule_submit->start_value ){
 			$this->alert->js("尚未開放投稿",get_url("main",$conf_id));
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 			$this->output->_display();
 			exit;
 		}
 
 		if( $now > $schedule_submit->end_value ){
 			$this->alert->js("投稿截止",get_url("main",$conf_id));
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 			$this->output->_display();
 			exit;
 		}
@@ -160,7 +166,7 @@ class Submit extends MY_Conference {
         		}else{
         			if(!$this->session->has_userdata($conf_id.'_insert_id') ){
 						$this->alert->js("請以正常方式投稿或投稿逾時。",get_url("submit",$conf_id,"add"));
-						$this->load->view('common/footer');
+						$this->load->view('common/footer',$data);
 						$this->output->_display();
 						exit;
 					}else{
@@ -202,7 +208,7 @@ class Submit extends MY_Conference {
 				$data['step_class']=array(1=>"completed",2=>"completed",3=>"completed",4=>"active",5=>"disabled",6=>"disabled");
 				if(!$this->session->has_userdata($conf_id.'_insert_id') ){
 					$this->alert->js("請以正常方式投稿或投稿逾時。",get_url("submit",$conf_id,"add"));
-					$this->load->view('common/footer');
+					$this->load->view('common/footer',$data);
 					$this->output->_display();
 					exit;
 				}else{
@@ -262,7 +268,7 @@ class Submit extends MY_Conference {
 				$data['step_class']=array(1=>"completed",2=>"completed",3=>"completed",4=>"completed",5=>"active",6=>"disabled");
 				if(!$this->session->has_userdata($conf_id.'_insert_id') ){
 					$this->alert->js("請以正常方式投稿或投稿逾時。",get_url("submit",$conf_id,"add"));
-					$this->load->view('common/footer');
+					$this->load->view('common/footer',$data);
 					$this->output->_display();
 					exit;
 				}else{
@@ -292,7 +298,7 @@ class Submit extends MY_Conference {
 				$data['step_class']=array(1=>"completed",2=>"completed",3=>"completed",4=>"completed",5=>"completed",6=>"active");
 				if(!$this->session->has_userdata($conf_id.'_insert_id') ){
 					$this->alert->js("請以正常方式投稿或投稿逾時。",get_url("submit",$conf_id,"add"));
-					$this->load->view('common/footer');
+					$this->load->view('common/footer',$data);
 					$this->output->_display();
 					exit;
 				}else{
@@ -343,14 +349,14 @@ class Submit extends MY_Conference {
 			break;
 		}
 		//sp($this->session->all_userdata());
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 		
 	
 	}
 	public function edit($conf_id='',$paper_id=''){
 		if( empty($conf_id) || empty($paper_id) ){
 			$this->alert->js("查本篇稿件",get_url("submit",$conf_id));
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 			$this->output->_display();
 			exit;
 		}
@@ -363,7 +369,11 @@ class Submit extends MY_Conference {
 		//$data['schedule']=$this->conf->conf_schedule($conf_id);
 
 		$step = $this->input->get("step");
-		
+		if( $step == 3 || $step == 4 ){
+			$this->assets->add_js(asset_url().'js/fileinput/fileinput.min.js');
+			$this->assets->add_js(asset_url().'js/fileinput/fileinput_locale_zh-TW.js');
+			$this->assets->add_css(asset_url().'style/fileinput.min.css');
+		}
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
 		
@@ -373,7 +383,7 @@ class Submit extends MY_Conference {
 		$this->load->view('conf/menu_submit',$data);
 		if( !$this->conf->conf_hastopic($conf_id) ){
 			$this->alert->js("尚未建立研討會主題，請洽研討會會議管理人員",get_url("main",$conf_id));
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 			$this->output->_display();
 			exit;
 		}
@@ -382,28 +392,28 @@ class Submit extends MY_Conference {
 		$now = time();
 		if( $now < $schedule_submit->start_value ){
 			$this->alert->js("尚未開放投稿",get_url("main",$conf_id));
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 			$this->output->_display();
 			exit;
 		}
 
 		if( $now > $schedule_submit->end_value ){
 			$this->alert->js("投稿截止",get_url("main",$conf_id));
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 			$this->output->_display();
 			exit;
 		}
 		
 		if( $this->Submit->is_editable($paper_id, $this->user_login) ){
 			$this->alert->js("稿件已送審，無法編輯",get_url("submit",$conf_id));
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 			$this->output->_display();
 			exit;
 		}
 
 		if( !$this->Submit->is_author($paper_id, $this->user_login) ){
 			$this->alert->js("非本篇作者或查無稿件",get_url("submit",$conf_id));
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 			$this->output->_display();
 			exit;
 		}
@@ -627,7 +637,7 @@ class Submit extends MY_Conference {
 			break;
 			
 		}
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 		
 	}
 	public function files($conf_id='',$paper_id=''){
@@ -638,7 +648,7 @@ class Submit extends MY_Conference {
 
 		if( is_null($this->input->get("fid") ) ){
 			$this->alert->js("查無稿件檔案",get_url("submit",$conf_id));
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 			$this->output->_display();
 			exit;
 		}else{
@@ -680,7 +690,7 @@ class Submit extends MY_Conference {
 	public function detail($conf_id='',$paper_id=''){
 		if( empty($conf_id) || empty($paper_id) ){
 			$this->alert->js("查本篇稿件",get_url("submit",$conf_id));
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 			$this->output->_display();
 			exit;
 		}
@@ -692,7 +702,7 @@ class Submit extends MY_Conference {
 		$data['conf_content']= $this->conf->conf_content($conf_id);
 		if( !$this->Submit->is_author($paper_id, $this->user_login) ){
 			$this->alert->js("非本篇作者或查無稿件",get_url("submit",$conf_id));
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 			$this->output->_display();
 			exit;
 		}
@@ -712,13 +722,13 @@ class Submit extends MY_Conference {
 		$this->load->view('conf/conf_nav',$data);
 		$this->load->view('conf/menu_submit',$data);
 		$this->load->view('submit/detail',$data);
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 	}
 
 	public function remove($conf_id='',$paper_id=''){
 		if( empty($conf_id) || empty($paper_id) ){
 			$this->alert->js("查本篇稿件",get_url("submit",$conf_id));
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 			$this->output->_display();
 			exit;
 		}
@@ -729,7 +739,7 @@ class Submit extends MY_Conference {
 
 		if( !$this->Submit->is_author($paper_id, $this->user_login) ){
 			$this->alert->js("非本篇作者或查無稿件",get_url("submit",$conf_id));
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 			$this->output->_display();
 			exit;
 		}
@@ -1005,10 +1015,10 @@ class Submit extends MY_Conference {
 					$this->load->view('submit/most/list',$data);
 				break;
 			}
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 		}else{
 			$this->alert->js("本研討會未開啟科技部成果發表",get_url("main",$conf_id));
-			$this->load->view('common/footer');
+			$this->load->view('common/footer',$data);
 			$this->output->_display();
 			exit;
 		}
@@ -1195,7 +1205,7 @@ class Submit extends MY_Conference {
 				$this->load->view('submit/register/list',$data);
 			break;
 		}
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 	}
 
 	private function _temp($conf_id=''){
@@ -1212,7 +1222,7 @@ class Submit extends MY_Conference {
 		$this->load->view('conf/conf_nav',$data);
 		//$this->load->view('conf/conf_schedule',$data);
 		$this->load->view('conf/menu_submit',$data);
-		$this->load->view('common/footer');
+		$this->load->view('common/footer',$data);
 	}
 
 	private function _get_conf_info($conf_id){

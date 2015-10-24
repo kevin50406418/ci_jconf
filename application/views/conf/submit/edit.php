@@ -30,8 +30,14 @@
 						</td>
 					</tr>
 					<tr>
-						<th>主題</th><!-- if( 已經審查過 不能轉移主題)-->
-						<td><span title="<?php echo $paper->topic_info?>"><?php echo $paper->topic_name?></span></td>
+						<th>主題</th>
+						<td>
+							<select name="sub_topic" id="sub_topic" class="form-control"<?php if( !in_array($paper->sub_status,array(-1,1)) ){?> disabled<?php }?>>
+								<?php foreach ($topics as $key => $topic) {?>
+								<option value="<?php echo $topic->topic_id?>"<?php if($paper->topic_id == $topic->topic_id){?> selected<?php }?>><?php echo $topic->topic_name?>(<?php echo $topic->topic_name_eng?>)</option>
+								<?php }?>
+							</select>
+						</td>
 					</tr>
 					<tr>
 						<th>稿件狀態</th>
