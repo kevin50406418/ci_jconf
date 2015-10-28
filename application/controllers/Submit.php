@@ -14,13 +14,13 @@ class Submit extends MY_Conference {
 	}
 
 	public function index($conf_id=''){
-		$data['conf_id']     = $conf_id;
-		$data['body_class']  = $this->body_class;
-		$data['_lang']       = $this->_lang;
-		$data['spage']       = $this->spage;
-		$data['conf_config'] = $this->conf_config;
-		$data['conf_content']= $this->conf->conf_content($conf_id);
-		//$data['schedule']=$this->conf->conf_schedule($conf_id);
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
+		$data['_lang']        = $this->_lang;
+		$data['spage']        = $this->spage;
+		$data['conf_config']  = $this->conf_config;
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 		
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
@@ -36,13 +36,13 @@ class Submit extends MY_Conference {
 	}
 
 	public function add($conf_id=''){
-		$data['conf_id']     = $conf_id;
-		$data['body_class']  = $this->body_class;
-		$data['_lang']       = $this->_lang;
-		$data['spage']       = $this->spage;
-		$data['conf_config'] = $this->conf_config;
-		$data['conf_content']= $this->conf->conf_content($conf_id);
-		//$data['schedule']=$this->conf->conf_schedule($conf_id);
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
+		$data['_lang']        = $this->_lang;
+		$data['spage']        = $this->spage;
+		$data['conf_config']  = $this->conf_config;
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 		
 		$step = $this->input->get("step");
 		if( $step == 3 || $step == 4 ){
@@ -360,13 +360,13 @@ class Submit extends MY_Conference {
 			$this->output->_display();
 			exit;
 		}
-		$data['conf_id']     = $conf_id;
-		$data['body_class']  = $this->body_class;
-		$data['_lang']       = $this->_lang;
-		$data['spage']       = $this->spage;
-		$data['conf_config'] = $this->conf_config;
-		$data['conf_content']= $this->conf->conf_content($conf_id);
-		//$data['schedule']=$this->conf->conf_schedule($conf_id);
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
+		$data['_lang']        = $this->_lang;
+		$data['spage']        = $this->spage;
+		$data['conf_config']  = $this->conf_config;
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 
 		$step = $this->input->get("step");
 		if( $step == 3 || $step == 4 ){
@@ -694,12 +694,14 @@ class Submit extends MY_Conference {
 			$this->output->_display();
 			exit;
 		}
-		$data['conf_id']     = $conf_id;
-		$data['body_class']  = $this->body_class;
-		$data['_lang']       = $this->_lang;
-		$data['spage']       = $this->spage;
-		$data['conf_config'] = $this->conf_config;
-		$data['conf_content']= $this->conf->conf_content($conf_id);
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
+		$data['_lang']        = $this->_lang;
+		$data['spage']        = $this->spage;
+		$data['conf_config']  = $this->conf_config;
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+
 		if( !$this->Submit->is_author($paper_id, $this->user_login) ){
 			$this->alert->js("非本篇作者或查無稿件",get_url("submit",$conf_id));
 			$this->load->view('common/footer',$data);
@@ -725,36 +727,45 @@ class Submit extends MY_Conference {
 		$this->load->view('common/footer',$data);
 	}
 
-	public function remove($conf_id='',$paper_id=''){
-		if( empty($conf_id) || empty($paper_id) ){
-			$this->alert->js("查本篇稿件",get_url("submit",$conf_id));
-			$this->load->view('common/footer',$data);
-			$this->output->_display();
-			exit;
-		}
-		$data['conf_id']     = $conf_id;
-		$data['body_class']  = $this->body_class;
-		$data['_lang']       = $this->_lang;
-		$data['spage']       = $this->spage;
-
-		if( !$this->Submit->is_author($paper_id, $this->user_login) ){
-			$this->alert->js("非本篇作者或查無稿件",get_url("submit",$conf_id));
-			$this->load->view('common/footer',$data);
-			$this->output->_display();
-			exit;
-		}
-		
-	}
+	// public function remove($conf_id='',$paper_id=''){
+	// 	if( empty($conf_id) || empty($paper_id) ){
+	// 		$this->alert->js("查本篇稿件",get_url("submit",$conf_id));
+	// 		$this->load->view('common/footer',$data);
+	// 		$this->output->_display();
+	// 		exit;
+	// 	}
+	// 	$data['conf_id']      = $conf_id;
+	// 	$data['body_class']   = $this->body_class;
+	// 	$data['_lang']        = $this->_lang;
+	// 	$data['spage']        = $this->spage;
+	// 	$data['conf_config']  = $this->conf_config;
+	// 	$data['conf_content'] = $this->conf->conf_content($conf_id);
+	// 	$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+	// 	if( !$this->Submit->is_author($paper_id, $this->user_login) ){
+	// 		$this->alert->js("非本篇作者或查無稿件",get_url("submit",$conf_id));
+	// 		$this->load->view('common/footer',$data);
+	// 		$this->output->_display();
+	// 		exit;
+	// 	}
+	// 	$data['paper'] = $this->Submit->get_paperinfo($conf_id,$paper_id,$this->user_login);
+	// 	$this->load->view('common/header');
+	// 	$this->load->view('common/nav',$data);
+	// 	$this->load->view('conf/conf_nav',$data);
+	// 	$this->load->view('conf/menu_submit',$data);
+	// 	$this->load->view('submit/remove/index',$data);
+	// 	$this->load->view('common/footer',$data);
+	// }
 
 	public function most($conf_id='',$act=''){
 		// check $conf_config['conf_most'] == 1??
-		$data['conf_id']     = $conf_id;
-		$data['body_class']  = $this->body_class;
-		$data['_lang']       = $this->_lang;
-		$data['spage']       = $this->spage;
-		$data['conf_config'] = $this->conf_config;
-		$data['conf_content']= $this->conf->conf_content($conf_id);
-		
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
+		$data['_lang']        = $this->_lang;
+		$data['spage']        = $this->spage;
+		$data['conf_config']  = $this->conf_config;
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+
 		if( $this->conf_config['conf_most'] == 1 ){
 			$hold = $this->conf->get_schedule($conf_id,"hold");
 			$day = ($hold->end_value - $hold->start_value)/86400;
@@ -769,7 +780,7 @@ class Submit extends MY_Conference {
 			$this->load->view('common/nav',$data);
 
 			$this->load->view('conf/conf_nav',$data);
-			$this->load->view('conf/conf_schedule',$data);
+			// $this->load->view('conf/conf_schedule',$data);
 			$this->load->view('conf/menu_submit',$data);
 			switch($act){
 				case "add":
@@ -1041,12 +1052,13 @@ class Submit extends MY_Conference {
 	}*/
 
 	public function register($conf_id='',$act=''){
-		$data['conf_id']     = $conf_id;
-		$data['body_class']  = $this->body_class;
-		$data['_lang']       = $this->_lang;
-		$data['spage']       = $this->spage;
-		$data['conf_config'] = $this->conf_config;
-		$data['conf_content']= $this->conf->conf_content($conf_id);
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
+		$data['_lang']        = $this->_lang;
+		$data['spage']        = $this->spage;
+		$data['conf_config']  = $this->conf_config;
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 
 		if($act == "edit" || $act =="add"){
 			$this->assets->add_js(asset_url().'js/fileinput/fileinput.min.js');
@@ -1208,14 +1220,58 @@ class Submit extends MY_Conference {
 		$this->load->view('common/footer',$data);
 	}
 
-	private function _temp($conf_id=''){
-		$data['conf_id']     = $conf_id;
-		$data['body_class']  = $this->body_class;
-		$data['_lang']       = $this->_lang;
-		$data['spage']       = $this->spage;
-		$data['conf_config'] = $this->conf_config;
-		$data['conf_content']= $this->conf->conf_content($conf_id);
+	public function register_files($conf_id='',$act=''){
 
+		if( empty($conf_id) ){
+			$this->alert->js("查無稿件檔案",get_url("submit",$this->conf_id,"register"));
+		}
+
+		if( is_null($this->input->get("id") ) ){
+			$this->alert->js("查無稿件檔案",get_url("submit",$this->conf_id,"register"));
+			$this->load->view('common/footer',$data);
+			$this->output->_display();
+			exit;
+		}else{
+			$register_id = $this->input->get("id");
+			$register = $this->Submit->get_register($this->conf_id,$this->user_login,$register_id);
+
+			$regdir=$this->conf->get_regdir($this->conf_id);
+
+			if( empty($register->pay_bill) || !file_exists($regdir.$register->pay_bill) ){
+				$this->alert->file_notfound(get_url("submit",$conf_id,"register"));
+			}
+			$ext = pathinfo($register->pay_bill, PATHINFO_EXTENSION);
+			switch($act){
+				case "download":
+					$this->load->helper('download');
+					force_download($register_id."-pay_bill.".$ext,file_get_contents($regdir.$register->pay_bill));
+				break;
+				default:
+				case "view":
+					$this->output
+						->set_content_type(get_mime_by_extension($register->pay_bill))
+						->set_header("Content-Disposition: inline; filename=\"".$register_id."-pay_bill.".$ext."\"")
+						->set_output(file_get_contents($regdir.$register->pay_bill));
+				break;
+				case "del":
+					$this->Submit->update_register_pay_bill("",$this->conf_id,$this->user_login,$register_id);
+					delete_files($regdir.$register->pay_bill);
+					$this->alert->js("檔案刪除成功",get_url("submit",$conf_id,"register","edit")."?id=".$register->register_id);
+
+				break;
+			}
+		}
+	}
+
+	private function _temp($conf_id=''){
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
+		$data['_lang']        = $this->_lang;
+		$data['spage']        = $this->spage;
+		$data['conf_config']  = $this->conf_config;
+		$data['conf_content'] = $this->conf->conf_content($this->conf_id);
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+		
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
 

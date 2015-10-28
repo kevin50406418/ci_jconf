@@ -11,6 +11,9 @@
 			<?php }?>
 		</div>
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<?php if($this->cinfo['show_confinfo']){?>
+			<a class="btn btn-danger navbar-btn" data-toggle="modal" data-target="#conf_schedule">重要日期</a>
+			<?php }?>
 			<?php if($this->user->is_login()){?>
 			<ul class="nav navbar-nav navbar-right">
 				<li class="dropdown">

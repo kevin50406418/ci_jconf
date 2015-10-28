@@ -65,7 +65,7 @@ class Alert_model extends CI_Model {
     }
 
     function file_notfound($refresh){
-    	$this->js("查無稿件檔案",$refresh);
+    	$this->js("找不到檔案",$refresh);
 		$this->output->_display();
 		exit;
     }

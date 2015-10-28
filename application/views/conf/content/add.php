@@ -27,7 +27,7 @@
 		<div class="form-group">
 			<label for="econtent" class="col-sm-2 control-label">網頁內容</label>
 			<div class="col-sm-10">
-				<textarea name="page_content[zhtw]" rows="10" class="form-control tinymce" id="page_content"></textarea>
+				<textarea name="page_content[zhtw]" rows="10" class="form-control tinymce" id="page_content"><div></div></textarea>
 			</div>
 		</div>
 	</div>
@@ -40,14 +40,14 @@
 		<div class="form-group">
 			<label for="content" class="col-sm-2 control-label">標題</label>
 			<div class="col-sm-10">
-				<input type="text" class="form-control" id="page_title" name="page_title[eng]">
+				<input type="text" class="form-control" id="page_title" name="page_title[en]">
 			</div>
 		</div>
 		
 		<div class="form-group">
 			<label for="econtent" class="col-sm-2 control-label">網頁內容</label>
 			<div class="col-sm-10">
-				<textarea name="page_content[eng]" rows="10" class="form-control tinymce" id="page_content"></textarea>
+				<textarea name="page_content[en]" rows="10" class="form-control tinymce" id="page_content"><div></div></textarea>
 			</div>
 		</div>
 	</div>

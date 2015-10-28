@@ -24,13 +24,13 @@ class Dashboard extends MY_Conference {
 	}
 
 	public function index($conf_id=''){
-		$data['conf_id'] = $conf_id;
-		$data['body_class'] = $this->body_class;
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
 		
-		$data['spage']=$this->config->item('spage');
-		$data['conf_config']=$this->conf_config;
-		//$data['schedule']=$this->conf->conf_schedule($conf_id);
-		$data['conf_content']=$this->conf->conf_content($conf_id);
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
 
 		$this->assets->add_css(asset_url().'style/datepicker.css');
 		$this->assets->add_js(asset_url().'js/bootstrap-datepicker.js');
@@ -196,14 +196,14 @@ class Dashboard extends MY_Conference {
 	}
 
 	public function topic($conf_id='',$type=''){
-		$data['conf_id'] = $conf_id;
-		$data['body_class'] = $this->body_class;
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
 		
-		$data['spage']=$this->config->item('spage');
-		$data['conf_config']=$this->conf_config;
-		//$data['schedule']=$this->conf->conf_schedule($conf_id);
-		$data['conf_content']=$this->conf->conf_content($conf_id);
-		$data['count_editor']=$this->conf->count_editor($conf_id);
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
+		$data['count_editor'] = $this->conf->count_editor($conf_id);
 
 		if( !is_null( $this->input->get('id', TRUE)) && $type =="assign" ){
 			$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
@@ -356,14 +356,14 @@ class Dashboard extends MY_Conference {
 	}
 
 	public function website($conf_id='',$do='all'){
-		$data['conf_id'] = $conf_id;
-		$data['body_class'] = $this->body_class;
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
 		
-		$data['spage']=$this->config->item('spage');
-		$data['conf_config']=$this->conf_config;
-		$data['conf_lang'] = explode(",", $this->conf_config['conf_lang']);
-		//$data['schedule']=$this->conf->conf_schedule($conf_id);
-		$data['conf_content']=$this->conf->conf_content($conf_id);
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['conf_lang']    = explode(",", $this->conf_config['conf_lang']);
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		
 		if( !$this->user->is_conf() && !$this->user->is_sysop() ){
 			$this->conf->show_permission_deny($data);
@@ -389,6 +389,7 @@ class Dashboard extends MY_Conference {
 			switch($do){
 				default:
 				case "all":
+					$show_alert = true;
 					if(in_array("zhtw",$data['conf_lang'])){
 						$this->form_validation->set_rules('zhtw[]', '', 'required');
 						$data['contents']['zhtw'] = $this->conf->get_contents($conf_id,"zhtw");
@@ -404,13 +405,17 @@ class Dashboard extends MY_Conference {
 									$page_show  = 0;
 									$text = "隱藏";
 								}
-								if( $this->conf->update_contents($conf_id,$page_id,'zhtw',$page_order,$page_show) ){
-									$this->alert->show("s","成功更新".$page_id."順序及狀態(".$text.")");
-								}else{
+								if( !$this->conf->update_contents($conf_id,$page_id,'zhtw',$page_order,$page_show) ){
 									$this->alert->show("d","更新".$page_id."順序及狀態失敗(".$text.")");
 								}
 							}
-							$this->alert->refresh(2);
+							if($show_alert){
+								$this->alert->js("更新成功");
+								$show_alert = false;
+								$this->alert->refresh(2);
+							}
+							
+							
 						}
 					}
 					if(in_array("eng",$data['conf_lang'])){
@@ -428,13 +433,15 @@ class Dashboard extends MY_Conference {
 									$page_show  = 0;
 									$text = "隱藏";
 								}
-								if( $this->conf->update_contents($conf_id,$page_id,'eng',$page_order,$page_show) ){
-									$this->alert->show("s","成功更新".$page_id."順序及狀態(".$text.")");
-								}else{
+								if( !$this->conf->update_contents($conf_id,$page_id,'eng',$page_order,$page_show) ){
 									$this->alert->show("d","更新".$page_id."順序及狀態失敗(".$text.")");
 								}
 							}
-							//$this->alert->refresh(2);
+							if($show_alert){
+								$this->alert->js("更新成功");
+								$show_alert = false;
+								$this->alert->refresh(2);
+							}
 						}
 					}
 					
@@ -442,24 +449,26 @@ class Dashboard extends MY_Conference {
 				break;
 				case "add":
 					$this->form_validation->set_rules('page_title[]', '標題', 'required');
-					$this->form_validation->set_rules('page_id', '網頁簡稱', 'required');
-					$this->form_validation->set_rules('page_content[]', '網頁內容', 'required');
+					$this->form_validation->set_rules('page_id', '網頁簡稱', 'required|alpha_numeric_spaces');
+					// $this->form_validation->set_rules('page_content[]', '網頁內容', 'required');
 					if($this->form_validation->run()){
 						$page_title   =$this->input->post('page_title');
 						$page_id      =$this->input->post('page_id');
 						$page_content =$this->input->post('page_content',false);
+
 						if(in_array("zhtw",$data['conf_lang'])){
 							if( $this->conf->add_content($conf_id,$page_id,$page_title['zhtw'],$page_content['zhtw'],'zhtw') ){
-								$this->alert->show("s","成功新增".$page_id."網頁內容");
+								$this->alert->show("s","成功新增".$page_id."[中文]網頁內容");
 							}else{
-								$this->alert->show("d","新增".$page_id."網頁內容失敗");
+								$this->alert->show("d","新增".$page_id."[中文]網頁內容失敗");
 							}
 						}
+
 						if(in_array("eng",$data['conf_lang'])){
-							if( $this->conf->add_content($conf_id,$page_id,$page_title['eng'],$page_content['eng'],'eng') ){
-								$this->alert->show("s","成功新增".$page_id."網頁內容");
+							if( $this->conf->add_content($conf_id,$page_id,$page_title['en'],$page_content['en'],'en') ){
+								$this->alert->show("s","成功新增".$page_id."[英文]網頁內容");
 							}else{
-								$this->alert->show("d","新增".$page_id."網頁內容失敗");
+								$this->alert->show("d","新增".$page_id."[英文]網頁內容失敗");
 							}
 						}
 						$this->alert->refresh(2);
@@ -505,13 +514,13 @@ class Dashboard extends MY_Conference {
 	}
 
 	public function filter($conf_id='',$type=''){
-		$data['conf_id'] = $conf_id;
-		$data['body_class'] = $this->body_class;
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
 		
-		$data['spage']=$this->config->item('spage');
-		$data['conf_config']=$this->conf_config;
-		//$data['schedule']=$this->conf->conf_schedule($conf_id);
-		$data['conf_content']=$this->conf->conf_content($conf_id);
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
 
 		$this->assets->add_js(base_url('ckeditor/ckeditor.js'));
 		$this->load->view('common/header');
@@ -576,14 +585,14 @@ class Dashboard extends MY_Conference {
 
 
 	public function user($conf_id='',$do="all",$user_login=""){
-		$data['conf_id'] = $conf_id;
-		$data['body_class'] = $this->body_class;
-		$data['do']=$do;
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
+		$data['do']           = $do;
 		
-		$data['spage']=$this->config->item('spage');
-		$data['conf_config']=$this->conf_config;
-		//$data['schedule']=$this->conf->conf_schedule($conf_id);
-		$data['conf_content']=$this->conf->conf_content($conf_id);
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
 
 		if( ( empty($user_login) && $do=="add" ) || ( !empty($user_login) && $do=="edit" ) ){
 			$country_list = config_item('country_list');
@@ -769,13 +778,13 @@ class Dashboard extends MY_Conference {
 	}
 
 	public function news($conf_id='',$type=''){
-		$data['conf_id'] = $conf_id;
-		$data['body_class'] = $this->body_class;
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
 		
-		$data['spage']=$this->config->item('spage');
-		$data['conf_config']=$this->conf_config;
-		//$data['schedule']=$this->conf->conf_schedule($conf_id);
-		$data['conf_content']=$this->conf->conf_content($conf_id);
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
 
 		$this->assets->add_js(base_url('ckeditor/ckeditor.js'));
 		$this->load->view('common/header');
@@ -861,13 +870,13 @@ class Dashboard extends MY_Conference {
 	}
 
 	public function email($conf_id=''){
-		$data['conf_id'] = $conf_id;
-		$data['body_class'] = $this->body_class;
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
 		
-		$data['spage']=$this->config->item('spage');
-		$data['conf_config']=$this->conf_config;
-		//$data['schedule']=$this->conf->conf_schedule($conf_id);
-		$data['conf_content']=$this->conf->conf_content($conf_id);
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
 
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
@@ -882,13 +891,13 @@ class Dashboard extends MY_Conference {
 	}
 
 	public function submit($conf_id='',$act='',$paper_id=''){
-		$data['conf_id'] = $conf_id;
-		$data['body_class'] = $this->body_class;
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
 		
-		$data['spage']=$this->config->item('spage');
-		$data['conf_config']=$this->conf_config;
-		//$data['schedule']=$this->conf->conf_schedule($conf_id);
-		$data['conf_content']=$this->conf->conf_content($conf_id);
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
 
 		$this->assets->add_css(asset_url().'style/chosen.css');
 		
@@ -1086,13 +1095,13 @@ class Dashboard extends MY_Conference {
 	}
 
 	public function register($conf_id='',$act='',$do=''){
-		$data['conf_id'] = $conf_id;
-		$data['body_class'] = $this->body_class;
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
 		
-		$data['spage']=$this->config->item('spage');
-		$data['conf_config']=$this->conf_config;
-		//$data['schedule']=$this->conf->conf_schedule($conf_id);
-		$data['conf_content']=$this->conf->conf_content($conf_id);
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
@@ -1180,13 +1189,13 @@ class Dashboard extends MY_Conference {
 	}
 
 	public function report($conf_id=''){
-		$data['conf_id'] = $conf_id;
-		$data['body_class'] = $this->body_class;
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
 		
-		$data['spage']=$this->config->item('spage');
-		$data['conf_config']=$this->conf_config;
-		//$data['schedule']=$this->conf->conf_schedule($conf_id);
-		$data['conf_content']=$this->conf->conf_content($conf_id);
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
@@ -1201,13 +1210,13 @@ class Dashboard extends MY_Conference {
 	}
 
 	public function logs($conf_id=''){
-		$data['conf_id'] = $conf_id;
-		$data['body_class'] = $this->body_class;
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
 		
-		$data['spage']=$this->config->item('spage');
-		$data['conf_config']=$this->conf_config;
-		//$data['schedule']=$this->conf->conf_schedule($conf_id);
-		$data['conf_content']=$this->conf->conf_content($conf_id);
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
@@ -1222,13 +1231,13 @@ class Dashboard extends MY_Conference {
 	}
 
 	public function modules($conf_id='',$do="all",$module_id=''){
-		$data['conf_id'] = $conf_id;
-		$data['body_class'] = $this->body_class;
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
 		
-		$data['spage']=$this->config->item('spage');
-		$data['conf_config']=$this->conf_config;
-		//$data['schedule']=$this->conf->conf_schedule($conf_id);
-		$data['conf_content']=$this->conf->conf_content($conf_id);
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		
 		if( empty($module_id) && $do=="all"){
 			$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
@@ -1358,13 +1367,13 @@ class Dashboard extends MY_Conference {
 	}
 
 	public function most($conf_id='',$act=''){
-		$data['conf_id'] = $conf_id;
-		$data['body_class'] = $this->body_class;
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
 		
-		$data['spage']=$this->config->item('spage');
-		$data['conf_config']=$this->conf_config;
-		//$data['schedule']=$this->conf->conf_schedule($conf_id);
-		$data['conf_content']=$this->conf->conf_content($conf_id);
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		
 		$hold = $this->conf->get_schedule($conf_id,"hold");
 		$day = ($hold->end_value - $hold->start_value)/86400;
@@ -1561,13 +1570,13 @@ class Dashboard extends MY_Conference {
 
 	// Template
 	private function _temp($conf_id=''){
-		$data['conf_id'] = $conf_id;
-		$data['body_class'] = $this->body_class;
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
 		
-		$data['spage']=$this->config->item('spage');
-		$data['conf_config']=$this->conf_config;
-		//$data['schedule']=$this->conf->conf_schedule($conf_id);
-		$data['conf_content']=$this->conf->conf_content($conf_id);
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);

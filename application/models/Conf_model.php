@@ -722,9 +722,10 @@ class Conf_model extends CI_Model {
 	}
 
 	function add_content($conf_id,$page_id,$page_title,$page_content,$page_lang){
-		if( !in_array($page_lang,array("zhtw","eng")) ){
+		if( !in_array($page_lang,array("zhtw","en")) ){
 			return false;
 		}
+		$page_id = str_replace(" ","_",strtolower($page_id));
 		$content = array(
 			"conf_id"      => $conf_id,
 			"page_id"      => $page_id,

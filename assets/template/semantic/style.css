@@ -1,0 +1,26 @@
+body,.ui.menu,h1,h2,h3,h4,h5,h6{
+	font-family: "Microsoft JhengHei UI", "Microsoft JhengHei", sans-serif !important;
+}
+body{
+	background-color: #eee;
+}
+.pull-right {
+    float: right!important
+}
+
+#content{
+	padding-top: 70px;
+}
+.clear{
+	clear: both;
+}
+.footer.segment {
+	margin-top: 2em !important;
+	padding: 3em 0em;
+}
+.ui.fixed.menu .item{
+	line-height: 30px;
+}
+.ui.inverted.attached.segment{
+	border: 0;
+}

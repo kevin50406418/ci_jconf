@@ -30,7 +30,7 @@ class Reviewer extends MY_Conference {
 		$data['spage']=$this->config->item('spage');
 		$data['conf_config']=$this->conf_config;
 		$data['conf_content']=$this->conf->conf_content($conf_id);
-		
+		$data['schedule'] = $this->conf->get_schedules($this->conf_id);
 
 		$user_login = $this->session->userdata('user_login');
 		$data['papers']=$this->reviewer->get_paper($conf_id,$user_login);
@@ -60,7 +60,8 @@ class Reviewer extends MY_Conference {
 		$data['spage']=$this->config->item('spage');
 		$data['conf_config']=$this->conf_config;
 		$data['conf_content']=$this->conf->conf_content($conf_id);
-
+		$data['schedule'] = $this->conf->get_schedules($this->conf_id);
+		
 		if( empty($paper_id) ){
 			$this->alert->js("稿件不存在",get_url("topic",$conf_id,"index"));
 			$this->load->view('common/footer',$data);

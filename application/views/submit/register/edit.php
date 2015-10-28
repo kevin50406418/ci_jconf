@@ -57,7 +57,9 @@
 					<?php if( empty($register->pay_bill) ){?>
 					<span class="text-danger">收據檔案尚為上傳</span>
 					<?php }else{?>
-					<span><?php echo $register->pay_bill; ?></span>
+					<a href="<?php echo get_url("submit",$conf_id,"register_files","view")?>?id=<?php echo $register->register_id?>" target="_blank">收據檔案</a>
+					<a href="<?php echo get_url("submit",$conf_id,"register_files","download")?>?id=<?php echo $register->register_id?>" class="ui button blue" target="_blank">下載</a>
+					<a href="<?php echo get_url("submit",$conf_id,"register_files","del")?>?id=<?php echo $register->register_id?>" class="ui button red">刪除檔案</a>
 					<?php }?>
 				</td>
 			</tr>

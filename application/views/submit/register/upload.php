@@ -10,7 +10,11 @@
 				<?php if( empty($register->pay_bill) ){?>
 				<p class="text-danger">收據檔案尚為上傳</p>
 				<?php }else{?>
-				<p><?php echo $register->pay_bill; ?></p>
+				<p>
+					<a href="<?php echo get_url("submit",$conf_id,"register_files","view")?>?id=<?php echo $register->register_id?>" target="_blank">收據檔案</a>
+					<a href="<?php echo get_url("submit",$conf_id,"register_files","download")?>?id=<?php echo $register->register_id?>" class="ui button blue" target="_blank">下載</a>
+					<a href="<?php echo get_url("submit",$conf_id,"register_files","del")?>?id=<?php echo $register->register_id?>" class="ui button red">刪除檔案</a>
+				</p>
 				<?php }?>
 				<input name="register_file" type="file" required="required" id="register_file" class="file file-loading" accept=".pdf,.png,.jpg">
 				<p class="help-block">允許上傳的副檔名：pdf、png、jpg</p>

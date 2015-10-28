@@ -23,12 +23,13 @@ class Topic extends MY_Topic {
 	}
 
 	public function index($conf_id=''){
-		$data['conf_id'] = $conf_id;
-		$data['body_class'] = $this->body_class;
-		$data['_lang'] = $this->_lang;
-		$data['spage']=$this->config->item('spage');
-		$data['conf_config']=$this->conf_config;
-		$data['conf_content']=$this->conf->conf_content($conf_id);
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
+		$data['_lang']        = $this->_lang;
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 
 		if( !$this->conf->conf_hastopic($conf_id) ){
 			$this->alert->js("尚未建立研討會主題，請洽研討會會議管理人員",get_url("main",$conf_id));
@@ -84,13 +85,14 @@ class Topic extends MY_Topic {
 	}
 
 	public function detail($conf_id='',$paper_id=''){
-		$data['conf_id'] = $conf_id;
-		$data['body_class'] = $this->body_class;
-		$data['_lang'] = $this->_lang;
-		$data['paper_id'] = $paper_id;
-		$data['spage']=$this->config->item('spage');
-		$data['conf_config']=$this->conf_config;
-		$data['conf_content']=$this->conf->conf_content($conf_id);
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
+		$data['_lang']        = $this->_lang;
+		$data['paper_id']     = $paper_id;
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 
 		if( empty($paper_id) ){
 			$this->alert->js("稿件不存在",get_url("topic",$conf_id,"index"));
@@ -300,16 +302,17 @@ class Topic extends MY_Topic {
 	}
 
 	public function users($conf_id=''){
-		$data['conf_id'] = $conf_id;
-		$data['body_class'] = $this->body_class;
-		$data['_lang'] = $this->_lang;
-		$data['spage']=$this->config->item('spage');
-		$data['conf_config']=$this->conf_config;
-		$data['conf_content']=$this->conf->conf_content($conf_id);
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
+		$data['_lang']        = $this->_lang;
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 
-		$data['users']=$this->user->get_all_users(10);
-		$data['confs']=$this->user->get_conf_array($conf_id);
-		$data['reviewers']=$this->user->get_reviewer_array($conf_id);
+		$data['users']     = $this->user->get_all_users(10);
+		$data['confs']     = $this->user->get_conf_array($conf_id);
+		$data['reviewers'] = $this->user->get_reviewer_array($conf_id);
 		
 		$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
 		$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
@@ -361,12 +364,13 @@ class Topic extends MY_Topic {
 	}
 
 	public function _tmp($conf_id=''){
-		$data['conf_id'] = $conf_id;
-		$data['body_class'] = $this->body_class;
-		$data['_lang'] = $this->_lang;
-		$data['spage']=$this->config->item('spage');
-		$data['conf_config']=$this->conf_config;
-		$data['conf_content']=$this->conf->conf_content($conf_id);
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
+		$data['_lang']        = $this->_lang;
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);

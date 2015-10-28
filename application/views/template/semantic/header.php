@@ -19,12 +19,23 @@ $pg_id = $this->uri->segment(2);
 <?php echo link_tag(template_url('semantic','bootstrap.min.css'));?>
 <?php echo link_tag(template_url('semantic','semantic.min.css'));?>
 <?php echo link_tag(template_url('semantic','style.css'));?>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="<?php echo template_url('semantic','semantic.min.js')?>" type="text/javascript"></script>
+<!--[if lt IE 9]>
+<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<script src="//css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>
+<![endif]-->
+<script>
+$(function(){
+	$('.dropdown').dropdown();
+});
+</script>
 </head>
 <body>
-<div class="ui fixed menu inverted">
-	<div class="container">
-		<a class="item"><i class="fa fa-bookmark fa-lg"></i> <?php echo $conf_config['conf_name']?></a>
-		<?php foreach ($conf_content as $key => $content) {?>
+<div class="ui menu inverted fixed">
+	<a class="item"><?php echo $conf_config['conf_name']?></a>
+	<?php foreach ($conf_content as $key => $content) {?>
+		<?php if($key < 9){?>
 			<?php if(in_array($content->page_id,$spage)){?>
 			<a class="item <?php echo active_confnav($pg_id,$content->page_id,"active")?>" href="<?php echo get_url($content->page_id,$conf_config['conf_id']);?>"><?php echo $content->page_title?></a>
 			<?php }else{?>
@@ -32,5 +43,31 @@ $pg_id = $this->uri->segment(2);
 			<a class="item <?php echo active_confnav($pg_id,$content->page_id,"active")?>" href="<?php echo get_url("about",$conf_config['conf_id'],$content->page_id);?>"><?php echo $content->page_title?></a>
 			<?php }?>
 		<?php }?>
+	<?php }?>
+	<div class="ui dropdown item">
+		其他資訊 <i class="dropdown icon"></i>
+		<div class="menu">
+			<?php foreach ($conf_content as $key => $content) {?>
+				<?php if($key > 8){?>
+					<?php if(in_array($content->page_id,$spage)){?>
+					<a class="item <?php echo active_confnav($pg_id,$content->page_id,"active")?>" href="<?php echo get_url($content->page_id,$conf_config['conf_id']);?>"><?php echo $content->page_title?></a>
+					<?php }else{?>
+					<?php $pg_id = $this->uri->segment(3);?>
+					<a class="item <?php echo active_confnav($pg_id,$content->page_id,"active")?>" href="<?php echo get_url("about",$conf_config['conf_id'],$content->page_id);?>"><?php echo $content->page_title?></a>
+					<?php }?>
+				<?php }?>
+			<?php }?>
+		</div>
 	</div>
+	<div class="right menu">
+		<?php if( is_login() ){?>
+		<div class="item">您好，<?php echo get_current_user_login()?></div>
+        <?php }else{?>
+        <div class="item">
+        	<a href="<?php echo base_url("user/login")?>" class="ui teal button">登入</a>
+        </div>
+        <?php }?>
+    </div>
 </div>
+<div class="container-fluid" id="content">
+<div class="row">

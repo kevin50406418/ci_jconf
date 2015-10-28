@@ -726,4 +726,6 @@ class Submit_model extends CI_Model {
         $this->db->where('register_id', $register_id);
         return $this->db->update('register', $pay);
     }
+
+    
 }

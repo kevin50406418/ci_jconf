@@ -36,7 +36,7 @@ class Home extends MY_Controller {
 
 				$schedule = $this->conf->get_schedules($this->conf_id);
 				$data['schedule'] = $schedule;
-
+				
 				if( $conf_template == "default"){
 					$this->load->view('common/header');
 					$this->load->view('common/nav',$data);
@@ -52,7 +52,12 @@ class Home extends MY_Controller {
 
 					$this->load->view('common/footer',$data);
 				}else{
+					$data['col_index'] = array("index");// 
+					$data['col_sidebar_1'] = array("schedule","news");
+					$data['col_sidebar_2'] = array("");
+					
 					$this->load->view($template_dir.'header',$data);
+					$this->load->view($template_dir."col-".$conf_col,$data);
 					$this->load->view($template_dir.'footer',$data);
 				}
 			}else{
@@ -78,16 +83,38 @@ class Home extends MY_Controller {
 				//$data['schedule']=$this->conf->conf_schedule($conf_id);
 				$data['conf_content']=$this->conf->conf_content($conf_id);
 				$data['conf_news'] = $this->conf->get_news($conf_id);
+				$conf_col=$data['conf_config']['conf_col'];
+				$conf_template=$data['conf_config']['conf_template'];
+				$template_dir = "template/".$conf_template."/";
 				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
 				$this->assets->add_css(asset_url().'style/statistic.min.css');
 
-				$this->load->view('common/header');
-				$this->load->view('common/nav',$data);
-				$this->load->view('conf/index');
-				$this->load->view('conf/conf_nav',$data);
-				//$this->load->view('conf/conf_schedule',$data);
-				$this->load->view('conf/news',$data);
-				$this->load->view('common/footer',$data);
+				$schedule = $this->conf->get_schedules($this->conf_id);
+				$data['schedule'] = $schedule;
+				
+				if( $conf_template == "default"){
+					$this->load->view('common/header');
+					$this->load->view('common/nav',$data);
+					$this->load->view('conf/index');
+					$this->load->view('conf/conf_nav',$data);
+					//$this->load->view('conf/conf_schedule',$data);
+					
+					$data['col_index'] = array("index","news");
+					$data['col_sidebar_1'] = array("schedule");
+					$data['col_sidebar_2'] = array("");
+
+					$this->load->view('conf/news',$data);
+
+					$this->load->view('common/footer',$data);
+				}else{
+					$data['col_index'] = array("news");// 
+					$data['col_sidebar_1'] = array("schedule");
+					$data['col_sidebar_2'] = array("");
+					
+					$this->load->view($template_dir.'header',$data);
+					$this->load->view($template_dir."col-".$conf_col,$data);
+					$this->load->view($template_dir.'footer',$data);
+				}
 			}else{
 				$this->cinfo['show_confinfo'] = false;
 				$this->conf->show_404conf();
@@ -116,7 +143,8 @@ class Home extends MY_Controller {
 
 				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
 				$this->assets->add_css(asset_url().'style/statistic.min.css');
-
+				$data['schedule'] = $this->conf->get_schedules($this->conf_id);
+				
 				$this->load->view('common/header');
 				$this->load->view('common/nav',$data);
 				$this->load->view('conf/index');
@@ -162,21 +190,36 @@ class Home extends MY_Controller {
 				//$data['schedule']=$this->conf->conf_schedule($conf_id);
 				$data['conf_content']=$this->conf->conf_content($conf_id);
 				$data['content']=$this->conf->get_content($conf_id,$page_id,$this->_lang);
+				$data['conf_news'] = $this->conf->get_news($conf_id);
+				$conf_col=$data['conf_config']['conf_col'];
+				$conf_template=$data['conf_config']['conf_template'];
+				$template_dir = "template/".$conf_template."/";
 				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
 				$this->assets->add_css(asset_url().'style/statistic.min.css');
 
-				$this->load->view('common/header');
-				$this->load->view('common/nav',$data);
-				$this->load->view('conf/index');
-				$this->load->view('conf/conf_nav',$data);
-				//$this->load->view('conf/conf_schedule',$data);
-				if($data['content']->page_show == 1){
-					$this->load->view('conf/about',$data);
+				if( $conf_template == "default"){
+					$this->load->view('common/header');
+					$this->load->view('common/nav',$data);
+					$this->load->view('conf/index');
+					$this->load->view('conf/conf_nav',$data);
+					//$this->load->view('conf/conf_schedule',$data);
+					
+					$data['col_index'] = array("index","news");
+					$data['col_sidebar_1'] = array("schedule");
+					$data['col_sidebar_2'] = array("");
+
+					if($data['content']->page_show == 1){
+						$this->load->view('conf/about',$data);
+					}else{
+						$this->cinfo['show_confinfo'] = false;
+						$this->conf->show_404conf();
+					}
+					$this->load->view('common/footer',$data);
 				}else{
-					$this->cinfo['show_confinfo'] = false;
-					$this->conf->show_404conf();
+					$this->load->view($template_dir.'header',$data);
+					$this->load->view($template_dir.'about',$data);
+					$this->load->view($template_dir.'footer',$data);
 				}
-				$this->load->view('common/footer',$data);
 			}else{
 				$this->cinfo['show_confinfo'] = false;
 				$this->conf->show_404conf();

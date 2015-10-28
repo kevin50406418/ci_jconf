@@ -23,6 +23,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 		<div class="container">
 			<?php echo $message; ?>
   		</div>
+  		<a href="<?php echo config_item('base_url');?>" class="btn btn-lg btn-primary"><i class="fa fa-home"></i> 返回首頁</a>
 	</div>
 </body>
 </html>

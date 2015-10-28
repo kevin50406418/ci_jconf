@@ -22,7 +22,6 @@
 			<td data-order="0">
 				<div class="small icon ui buttons">
 					<a href="<?php echo get_url("submit",$conf_id,"detail",$list->sub_id)?>" class="tiny ui blue button">查看</a>
-					<a href="<?php echo get_url("submit",$conf_id,"remove",$list->sub_id)?>" class="tiny ui red button">撤稿</a>
 					<?php if($list->sub_status==-1){?>
 					<a href="<?php echo get_url("submit",$conf_id,"edit",$list->sub_id)?>" class="tiny ui teal button">編輯</a>
                     <?php }elseif($list->sub_status==5){?>

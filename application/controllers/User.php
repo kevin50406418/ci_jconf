@@ -69,6 +69,7 @@ class User extends MY_Controller {
 
 	public function login($conf_id=""){
 		$data['body_class'] = $this->body_class;
+		$data['redirect'] = $this->session->redirected;
 		if(!$this->user->is_login()){
 			$this->form_validation->set_rules('user_login', '帳號', 'required');
 		    $this->form_validation->set_rules('user_pass', '密碼', 'required');
@@ -80,7 +81,7 @@ class User extends MY_Controller {
 		    	$result = $this->user->login($user_login, $user_pwd);
 		    	if($result){
 		    		$this->form_validation->set_message('login_success', 'Login Success');
-		    		redirect($redirect, 'refresh');
+		    		redirect(base_url($redirect), 'refresh');
 		    	}else{
 		    		$this->alert->js("帳號或密碼錯誤");
 		    	}
@@ -88,16 +89,7 @@ class User extends MY_Controller {
 		}else{
 			redirect('/', 'location', 301);
 		}
-
-		if(empty($conf_id)){
-			$data['redirect'] = "/";
-		}else{
-			if($this->conf->confid_exists($conf_id)){
-				$data['redirect'] = "$conf_id/index/";
-			}else{
-				$data['redirect'] = "/";
-			}
-		}
+		
 
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);

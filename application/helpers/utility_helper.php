@@ -147,3 +147,13 @@ function active_confnav($now_page_id,$page_id,$active){
 		if( $now_page_id == $page_id) return $active;
 	}
 }
+
+function is_login(){
+	$ci =&get_instance();
+	return $ci->user->is_login();
+}
+
+function get_current_user_login(){
+	$ci =&get_instance();
+	return $ci->session->user_login;
+}

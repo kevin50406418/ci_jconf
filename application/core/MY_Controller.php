@@ -30,6 +30,9 @@ class MY_Controller extends CI_Controller{
 		$this->lang->load("paper_status",$this->_lang);
 		$this->lang->load("conf",$this->_lang);
 
+		$this->conf_id = $this->uri->segment(1);
+		$pg_id = $this->uri->segment(2);
+
 		if( $this->user->is_login() ){
 			$this->user_login = $this->session->userdata('user_login');
 			$bool_conf     = $this->session->has_userdata('priv_conf');
@@ -54,9 +57,15 @@ class MY_Controller extends CI_Controller{
 					$this->conf_id = $this->uri->segment(2);
 				break;
 			}*/
-			$this->conf_id = $this->uri->segment(1);
-			$pg_id = $this->uri->segment(2);
+			
+		}else{
+			if( $this->conf_id != "user"){
+				$tmp_url = $this->session->redirected;
+				$this->session->set_userdata('redirected', uri_string(current_url()));
+				$this->session->set_userdata('redirect', $tmp_url);
+			}
 		}
+		
     }
 }
 
