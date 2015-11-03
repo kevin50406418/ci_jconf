@@ -117,6 +117,10 @@ class User extends MY_Controller {
 		$this->lang->load("user_login_log",$this->_lang);
 		if($this->user->is_login()){
 			$data['logs'] = $this->user->get_login_log($this->session->user_login);
+			$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
+			$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
+			$this->assets->add_js(asset_url().'js/dataTables.bootstrap.js',true);
+
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
 			$this->load->view('user/log',$data);
@@ -146,7 +150,7 @@ class User extends MY_Controller {
 			$this->form_validation->set_rules('user_id', '帳號', 'required');
 		    $this->form_validation->set_rules('user_pw', '密碼', 'required|min_length[6]');
 		    $this->form_validation->set_rules('user_pw2', '重覆輸入密碼', 'required|matches[user_pw]|min_length[6]');
-		    $this->form_validation->set_rules('user_email', '電子信箱', 'required');
+		    $this->form_validation->set_rules('user_email', '電子信箱', 'required|valid_email');
 		    $this->form_validation->set_rules('user_title', '稱謂', 'required');
 		    $this->form_validation->set_rules('user_firstname', '名字', 'required');
 		    $this->form_validation->set_rules('user_lastname', '姓氏', 'required');
@@ -168,9 +172,7 @@ class User extends MY_Controller {
 				echo $this->email->print_debugger();
 			}*/
 
-		    if ($this->form_validation->run() === FALSE){
-
-		    }else{
+		    if ( $this->form_validation->run() ){
 		    	$user_login = $this->input->post('user_id', TRUE);
 		    	$user_pass = $this->input->post('user_pw', TRUE);
 		    	$user_email = $this->input->post('user_email', TRUE);
@@ -254,5 +256,72 @@ class User extends MY_Controller {
 		}
 	}
 
-	
+	public function lostpwd(){
+		$data['body_class'] = $this->body_class;
+		if($this->user->is_login()){
+			redirect('/user/passwd', 'location', 301);
+		}else{
+			$this->load->view('common/header');
+			$this->load->view('common/nav',$data);
+
+			$this->form_validation->set_rules('user_login', '帳號', 'required');
+		    $this->form_validation->set_rules('user_email', '電子信箱', 'required|valid_email');
+		    $this->form_validation->set_rules('g-recaptcha-response', 'Recaptcha', 'required');
+
+		    if ( $this->form_validation->run() ){
+		    	$user_login = $this->input->post('user_login');
+		    	$user_email = $this->input->post('user_email');
+		    	$g_recaptcha_response = $this->input->post('g-recaptcha-response');
+
+		    	if( $this->user->passwd_reset($user_login,$user_email,$g_recaptcha_response) ){
+		    		$this->alert->show("s","重置密碼信寄出成功，請查閱信箱(收件匣若無信件，請查閱垃圾信箱)");
+		    	}else{
+		    		$this->alert->show("d","查無此使用者");
+		    	}
+		    }
+			
+			$this->load->view('user/lostpwd',$data);
+			$this->load->view('common/footer',$data);
+		}
+	}
+
+	public function reset($user_login="",$reset_token=""){
+		$data['body_class'] = $this->body_class;
+		if($this->user->is_login()){
+			redirect('/user/passwd', 'location', 301);
+		}else{
+			if( empty($user_login) || empty($reset_token) ){
+				redirect('/user/lostpwd', 'location', 301);
+			}else{
+				$reset_token = $this->user->get_reset_token($user_login,$reset_token);
+				$this->load->view('common/header');
+				$this->load->view('common/nav',$data);
+
+				$data['reset_token'] = $reset_token;
+
+				if( empty($reset_token) ){
+					$this->alert->js("密碼重製金鑰無效",base_url('/user/lostpwd'));
+				}else{
+					if( $reset_token->reset_staus == 0 && time() < $reset_token->reset_failtime ){
+					    $this->form_validation->set_rules('user_pass', '新密碼', 'required|min_length[6]');
+					    $this->form_validation->set_rules('user_pass2', '確認新密碼', 'required|matches[user_pass]|min_length[6]');
+						if ( $this->form_validation->run() ){
+							$user_pass  = $this->input->post('user_pass', TRUE);
+							if( $this->user->change_passwd($user_login,$user_pass,3) ){
+								$this->user->set_reset_token($user_login,$reset_token->reset_token);
+								$this->alert->js("更改密碼成功",base_url('/user/login'));
+							}else{
+								$this->alert->js("更改密碼失敗",base_url('/user/login'));
+							}
+						}
+
+						$this->load->view('user/reset',$data);
+					}else{
+						$this->alert->js("密碼重製金鑰無效",base_url('/user/lostpwd'));
+					}
+				}	
+				$this->load->view('common/footer',$data);
+			}
+		}
+	}
 }

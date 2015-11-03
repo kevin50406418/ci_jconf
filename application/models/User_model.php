@@ -386,7 +386,7 @@ class User_model extends CI_Model {
 	}
 
 	function user_valid(){
-		$this->form_validation->set_rules('user_email', '電子信箱', 'required');
+		$this->form_validation->set_rules('user_email', '電子信箱', 'required|valid_email');
 	    $this->form_validation->set_rules('user_title', '稱謂', 'required');
 	    $this->form_validation->set_rules('user_firstname', '名字', 'required');
 	    $this->form_validation->set_rules('user_lastname', '姓氏', 'required');
@@ -401,16 +401,17 @@ class User_model extends CI_Model {
 	    $this->form_validation->set_rules('user_title', '研究領域', 'required|min_length[1]');
 	}
 
-	function change_passwd($user_login,$user_pass){
+	function change_passwd($user_login,$user_pass,$login_staus=2){
 		$user = array(
 			"user_pass" => hash('sha256',$user_pass)
 		);
 		$this->db->where('user_login', $user_login);
-		if( $this->db->update('users', $user) ){
-			return true;
-		}else{
-			return false;
+		if( $login_staus==2 ){
+			$this->add_login_log($user_login,2);
+		}else if( $login_staus==3 ){
+			$this->add_login_log($user_login,3);
 		}
+		return $this->db->update('users', $user);
 	}
 
 	function generator_password($password_len){
@@ -474,6 +475,72 @@ class User_model extends CI_Model {
         $this->session->mark_as_temp('priv_conf', 600);
         $this->session->mark_as_temp('priv_topic', 600);
         $this->session->mark_as_temp('priv_reviewer', 600);
+	}
+
+	function passwd_reset($user_login,$user_email,$g_recaptcha_response){
+		$response=file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=6Lf-HgITAAAAAK8nwI1ZjVq_6IitifEueos00VUn&response=".$g_recaptcha_response);
+		$response=json_decode($response);
+
+		if($response->success){
+			$this->db->from('users');
+			$this->db->where('user_login', $user_login);
+			$this->db->where('user_email', $user_email);
+			$this->db->where('user_staus', 0);
+			$this->db->limit(1);
+
+			$query=$this->db->get();
+			
+			if($query->num_rows() == 1){
+				$this->add_login_log($user_login,3);
+				$reset_token = md5(uniqid());
+				$this->add_reset_token($user_login,$reset_token);
+				return $this->send_resetpwd_mail($user_login,$user_email,$reset_token);
+			}else{
+				return false;
+			}
+		}else{
+			$this->alert->show("d","reCAPTCHA error");
+		}
+	}
+
+	function add_reset_token($user_login,$reset_token){
+		$reset_token = array(
+			"user_login"     => $user_login,
+			"reset_token"    => $reset_token,
+			"reset_failtime" => time()+3600
+		);
+		return $this->db->insert('login_reset', $reset_token);
+	}
+
+	function send_resetpwd_mail($user_login,$user_email,$reset_token){
+		$time = date("Y-m-d H:i:s",time());
+		$site_name = $this->config->item('site_name');
+    	$message = "會員 ".$user_login." 您好,<br><br>您於 ".$time." 送出重置密碼請求，重置訊息如下：<br>".base_url("user/reset/".$user_login."/".$reset_token)."<br>(若非本人所提出的請求，請忽略本信件)<br><br>".$site_name;
+    	// sp("TO:".$user_email."\n".$message);
+    	
+    	$this->email->from('ccs@asia.edu.tw', $site_name);
+		$this->email->to($user_email);
+		$this->email->subject('[重設密碼]'.$site_name.'重設密碼');
+		$this->email->message($message);
+
+		return $this->email->send();
+	}
+
+	function get_reset_token($user_login,$reset_token){
+		$this->db->from('login_reset');
+		$this->db->where('user_login', $user_login);
+		$this->db->where('reset_token', $reset_token);
+		$query=$this->db->get();
+		return $query->row();
+	}
+
+	function set_reset_token($user_login,$reset_token){
+		$login_reset = array(
+			"reset_staus" => 1
+		);
+		$this->db->where('user_login', $user_login);
+		$this->db->where('reset_token', $reset_token);
+		return $this->db->update('login_reset', $login_reset);
 	}
 }
 ?>

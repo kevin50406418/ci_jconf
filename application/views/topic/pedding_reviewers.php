@@ -2,6 +2,7 @@
 <div class="ui segment raised yellow">
 	<?php echo form_open(get_url("topic",$conf_id,"detail",$paper->sub_id))?>
 	<?php echo form_hidden('type', 'del');?>
+	<?php echo form_hidden('act', 'assign');?>
 	<div class="modal-header">
 		<h4 class="modal-title">分派審查(確認中)</h4>
 	</div>
@@ -52,6 +53,7 @@
 	<?php
 		echo form_open(get_url("topic",$conf_id,"detail",$paper->sub_id),array("class"=>"text-center"));
 		echo form_hidden('type', 'confirm');
+		echo form_hidden('act', 'assign');
 		foreach ($pedding_reviewers as $key => $user) { echo form_hidden('user_login[]', $user->user_login);}
 	?>
 	<button type="submit" class="ui button blue"<?php if($pedding_count%2==0){?> disabled<?php }?>>確認審查人</button>

@@ -1,5 +1,10 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+// $ci =&get_instance();
+// echo $ci->uri->segment(1);
+// if( $this->conf->confid_exists($conf_id,$user_sysop) ){
+
+// }
 ?><!DOCTYPE html>
 <!--[if IE 8]>
 <html xmlns="http://www.w3.org/1999/xhtml" class="ie8">

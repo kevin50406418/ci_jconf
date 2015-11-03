@@ -1,30 +1,31 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <div class="ui segment">
 	<div class="row">
+		<?php echo form_open(get_url("topic",$conf_id,"index"),array("method"=>"get","id"=>"act"))?>
 		<div class="col-md-3 col-md-offset-4">
 			<div class="input-group">
 				<span class="input-group-addon" id="sizing-addon1">稿件狀態</span>
-				<select class="form-control">
-					<option value="-4"><?php echo lang('status_all')?></option>
-					<option value="-3"><?php echo lang('status_delete')?></option>
-					<option value="-2"><?php echo lang('status_reject')?></option>
-					<option value="-1"><?php echo lang('status_editing')?></option>
-					<option value="1" selected="selected"><?php echo lang('status_submitcomplete')?></option>
-					<option value="2"><?php echo lang('status_pending')?></option>
-					<option value="3"><?php echo lang('status_review')?></option>
-					<option value="4"><?php echo lang('status_accepte')?></option>
-					<option value="5"><?php echo lang('status_complete')?></option>
+				<select class="form-control" id="status" name="status">
+					<option value=""<?php if( is_null($status) ){?> selected<?php }?>><?php echo lang('status_all')?></option>
+					<option value="-3"<?php if( $status == -3 ){?> selected<?php }?>><?php echo lang('status_delete')?></option>
+					<option value="-2"<?php if( $status == -2 ){?> selected<?php }?>><?php echo lang('status_reject')?></option>
+					<option value="-1"<?php if( $status == -1 ){?> selected<?php }?>><?php echo lang('status_editing')?></option>
+					<option value="1"<?php if( $status == 1 ){?> selected<?php }?>><?php echo lang('status_submitcomplete')?></option>
+					<option value="2"<?php if( $status == 2 ){?> selected<?php }?>><?php echo lang('status_pending')?></option>
+					<option value="3"<?php if( $status == 3 ){?> selected<?php }?>><?php echo lang('status_review')?></option>
+					<option value="4"<?php if( $status == 4 ){?> selected<?php }?>><?php echo lang('status_accepte')?></option>
+					<option value="5"<?php if( $status == 5 ){?> selected<?php }?>><?php echo lang('status_complete')?></option>
 				</select>
 			</div>
 		</div>
 		<div class="col-md-5">
 			<div class="input-group">
-				<span class="input-group-addon" id="sizing-addon1">主題</span>
+				<span class="input-group-addon" id="sizing-addon2">主題</span>
 				<?php if(is_array($topics)){?>
-				<select class="form-control">
-					<option value="-4">全部</option>
+				<select class="form-control" id="topic_id" name="topic_id">
+					<option value=""<?php if( is_null($topic_id) ){?> selected<?php }?>>全部</option>
 					<?php foreach ($topics as $key => $topic) {?>
-					<option value="<?php echo $topic->topic_id?>"><?php echo $topic->topic_name?> (<?php echo $topic->topic_name_eng?>)</option>
+					<option value="<?php echo $topic->topic_id?>"<?php if( $topic_id == $topic->topic_id ){?> selected<?php }?>><?php echo $topic->topic_name?> (<?php echo $topic->topic_name_eng?>)</option>
 					<?php }?>
 				</select>
 				<?php }else{?>
@@ -32,7 +33,9 @@
 				<?php }?>
 			</div>
 		</div>
-	</div><br>
+		<?php echo form_close()?>
+	</div>
+	<br>
 	<table class="table table-bordered table-hover datatable">
 		<thead>
 			<tr>
@@ -98,11 +101,6 @@
 					<?php }else{?>
 						<a href="<?php echo get_url("topic",$conf_id,"detail",$paper->sub_id)?>" class="ui teal button basic">分派審查</a>
 					<?php }?>
-					<?php if($paper->sub_status == 1){?>
-					<form method="post" action="<!--{get_url($conf_id,"topic","detail",$list['sub_id'])}-->">
-						<button onclick="return confirm('是否拒絕稿件[#<!--{$list['sub_id']}--> <!--{$list['sub_title']}-->]\n注意：拒絕稿件後，將無法撤回操作');" class="ui red button basic" name="reject">拒絕稿件</button>
-					</form>
-					<?php }?>
 				<?php }else{?>
 					<a href="<?php echo get_url("submit",$conf_id,"detail",$paper->sub_id)?>" class="ui blue button basic">查看稿件</a>
 				<?php }?>
@@ -113,3 +111,10 @@
 	<?php }?>
 	</table>
 </div>
+
+<script>
+$(function() {
+	$("#topic_id").change(function() {$("form#act").submit();});
+	$("#status").change(function() {$("form#act").submit();});
+});
+</script>

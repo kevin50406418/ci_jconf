@@ -60,12 +60,18 @@ class Topic extends MY_Topic {
 		}
 		$data['assign_count'] = $assign_count;
 		$data['had_count'] = $had_count;
-		if( is_null( $this->input->get('id', TRUE) ) ){
-			$data['papers']=$this->topic->get_paper($conf_id,$this->user_login);
-		}else{
-			$topic_id = $this->input->get('id', TRUE);
-			$data['papers']=$this->topic->get_paper($conf_id,$this->user_login,$topic_id);
-		}
+
+		$topic_id = $this->input->get('topic_id', TRUE);
+		$status = $this->input->get('status', TRUE);
+		if( empty($topic_id) ){$topic_id=null;}
+		if( empty($status) ){$status=null;}
+		
+		$data['topic_id'] = $topic_id;
+		$data['status'] = $status;
+		
+
+		$data['papers']=$this->topic->get_paper($conf_id,$this->user_login,$topic_id,$status);
+
 		$paper_author=$this->Submit->show_mypaper($this->user_login,$conf_id);
 		$data['paper_author'] = array();
 		if(is_array($paper_author)){
@@ -144,6 +150,7 @@ class Topic extends MY_Topic {
 					if( $data['paper']->sub_status == 1 ){
 						$this->form_validation->set_rules('user_login[]', '帳號', 'required');
 						$this->form_validation->set_rules('type', '', 'required');
+						
 						if ($this->form_validation->run()){
 							$type = $this->input->post('type');
 							$user_logins = $this->input->post('user_login');
@@ -259,6 +266,75 @@ class Topic extends MY_Topic {
 		
 		$this->load->view('common/footer',$data);
 		
+	}
+
+	public function operating($conf_id='',$paper_id=''){
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
+		$data['_lang']        = $this->_lang;
+		$data['paper_id']     = $paper_id;
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+
+		if( empty($paper_id) ){
+			$this->alert->js("稿件不存在",get_url("topic",$conf_id,"index"));
+			$this->load->view('common/footer',$data);
+			$this->output->_display();
+			exit;
+		}
+
+		$user_login = $this->user_login;
+		
+		$paper_author=$this->Submit->show_mypaper($user_login,$conf_id);
+		$paper_array = array();
+		if(is_array($paper_author)){
+			foreach ($paper_author as $key => $pa) {
+				array_push($paper_array,$pa->sub_id);
+			}
+		}
+		$this->load->view('common/header');
+		$this->load->view('common/nav',$data);
+
+		$this->load->view('conf/conf_nav',$data);
+		//$this->load->view('conf/conf_schedule',$data);
+		$this->load->view('conf/menu_topic',$data);
+		if( !in_array($paper_id,$paper_array) ){
+			$paper =  $this->topic->get_paperinfo($paper_id,$conf_id);
+			$data['paper'] = $paper;
+			if(!empty($paper)){
+				$data['reviewers']=$this->conf->get_reviewer($conf_id);
+				$data['authors'] = $this->Submit->get_author($paper_id);
+				$data['otherfile'] = $this->Submit->get_otherfile($paper_id);
+				$data['otherfiles'] = $this->Submit->get_otherfiles($paper_id);
+			}
+			if( $data['paper']->sub_status < 3 && $data['paper']->sub_status >= -1){
+				$this->form_validation->set_rules('do', '操作', 'required');
+	    		if ($this->form_validation->run()){
+	    			$do = $this->input->post('do');
+	    			if( in_array($do,array("remove","reject")) ){
+	    				switch ($do) {
+		    				case "remove":
+		    					$sub_status = -3;
+		    				break;
+		    				case "reject":
+		    					$sub_status = -2;
+		    				break;
+		    			}
+		    			if( $this->topic->topic_review($this->conf_id,$paper_id,$sub_status) ){
+		    				$this->alert->js("操作成功",get_url("topic",$conf_id,"detail",$paper->sub_id));
+		    			}else{
+		    				$this->alert->js("操作失敗",get_url("topic",$conf_id,"detail",$paper->sub_id));
+		    			}
+	    			}
+	    		}
+			}else{
+				$this->alert->js("操作失敗",get_url("topic",$conf_id,"detailg",$paper->sub_id));
+			}
+		}else{
+			$this->alert->js("由於您為本篇稿件作者之一，無法分派本篇稿件",get_url("topic",$conf_id,"index"));
+		}
 	}
 
 	public function files($conf_id='',$paper_id=''){

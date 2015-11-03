@@ -1,9 +1,11 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <div class="ui segment">
+	<?php echo form_open(get_url("dashboard",$conf_id,"website"));?>
 	<p>
 		<a href="<?php echo get_url("dashboard",$conf_id,"website","add")?>" class="ui blue button">新增</a>
+		<button class="ui pink button" type="submit" name="show_btn">更改</button>
 	</p>
-	<?php echo form_open(get_url("dashboard",$conf_id,"website"));?>
+	
 	<div>
 		<?php if(in_array("zhtw",$conf_lang)){?>
 		<div class="table-responsive repeat">

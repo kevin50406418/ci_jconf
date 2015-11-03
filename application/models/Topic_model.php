@@ -4,14 +4,19 @@ class Topic_model extends CI_Model {
 		parent::__construct();
     }
 
-    function get_paper($conf_id,$user_login,$topic_id=''){
+    function get_paper($conf_id,$user_login,$topic_id=null,$sub_status=null){
     	$this->db->from('auth_topic');
 		$this->db->join('topic', 'auth_topic.topic_id = topic.topic_id');
 		$this->db->join('paper', 'paper.sub_topic = topic.topic_id');
 		$this->db->where('user_login', $user_login);
 		$this->db->where('auth_topic.conf_id', $conf_id);
-		$this->db->where('sub_status !=', -1);
-		if(!empty($topic_id)){
+		if( is_null($sub_status) ){
+			$this->db->where('sub_status !=', -1);
+		}else{
+			$this->db->where('sub_status', $sub_status);
+		}
+		
+		if( !is_null($topic_id) ){
 			$this->db->where('auth_topic.topic_id', $topic_id);
 		}
 		$query = $this->db->get();
@@ -103,7 +108,7 @@ class Topic_model extends CI_Model {
 	function notice_reviewer($user_login,$user_email,$conf_name,$conf_id,$paper_name,$topic_name,$topic_name_eng,$topic_login){
 		$site_name = $this->config->item('site_name');
     	$message = "審查者 ".$user_login." 您好,<br><br>目前尚有稿件尚未審查，請盡速審查稿件。<br><br>稿件名稱：".$paper_name."<br>稿件主題：".$topic_name."(".$topic_name_eng.")<br><br><a href=\"".get_url("reviewer",$conf_id,"index")."\">前往審查</a><br>* 若已審查該稿件，請忽略本通知<br><br>主編 ".$topic_login."@".$conf_name." - ".$site_name;
-    	sp("TO:".$user_email."\n".$message);
+    	//sp("TO:".$user_email."\n".$message);
     	
     	$this->email->from('ccs@asia.edu.tw', $site_name);
 		$this->email->to($user_email);
@@ -143,7 +148,7 @@ class Topic_model extends CI_Model {
 	}
 
 	function topic_review($conf_id,$paper_id,$sub_status){
-		$status = array(-2,2,4);
+		$status = array(-3,-2,2,4);
 		if( in_array($sub_status,$status) ){
 			$paper = array(
             	"sub_status"=> $sub_status

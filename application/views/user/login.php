@@ -29,7 +29,7 @@
 				<div class="col-sm-offset-2 col-sm-10">
 					<div class="col-sm-6">
 						<button type="submit" class="ui button blue">登入</button>
-						<a href="#lostpwd" class="ui button orange">忘記密碼</a>
+						<a href="<?php echo base_url('user/lostpwd');?>" class="ui button orange">忘記密碼</a>
 					</div>
 					<div class="col-sm-6 text-right">
 						<a href="<?php echo site_url();?>" class="ui button teal">返回首頁</a>
@@ -37,7 +37,7 @@
 				</div>
 			</div>
 			<input name="redirect" type="hidden" id="redirect" value="<?php echo $redirect?>">
-		<?php echo form_close("\n")?>
+		<?php echo form_close()?>
 	</div>
 	<div class="col-md-2"></div>
 </div>

@@ -44,11 +44,7 @@ class Conf_model extends CI_Model {
         );
         $this->db->where('conf_id', $conf_id);
 
-        if( $this->db->update('conf', $conf) ){
-            return true;
-        }else{
-            return false;
-        }
+        $this->db->update('conf', $conf);
 	}
 
 	function all_conf_config($sysop=false){
@@ -159,11 +155,7 @@ class Conf_model extends CI_Model {
 		);
         $this->db->where("filter_id", $filter_id);
         $this->db->where("conf_id", $conf_id);
-        if( $this->db->update('filter', $filter) ){
-            return true;
-        }else{
-            return false;
-        }
+        return $this->db->update('filter', $filter);
 	}
 
 	function get_filter_info($conf_id,$filter_id){

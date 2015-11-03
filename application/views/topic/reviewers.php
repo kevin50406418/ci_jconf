@@ -1,6 +1,7 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');?>
 <?php echo form_open(get_url("topic",$conf_id,"detail",$paper->sub_id),array("class"=>"ui segment raised orange"))?>
 	<?php echo form_hidden('type', 'add');?>
+	<?php echo form_hidden('act', 'assign');?>
 	<div class="modal-header">
 		<h4 class="modal-title">分派審查</h4>
 	</div>

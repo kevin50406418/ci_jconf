@@ -7,7 +7,25 @@
 			<li> <a href="#tab_author" data-toggle="tab"> 作者資訊 </a> </li>
 			<li> <a href="#tab_file" data-toggle="tab"> 稿件檔案 </a> </li>
 			<?php if( $paper->sub_status >= 3 || $paper->sub_status == -2){?><li> <a href="#tab_review" data-toggle="tab"> 審查資料 </a> </li><?php }?>
-			<?php if( $paper->sub_status == -1){?><a href="<?php echo get_url("submit",$conf_id,"edit",$paper->sub_id)?>" class="ui teal button pull-right">編輯稿件</a><?php }?>
+			<?php if( $paper->sub_status < 3 && $paper->sub_status >= -1){?>
+			<?php echo form_open(get_url("topic",$conf_id,"operating",$paper->sub_id),array("class"=>"pull-right","id"=>"paper_act"))?>
+				操作：
+				<div class="btn-group" role="group">
+					<button id="remove" type="submit" name="do" value="remove" class="btn btn-default">接受撤搞</button>
+					<button id="reject" type="submit" name="do" value="reject" class="btn btn-danger">直接拒絕</button>
+				</div>
+			<?php echo form_close()?>
+			<script>
+				$(function() { 
+					$("#remove").click(function(){
+						return confirm("確定是否接受徹搞\n注意：操作後無法恢復");
+					});
+					$("#reject").click(function(){
+						return confirm("確定是否直接拒絕\n注意：操作後無法恢復");
+					});
+				});
+			</script>
+			<?php }?>
 		</ul>
 		<div class="tab-content">
 			<div class="tab-pane active container-fluid" id="tab_info">
@@ -23,11 +41,15 @@
 					</tr>
 					<tr>
 						<th>主題</th>
-						<td><span title="<?php echo $paper->topic_info?>"><?php echo $paper->topic_name?></span></td>
+						<td>
+							<span title="<?php echo $paper->topic_info?>"><?php echo $paper->topic_name?></span>
+						</td>
 					</tr>
 					<tr>
 						<th>稿件狀態</th>
-						<td><?php echo $this->Submit->sub_status($paper->sub_status,true)?></td>
+						<td class="row">
+							<?php echo $this->Submit->sub_status($paper->sub_status,true)?>
+						</td>
 					</tr>
 					<tr>
 						<th>語言</th>
@@ -166,7 +188,7 @@
 </div>
 </div>
 <script>
-$(function() { 
+$(function() { 	
 	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 		localStorage.setItem('topic_<?php echo $paper->sub_id?>', $(this).attr('href'));
 	});

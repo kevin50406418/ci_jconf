@@ -31,6 +31,25 @@ if(is_null($this->input->get("upload"))){
 			<input name="paper_file" type="file" required="required" id="paper_file" accept=".pdf">
 			<p class="help-block">只限PDF上傳投稿資料</p>
 		</div>
+		<!--[if IE 8]>
+		<button id="check" type="submit" class="ui blue button">上傳</button>
+		<script>
+			$(function(){
+				$("#check").on("click",function(){
+					if(!$("#paper_file").val()==""){
+						if($("#paper_file").val().split('.').pop()=="pdf"){
+							return true;
+						}else{
+							alert("存檔格式必須為pdf!!");
+							return false;
+						}
+					}else{
+						alert("尚未上檔案");return false;
+					}
+				});
+			});
+		</script>
+		<![endif]-->
 	</div>
 </div>
 <?php echo form_close()?>

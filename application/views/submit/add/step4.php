@@ -17,6 +17,9 @@ if(!is_null($this->input->get("upload"))){
 			<input name="paper_file[]" type="file" multiple id="paper_file" accept=".pdf">
 			<p class="help-block">只限PDF上傳投稿資料(一次可多個上傳檔案)</p>
 		</div>
+		<!--[if IE 8]>
+		<button id="check" type="submit" class="ui blue button">上傳</button>
+		<![endif]-->
 	</div>
 	<?php echo form_close()?>
 	<div class="text-center">
@@ -56,20 +59,53 @@ if(!is_null($this->input->get("upload"))){
 		<div class="ui message info">目前無補充任何文件</div>
 	<?php }?>
 </div>
+<!--[if IE 8]>
 <script>
-$("#paper_file").fileinput({
-	language: "zh-TW",
-    autoReplace: true,
-    allowedFileExtensions: ["pdf"],
-    removeIcon: '<i class="fa fa-trash"></i>',
-    
-    browseIcon: '<i class="fa fa-folder-open"></i>',
-    cancelIcon: '<i class="fa fa-ban"></i>',
-    uploadIcon: '<i class="fa fa-upload"></i>',
-    previewFileIcon: '<i class="fa fa-file"></i>',
-
-    previewFileIconSettings: {
-        'pdf': '<i class="fa fa-file-pdf-o text-danger"></i>',
-    }
+$(document).ready(function(){
+	$("#checks").on("click",function(){
+		if($("#paper_file").val().length>0){
+			for(i=0;i<$("#paper_file")[0].files.length;i++){
+				var e=$("#paper_file")[0].files[i];
+				var t=e.name;
+				var n=e.size;
+				var r=t.substr(t.lastIndexOf(".")+1);
+				if(r!="pdf"){
+					$("#alert1").add( '<div class="ui negative message"><strong>'+t+'</strong> 存檔格式必須為pdf!!</div>' ).appendTo( "#alert" );
+					alert(t+"存檔格式必須為pdf!!");
+					return false;
+				}
+			}
+		}else{
+			alert("尚未上檔案");
+			return false;
+		}
+	});
 });
+</script>
+<![endif]-->
+<script>
+$(document).ready(function(){
+	$("#paper_file").fileinput({
+		language: "zh-TW",
+	    autoReplace: true,
+	    allowedFileExtensions: ["pdf"],
+	    removeIcon: '<i class="fa fa-trash"></i>',
+	    
+	    browseIcon: '<i class="fa fa-folder-open"></i>',
+	    cancelIcon: '<i class="fa fa-ban"></i>',
+	    uploadIcon: '<i class="fa fa-upload"></i>',
+	    previewFileIcon: '<i class="fa fa-file"></i>',
+
+	    previewFileIconSettings: {
+	        'pdf': '<i class="fa fa-file-pdf-o text-danger"></i>',
+	    }
+	});
+	$("input[type='checkbox']").change(function (e) {
+		if ($(this).is(":checked")) { //If the checkbox is checked
+			$(this).closest('tr').addClass("danger"); 
+		} else {
+			$(this).closest('tr').removeClass("danger");
+		}
+	});
+})
 </script>

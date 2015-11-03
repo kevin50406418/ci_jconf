@@ -342,12 +342,21 @@ class Submit_model extends CI_Model {
         }
     }
 
-    function get_allpaper($conf_id){
+    function get_allpaper($conf_id,$topic_id=null,$sub_status=null){
         $this->db->from('paper');
         $this->db->join('topic', 'paper.sub_topic = topic.topic_id');
         //$this->db->join('paper_author', 'paper.sub_id = paper_author.paper_id');
         $this->db->where('paper.conf_id', $conf_id);
         $this->db->order_by('paper.sub_id', 'ASC');
+
+        if( !is_null($sub_status) ){
+            $this->db->where('paper.sub_status', $sub_status);
+        }
+        
+        if( !is_null($topic_id) ){
+            $this->db->where('paper.sub_topic', $topic_id);
+        }
+
         $query = $this->db->get();
         return $query->result();
     }

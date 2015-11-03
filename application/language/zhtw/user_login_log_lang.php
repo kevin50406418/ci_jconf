@@ -7,4 +7,7 @@ $lang['user_log_device'] = "裝置類別";
 $lang['user_log_action'] = "動作";
 $lang['user_log_success'] = "登入成功";
 $lang['user_log_fail'] = "登入失敗";
+$lang['user_log_reset'] = "重製密碼";
+$lang['user_log_lostpwd'] = "忘記密碼請求";
+$lang['user_log_change'] = "更改密碼";
 $lang['user_log_current'] = "當前登入";

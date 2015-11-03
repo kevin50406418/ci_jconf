@@ -909,7 +909,17 @@ class Dashboard extends MY_Conference {
 
 		$this->load->view('conf/menu_conf',$data);
 		if( empty($paper_id) ){
-			$data['papers']=$this->Submit->get_allpaper($conf_id);
+			$topic_id = $this->input->get('topic_id', TRUE);
+			$status = $this->input->get('status', TRUE);
+			if( empty($topic_id) ){$topic_id=null;}
+			if( empty($status) ){$status=null;}
+			
+			$data['topic_id'] = $topic_id;
+			$data['status'] = $status;
+			
+			$data['papers']=$this->Submit->get_allpaper($conf_id,$topic_id,$status);
+			$data['topics']=$this->topic->get_topic($conf_id,$this->user_login);
+
 			switch($act){
 				case "list":
 				default:
