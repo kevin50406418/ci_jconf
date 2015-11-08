@@ -129,6 +129,20 @@ class User extends MY_Controller {
 			redirect('/user/login', 'location', 301);
 		}
 	}
+	
+	public function paper(){
+		$data['body_class'] = $this->body_class;
+		if($this->user->is_login()){
+			$data['papers'] = $this->Submit->get_mypapers($this->user_login);
+			$this->load->view('common/header');
+			$this->load->view('common/nav',$data);
+			// sp($data['papers']);
+			$this->load->view('user/paper',$data);
+			$this->load->view('common/footer',$data);
+		}else{
+			redirect('/user/login', 'location', 301);
+		}
+	}
 
 	public function signup(){
 		$data['body_class'] = $this->body_class;

@@ -13,11 +13,7 @@ class Conf_model extends CI_Model {
 			$this->db->where('conf_staus', 0);
 		}
 		$query = $this->db->get();
-		if ($query->num_rows() == 1){
-			return true;
-		}else{
-			return false;
-		}
+		return ($query->num_rows() == 1);
 	}
 
     function conf_config($conf_id,$user_sysop=false){
@@ -44,7 +40,9 @@ class Conf_model extends CI_Model {
         );
         $this->db->where('conf_id', $conf_id);
 
-        $this->db->update('conf', $conf);
+        $this->add_log("conf","update_status",$conf_id,$conf);
+
+        return $this->db->update('conf', $conf);
 	}
 
 	function all_conf_config($sysop=false){
@@ -115,15 +113,11 @@ class Conf_model extends CI_Model {
 		$this->output->_display();
 		exit();
 	}
-
+	
 	function conf_hastopic($conf_id){
 		$this->db->from('topic');
 		$this->db->where('conf_id', $conf_id);
-		if( $this->db->count_all_results() >0 ){
-			return TRUE;
-		}else{
-			return FALSE;
-		}
+		return ( $this->db->count_all_results() > 0 );
 	}
 
 	function get_filter($conf_id){
@@ -145,6 +139,7 @@ class Conf_model extends CI_Model {
 			"filter_content" => $filter_content,
 			"filter_content_eng" => $filter_content_eng
 		);
+		$this->add_log("conf","add_filter",$conf_id,$filter);
 		return $this->db->insert('filter', $filter);
 	}
 
@@ -155,6 +150,7 @@ class Conf_model extends CI_Model {
 		);
         $this->db->where("filter_id", $filter_id);
         $this->db->where("conf_id", $conf_id);
+        $this->add_log("conf","update_filter",$conf_id,$filter);
         return $this->db->update('filter', $filter);
 	}
 
@@ -183,6 +179,7 @@ class Conf_model extends CI_Model {
 			"news_posted"=>time(),
 			"news_poster"=>$this->session->user_login
 		);
+		$this->add_log("conf","add_news",$conf_id,$news);
 		return $this->db->insert('news', $news);
 	}
 
@@ -205,11 +202,8 @@ class Conf_model extends CI_Model {
 		);
         $this->db->where("news_id", $news_id);
         $this->db->where("conf_id", $conf_id);
-        if( $this->db->update('news', $news) ){
-            return true;
-        }else{
-            return false;
-        }
+		$this->add_log("conf","update_news",$conf_id,$news);
+        return $this->db->update('news', $news);
 	}
 	
 	function update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_host,$conf_place,$conf_desc=''){
@@ -225,11 +219,8 @@ class Conf_model extends CI_Model {
 			"conf_desc"    =>$conf_desc
         );
         $this->db->where("conf_id", $conf_id);
-        if( $this->db->update('conf', $conf) ){
-            return true;
-        }else{
-            return false;
-        }
+        $this->add_log("conf","update_confinfo",$conf_id,$conf);
+        return $this->db->update('conf', $conf);
 	}
 
 	function sysop_updateconf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$conf_lang,$conf_host,$conf_place,$conf_fax,$conf_desc=''){
@@ -248,11 +239,8 @@ class Conf_model extends CI_Model {
 			"conf_desc"    =>$conf_desc
         );
         $this->db->where("conf_id", $conf_id);
-        if( $this->db->update('conf', $conf) ){
-            return true;
-        }else{
-            return false;
-        }
+        $this->add_log("conf","sysop_updateconf",$conf_id,$conf);
+        return $this->db->update('conf', $conf);
 	}
 	function get_paperdir($conf_id){
 		return './upload/paper/'.$conf_id.'/';
@@ -565,6 +553,7 @@ class Conf_model extends CI_Model {
 		        }
 			}
 		}
+
 		return $return;
 	}
 
@@ -628,6 +617,7 @@ class Conf_model extends CI_Model {
 			"topic_info"     =>$topic_info,
 			"topic_name_eng" =>$topic_name_eng
 		);
+		$this->add_log("conf","add_topic",$conf_id,$topic);
 		return $this->db->insert('topic', $topic);
 	}
 
@@ -638,6 +628,7 @@ class Conf_model extends CI_Model {
 		}
 		$this->db->where('topic_id', $topic_id);
 		$this->db->where('conf_id', $conf_id);
+		$this->add_log("conf","del_topic",$conf_id,array("topic_id"=>$topic_id));
 		return $this->db->delete('topic');
 	}
 
@@ -650,6 +641,7 @@ class Conf_model extends CI_Model {
 			"topic_name_eng" => $topic_name_eng
 		);
 		$this->db->where('topic_id', $topic_id);
+		$this->add_log("conf","update_topic",$conf_id,$topic);
 		return $this->db->update('topic', $topic);
 	}
 
@@ -661,6 +653,7 @@ class Conf_model extends CI_Model {
 			"topic_level" => 0,
 			"auth_time"   => time()
 		);
+		$this->add_log("conf","add_assign_topic",$conf_id,$auth_topic);
 		return $this->db->insert('auth_topic', $auth_topic);
 	}
 
@@ -668,6 +661,7 @@ class Conf_model extends CI_Model {
 		$this->db->where('conf_id', $conf_id);
 		$this->db->where('user_login', $user_login);
 		$this->db->where('topic_id', $topic_id);
+		$this->add_log("conf","del_assign_topic",$conf_id,array("user_login"=>$user_login,"topic_id"=>$topic_id));
 		return $this->db->delete('auth_topic');;
 	}
 
@@ -727,6 +721,8 @@ class Conf_model extends CI_Model {
 			"page_order"   => 99,
 			"page_show"    => 0
 		);
+		$this->add_log("conf","add_content",$conf_id,$content);
+
 		return $this->db->insert('conf_content', $content);
 	}
 
@@ -738,6 +734,7 @@ class Conf_model extends CI_Model {
 		$this->db->where('conf_id', $conf_id);
 		$this->db->where('page_id', $page_id);
 		$this->db->where('page_lang', $page_lang);
+		$this->add_log("conf","update_contents",$conf_id,$contents);
 		return $this->db->update('conf_content', $contents);
 	}
 
@@ -750,6 +747,7 @@ class Conf_model extends CI_Model {
 		$this->db->where('page_id', $page_id);
 		$this->db->where('page_lang', $page_lang);
 		$this->db->where('page_edit', 1);
+		$this->add_log("conf","update_content",$conf_id,$content);
 		return $this->db->update('conf_content', $content);
 	}
 
@@ -757,6 +755,7 @@ class Conf_model extends CI_Model {
 		$this->db->where('conf_id', $conf_id);
 		$this->db->where('page_id', $page_id);
 		$this->db->where('page_del', 1);
+		$this->add_log("conf","del_contents",$conf_id,array("page_id"=>$page_id));
 		return $this->db->delete('conf_content');
 	}
 
@@ -776,6 +775,7 @@ class Conf_model extends CI_Model {
 			"conf_col" => $conf_col
 		);
 		$this->db->where('conf_id', $conf_id);
+		$this->add_log("conf","update_confcol",$conf_id,$conf_col);
 		return $this->db->update('conf', $conf_col);
 	}
 
@@ -784,6 +784,7 @@ class Conf_model extends CI_Model {
 			"conf_most" => $conf_most
 		);
 		$this->db->where('conf_id', $conf_id);
+		$this->add_log("conf","update_confmost",$conf_id,$conf_col);
 		return $this->db->update('conf', $conf_col);
 	}
 
@@ -812,6 +813,7 @@ class Conf_model extends CI_Model {
 		);
 		$this->db->where('conf_id', $conf_id);
 		$this->db->where('date_type', $date_type);
+		$this->add_log("conf","update_schedule",$conf_id,$schedule);
 		return $this->db->update('conf_date', $schedule);
 	}
 
@@ -873,6 +875,7 @@ class Conf_model extends CI_Model {
         );
         $this->db->where('most_id', $most_id);
         $this->db->where('conf_id', $conf_id);
+        $this->add_log("conf","update_most",$conf_id,$most);
         return $this->db->update('most', $most);
     }
 
@@ -905,6 +908,7 @@ class Conf_model extends CI_Model {
 			"conf_id"      => $conf_id,
 			"meal_name"    => $meal_name
 		);
+		$this->add_log("conf","add_register_meal",$conf_id,$conf_meal);
 		return $this->db->insert('conf_meal', $conf_meal);
 	}
 
@@ -929,12 +933,14 @@ class Conf_model extends CI_Model {
 		);
 		$this->db->where("conf_id",$conf_id);
 		$this->db->where("meal_id",$meal_id);
+		$this->add_log("conf","update_register_meal",$conf_id,$conf_meal);
 		return $this->db->update('conf_meal', $conf_meal);
 	}
 
 	function del_register_meal($conf_id,$meal_id){
 		$this->db->where("conf_id",$conf_id);
 		$this->db->where("meal_id",$meal_id);
+		$this->add_log("conf","del_register_meal",$conf_id,array("meal_id"=>$meal_id));
 		return $this->db->delete('conf_meal');
 	}
 
@@ -952,6 +958,27 @@ class Conf_model extends CI_Model {
 		);
 		$this->db->where("conf_id",$conf_id);
 		$this->db->where("topic_id",$topic_id);
+		$this->add_log("conf","update_sort_topic",$conf_id,array("topic_id"=>$topic_id,"topic_order"=>$topic_order));
 		return $this->db->update('topic', $topic_order);
+	}
+
+	function add_log($log_type,$log_act,$log_conf,$log_to){
+		$login_user = $this->session->userdata('user_login');
+		$conf_log = array(
+			"login_user"=>$login_user,
+			"log_type"=>$log_type,
+			"log_act"=>$log_act,
+			"log_time"=>time(),
+			"log_conf"=>$log_conf,
+			"log_to"=>json_encode($log_to)
+		);
+		return $this->db->insert('conf_log', $conf_log);
+	}
+
+	function get_logs($conf_id){
+		$this->db->from('conf_log');
+		$this->db->where("log_conf",$conf_id);
+		$query = $this->db->get();
+		return $query->result();
 	}
 }

@@ -67,6 +67,7 @@ class Topic_model extends CI_Model {
 			"paper_id"      => $paper_id,
 			"user_login"   => $user_login
 		);
+		$this->conf->add_log("topic","assign_reviewer_pedding",$conf_id,$reviewer);
 		return $this->db->insert('paper_review_pedding', $reviewer);
 	}
 
@@ -86,6 +87,7 @@ class Topic_model extends CI_Model {
 	function del_reviewer_pedding($paper_id,$user_login){
 		$this->db->where('user_login', $user_login);
 		$this->db->where('paper_id', $paper_id);
+		$this->conf->add_log("topic","del_reviewer_pedding",$conf_id,array("user_login"=>$user_login,"paper_id"=>$paper_id));
 		return $this->db->delete('paper_review_pedding');;
 	}
 
@@ -94,6 +96,7 @@ class Topic_model extends CI_Model {
 			"paper_id"      => $paper_id,
 			"user_login"   => $user_login
 		);
+		$this->conf->add_log("topic","assign_reviewer",$conf_id,$reviewer);
 		return $this->db->insert('paper_review', $reviewer);
 	}
 
@@ -115,7 +118,9 @@ class Topic_model extends CI_Model {
 		$this->email->subject('[審查提醒]'.$conf_name.'稿件審查');
 		$this->email->message($message);
 
-		//return $this->email->send();
+		$this->conf->add_log("topic","notice_reviewer",$conf_id,array("user_login" =>$user_login));
+		
+		return $this->email->send();
 	}
 
 	function count_reviewer($conf_id,$topic_id){
@@ -155,6 +160,7 @@ class Topic_model extends CI_Model {
 	        );
 	        $this->db->where("conf_id",$conf_id);
 	        $this->db->where("sub_id",$paper_id);
+	        $this->conf->add_log("topic","topic_review",$conf_id,$paper);
 	        return $this->db->update('paper', $paper);
 		}else{
 			return false;

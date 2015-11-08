@@ -22,6 +22,7 @@
 						<li><a href="<?php echo base_url('user/index');?>">編輯個人資料</a></li>
 						<li><a href="<?php echo base_url('user/passwd');?>">更改密碼</a></li>
 						<li><a href="<?php echo base_url('user/log');?>">個人登入紀錄</a></li>
+						<li><a href="<?php echo base_url('user/paper');?>">投稿紀錄</a></li>
 						<li class="divider"></li>
 						<li><a href="<?php echo base_url('user/logout');?>">登出</a></li>
 					</ul>

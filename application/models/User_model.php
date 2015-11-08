@@ -542,5 +542,6 @@ class User_model extends CI_Model {
 		$this->db->where('reset_token', $reset_token);
 		return $this->db->update('login_reset', $login_reset);
 	}
+
 }
 ?>

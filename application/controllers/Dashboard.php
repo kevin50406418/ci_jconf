@@ -1227,15 +1227,15 @@ class Dashboard extends MY_Conference {
 		$data['conf_config']  = $this->conf_config;
 		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
-		
+		$data['conf_logs']    = $this->conf->get_logs($conf_id);
+
+		$this->lang->load("log",$this->_lang);
+
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
-
 		$this->load->view('conf/conf_nav',$data);
-		//$this->load->view('conf/conf_schedule',$data);
-
 		$this->load->view('conf/menu_conf',$data);
-		//$this->load->view('conf/setting',$data);
+		$this->load->view('conf/logs/index',$data);
 		$this->load->view('common/footer',$data);
 		
 	}
