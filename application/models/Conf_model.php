@@ -35,14 +35,8 @@ class Conf_model extends CI_Model {
 	}
 
 	function update_status($conf_id,$conf_staus){
-		$conf  = array(
-            "conf_staus"   => $conf_staus
-        );
-        $this->db->where('conf_id', $conf_id);
-
-        $this->add_log("conf","update_status",$conf_id,$conf);
-
-        return $this->db->update('conf', $conf);
+        $this->add_log("conf","update_status",$conf_id,array("conf_staus"=> $conf_staus));
+        return $this->db->update('conf',array("conf_staus"=> $conf_staus),array("conf_id"=>$conf_id));
 	}
 
 	function all_conf_config($sysop=false){
@@ -813,8 +807,13 @@ class Conf_model extends CI_Model {
 		);
 		$this->db->where('conf_id', $conf_id);
 		$this->db->where('date_type', $date_type);
-		$this->add_log("conf","update_schedule",$conf_id,$schedule);
-		return $this->db->update('conf_date', $schedule);
+		
+		if( $this->db->update('conf_date', $schedule) ){
+			$this->conf->add_log("conf","update_schedule",$conf_id,$schedule);
+			return true;
+		}else{
+			return false;
+		}
 	}
 
 	function get_schedules($conf_id){
@@ -958,12 +957,17 @@ class Conf_model extends CI_Model {
 		);
 		$this->db->where("conf_id",$conf_id);
 		$this->db->where("topic_id",$topic_id);
-		$this->add_log("conf","update_sort_topic",$conf_id,array("topic_id"=>$topic_id,"topic_order"=>$topic_order));
-		return $this->db->update('topic', $topic_order);
+		if( $this->db->update('topic', $topic_order) ){
+			$this->add_log("conf","update_sort_topic",$conf_id,array("topic_id"=>$topic_id,"topic_order"=>$topic_order));
+			return true;
+		}else{
+			return false;
+		}
 	}
 
 	function add_log($log_type,$log_act,$log_conf,$log_to){
 		$login_user = $this->session->userdata('user_login');
+
 		$conf_log = array(
 			"login_user"=>$login_user,
 			"log_type"=>$log_type,
@@ -972,7 +976,7 @@ class Conf_model extends CI_Model {
 			"log_conf"=>$log_conf,
 			"log_to"=>json_encode($log_to)
 		);
-		return $this->db->insert('conf_log', $conf_log);
+		$this->db->insert('conf_log', $conf_log);
 	}
 
 	function get_logs($conf_id){
@@ -980,5 +984,9 @@ class Conf_model extends CI_Model {
 		$this->db->where("log_conf",$conf_id);
 		$query = $this->db->get();
 		return $query->result();
+	}
+
+	function dw_paper($conf_id){
+		// $this->load->library('zip');
 	}
 }

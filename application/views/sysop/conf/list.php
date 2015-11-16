@@ -26,6 +26,7 @@
 				<button type="submit" name="conf_staus" value="0" class="ui button green"><i class="fa fa-eye"></i> 顯示</button>
 				<?php }?>
 				<?php echo form_close()?>
+				<a href="<?php echo base_url("sysop/conf/admin/".$conf->conf_id)?>" class="ui button teal">研討會管理員</a>
 			</td>
 		</tr>
 		<?php }?>

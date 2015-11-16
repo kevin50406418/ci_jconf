@@ -12,7 +12,6 @@
 </div>
 <div id="chlang"></div>
 <footer class="footer text-center">
-	<p>地址: 41354 台中市霧峰區柳豐路500號</p>
 	<p>亞大研討會系統 © Jingxun Lai. All rights reserved.</p>
 </footer>
 <?php echo $this->assets->show_js(true);?>

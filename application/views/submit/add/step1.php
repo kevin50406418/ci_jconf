@@ -19,12 +19,6 @@
 		</tr>
 		<?php }?>
 		<?php }?>
-		<tr>
-			<td><input name="list[]" id="chks1" type="checkbox"<?php if($this->user->is_sysop()){?> checked<?php }?>></td>
-			<td>
-				<label for="chks1">本投稿在未上傳投稿資料前，輸入的資料，將不列入本次研討會資料。</label>
-			</td>
-		</tr>
 	</table>
 	<br><br>
 	<div class="text-center">

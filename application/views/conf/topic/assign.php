@@ -34,6 +34,7 @@ $(document).ready(function() {
 	</div>
 	<div class="modal-body">
 		<?php echo form_open(get_url("dashboard",$conf_id,"topic","assign")."?id=".$topic['topic_id'],array("class"=>"form-horizontal"))?>
+
 			<table class="table table-hover table-striped table-bordered datatable_users">
 				<thead>
 					<tr>

@@ -45,43 +45,43 @@ $(function() {
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="conf_name" class="col-sm-2 control-label">研討會名稱</label>
+						<label for="conf_name" class="col-sm-2 control-label">研討會名稱 <span class="text-danger">*</span></label>
 						<div class="col-sm-10">
 							<input name="conf_name" type="text" class="form-control" id="conf_name" value="<?php echo $conf_config['conf_name'];?>">
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="conf_master" class="col-sm-2 control-label">主要聯絡人</label>
+						<label for="conf_master" class="col-sm-2 control-label">主要聯絡人 <span class="text-danger">*</span></label>
 						<div class="col-sm-10">
 							<input name="conf_master" type="text" class="form-control" id="conf_master" value="<?php echo $conf_config['conf_master'];?>">
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="conf_email" class="col-sm-2 control-label">聯絡信箱</label>
+						<label for="conf_email" class="col-sm-2 control-label">聯絡信箱 <span class="text-danger">*</span></label>
 						<div class="col-sm-10">
 							<input name="conf_email" type="email" class="form-control" id="conf_email" value="<?php echo $conf_config['conf_email'];?>">
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="conf_phone" class="col-sm-2 control-label">聯絡電話</label>
+						<label for="conf_phone" class="col-sm-2 control-label">聯絡電話 <span class="text-danger">*</span></label>
 						<div class="col-sm-10">
 							<input name="conf_phone" type="text" class="form-control" id="conf_phone" value="<?php echo $conf_config['conf_phone'];?>">
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="conf_address" class="col-sm-2 control-label">通訊地址</label>
+						<label for="conf_address" class="col-sm-2 control-label">通訊地址 <span class="text-danger">*</span></label>
 						<div class="col-sm-10">
 							<input name="conf_address" type="text" class="form-control" id="conf_address" value="<?php echo $conf_config['conf_address'];?>">
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="conf_host" class="col-sm-2 control-label">主辦單位</label>
+						<label for="conf_host" class="col-sm-2 control-label">主辦單位 <span class="text-danger">*</span></label>
 						<div class="col-sm-10">
 							<input name="conf_host" type="text" class="form-control" id="conf_host" value="<?php echo $conf_config['conf_host'];?>">
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="conf_place" class="col-sm-2 control-label">大會地點</label>
+						<label for="conf_place" class="col-sm-2 control-label">大會地點 <span class="text-danger">*</span></label>
 						<div class="col-sm-10">
 							<input name="conf_place" type="text" class="form-control" id="conf_place" value="<?php echo $conf_config['conf_place'];?>">
 						</div>
@@ -93,7 +93,7 @@ $(function() {
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="conf_desc" class="col-sm-2 control-label">簡介</label>
+						<label for="conf_desc" class="col-sm-2 control-label">簡介 <span class="text-danger">*</span></label>
 						<div class="col-sm-10">
 							<textarea name="conf_desc" class="form-control" id="conf_desc" rows="5"><?php echo $conf_config['conf_desc'];?></textarea>
 						</div>
@@ -164,7 +164,7 @@ $(function() {
 				<?php echo form_open(get_url("dashboard",$conf_id,"setting"),array("class"=>"form-horizontal"))?>
 				<?php echo form_hidden('do', 'schedule');?>
 				<div class="form-group">
-					<label class="col-sm-2 control-label">會議舉行日期</label>
+					<label class="col-sm-2 control-label">會議舉行日期 <span class="text-danger">*</span></label>
 					<div class="col-sm-10">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="input-daterange input-group" id="datepicker">
@@ -177,7 +177,7 @@ $(function() {
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-2 control-label">論文徵稿</label>
+					<label class="col-sm-2 control-label">論文徵稿 <span class="text-danger">*</span></label>
 					<div class="col-sm-10">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="input-daterange input-group" id="datepicker">
@@ -190,7 +190,7 @@ $(function() {
 				</div>
 				
 				<div class="form-group">
-					<label class="col-sm-2 control-label">早鳥繳費</label>
+					<label class="col-sm-2 control-label">早鳥繳費 <span class="text-danger">*</span></label>
 					<div class="col-sm-10">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="input-daterange input-group" id="datepicker">
@@ -203,7 +203,7 @@ $(function() {
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-2 control-label">研討會註冊</label>
+					<label class="col-sm-2 control-label">研討會註冊 <span class="text-danger">*</span></label>
 					<div class="col-sm-10">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="input-daterange input-group" id="datepicker">
@@ -216,7 +216,7 @@ $(function() {
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-2 control-label">上傳完稿截止</label>
+					<label class="col-sm-2 control-label">上傳完稿截止 <span class="text-danger">*</span></label>
 					<div class="col-sm-10">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="input-daterange input-group" id="datepicker">
@@ -227,7 +227,7 @@ $(function() {
 				</div>
 				<?php if($conf_config['conf_most'] == 1 ){?>
 				<div class="form-group">
-					<label class="col-sm-2 control-label">科技部成果發表</label>
+					<label class="col-sm-2 control-label">科技部成果發表 <span class="text-danger">*</span></label>
 					<div class="col-sm-10">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="input-daterange input-group" id="datepicker">

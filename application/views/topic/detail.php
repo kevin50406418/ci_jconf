@@ -86,7 +86,7 @@
 						<td><?php echo $author->author_order?></td>
 						<td>
 							<?php echo $author->user_first_name?> <?php echo $author->user_last_name?>
-							<?php if( $author->main_contract ){?><span class="ui label green">主要</span><?php }?>
+							<?php if( $author->main_contract ){?><span class="ui label green">通訊作者</span><?php }?>
 						</td>
 						<td><?php echo $author->user_email?></td>
 						<td><?php echo $author->user_org?></td>
@@ -145,6 +145,7 @@
 			<div class="tab-pane container-fluid" id="tab_review">
 				<h3>審查資料</h3>
 				<?php $cnt = 0;?>
+				<div class="table-responsive">
 				<?php echo form_open(get_url("topic",$conf_id,"detail",$paper->sub_id))?>
 				<?php echo form_hidden('do', 'notice');?>
 				<table class="table table-striped">
@@ -153,8 +154,9 @@
 							<th style="width:5%"> </th>
 							<th style="width:10%">審查人</th>
 							<th style="width:10%">審查狀態</th>
+							<th style="width:10%">審查期限</th>
 							<th style="width:10%">審查時間</th>
-							<th style="width:65%">審查建議</th>
+							<th style="width:55%">審查建議</th>
 						</tr>
 					</thead>
 					<?php foreach ($reviewers as $key => $reviewer) {?>
@@ -165,6 +167,9 @@
 						<td><?php echo $reviewer->user_login?></td>
 						<td>
 							<?php echo $this->Submit->sub_status($reviewer->review_status,true)?>
+						</td>
+						<td class="text-center">
+							<?php echo date("Y-m-d H:i",$reviewer->review_timeout)?>
 						</td>
 						<td>
 							<?php
@@ -180,7 +185,8 @@
 					<?php }?>
 				</table>
 				<?php if($cnt != count($reviewers)){?><button class="ui button orange" name="type" value="remind">提醒審查</button><?php }?>
-				<?php echo form_close()?>				
+				<?php echo form_close()?>	
+				</div>			
 			</div>
 			<?php }?>
 		</div>
@@ -210,11 +216,12 @@ $(function() {
 		<?php echo form_hidden('do', 'topic');?>
 		<div class="form-horizontal">
 			<div class="form-group">
-				<label class="col-sm-2 control-label">審查狀態</label>
+				<label class="col-sm-2 control-label">審查狀態 <span class="text-danger">*</span></label>
 				<div class="col-sm-10">
 					<select class="form-control" name="status">
 						<option>請選擇</option>
 						<option value="-2">拒絕</option>
+						<option value="0">修改後審查</option>
 						<option value="2">大會待決</option>
 						<option value="4">接受</option>
 					</select>

@@ -3,14 +3,14 @@
 <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 	<div class="container"> 
 		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#user_nav"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
 			<?php if($this->cinfo['show_confinfo']){?>
 			<a class="navbar-brand" href="<?php echo get_url("main",$conf_config['conf_id']);?>"><i class="fa fa-bookmark"></i> <?php echo $conf_config['conf_name']?></a>
 			<?php }else{?>
 			<a class="navbar-brand" href="<?php echo base_url();?>">亞大研討會系統</a>
 			<?php }?>
 		</div>
-		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+		<div class="collapse navbar-collapse" id="user_nav">
 			<?php if($this->cinfo['show_confinfo']){?>
 			<a class="btn btn-danger navbar-btn" data-toggle="modal" data-target="#conf_schedule">重要日期</a>
 			<?php }?>

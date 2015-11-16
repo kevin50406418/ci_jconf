@@ -53,10 +53,15 @@ class Submit_model extends CI_Model {
     			$html_class="purple";
     			$desc="稿件目前尚在編輯中";
     		break;
+            case 0:
+                $staus_text="編輯後審查";
+                $html_class="teal";
+                $desc="搞件進入審查";
+            break;
     		case 1:
-    			$staus_text=$this->lang->line('status_submitcomplete');
-    			$html_class="teal";
-    			$desc="稿件完成投稿，待主題主編分派審查人";
+    			$staus_text=$this->lang->line('status_review');
+    			$html_class="orange";
+    			$desc="搞件進入審查";
     		break;
     		case 2:
     			$staus_text=$this->lang->line('status_pending');
@@ -104,12 +109,9 @@ class Submit_model extends CI_Model {
             "sub_time"    =>time(),
             "conf_id"     =>$conf_id
         );
-        $this->conf->add_log("submit","add_paper",$conf_id,$paper);
+        // $this->conf->add_log("submit","add_paper",$conf_id,$paper);
         if( $this->db->insert('paper', $paper) ){
-            $this->session->set_userdata($conf_id.'_insert_id', $this->db->insert_id());
-            $expire = config_item('insert_id_expire')*60;
-            $this->session->mark_as_temp($conf_id.'_insert_id', $expire);
-            return true;
+            return $this->db->insert_id();
         }else{
             return false;
         }
@@ -127,7 +129,7 @@ class Submit_model extends CI_Model {
         );
         $this->db->where('sub_id', $paper_id);
         $this->db->where('conf_id', $conf_id);
-        $this->conf->add_log("submit","update_paper",$conf_id,$paper);
+        // $this->conf->add_log("submit","update_paper",$conf_id,$paper);
         return $this->db->update('paper', $paper);
     }
 
@@ -149,7 +151,6 @@ class Submit_model extends CI_Model {
             "main_contract"   =>$main_contract,
             "author_order"    =>$author_order
         );
-        $this->conf->add_log("submit","add_author",$conf_id,$author);
         return $this->db->insert('paper_author', $author);
     }
 
@@ -327,8 +328,12 @@ class Submit_model extends CI_Model {
         );
         $this->db->where("conf_id",$conf_id);
         $this->db->where("sub_id",$paper_id);
-        $this->conf->add_log("submit","paper_to_review",$conf_id,$paper);
-        return $this->db->update('paper', $paper);
+        if( $this->db->update('paper', $paper) ){
+            $this->conf->add_log("submit","paper_to_review",$conf_id,$paper);
+            return true;
+        }else{
+            return false;
+        }
     }
     
     function paper_to_reviewing($conf_id,$paper_id){
@@ -338,7 +343,12 @@ class Submit_model extends CI_Model {
         $this->db->where("conf_id",$conf_id);
         $this->db->where("sub_id",$paper_id);
         $this->conf->add_log("submit","paper_to_reviewing",$conf_id,$paper);
-        return $this->db->update('paper', $paper);
+        if( $this->db->update('paper', $paper) ){
+            $this->session->unset_userdata($conf_id.'_insert_id');
+            return true;
+        }else{
+            return false;
+        }
     }
 
     function is_editable($paper_id, $user_login){

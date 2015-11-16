@@ -63,4 +63,53 @@ class Sysop_model extends CI_Model {
 
 		return $this->email->send();
     }
+
+    function add_mail_template($email_key,$email_desc,$default_subject,$default_body){
+    	$template = array(
+			array(
+	            "email_key"       => $email_key,
+				"email_desc"      => $email_desc["zhtw"],
+				"email_lang"      => "zhtw",
+				"default_subject" => $default_subject["zhtw"],
+				"default_body"    => $default_body["zhtw"]
+			),
+			array(
+				"email_key"       => $email_key,
+				"email_desc"      => $email_desc["eng"],
+				"email_lang"      => "eng",
+				"default_subject" => $default_subject["eng"],
+				"default_body"    => $default_body["eng"]
+			)
+		);
+		return $this->db->insert_batch('email_about', $template);
+    }
+
+    function get_mail_templates($email_lang){
+    	$this->db->from('email_about');
+    	$this->db->where('email_lang', $email_lang);
+    	$query = $this->db->get();
+		return $query->result();
+    }
+
+    function get_mail_template($email_key){
+    	$this->db->from('email_about');
+    	$this->db->where('email_key', $email_key);
+    	$query = $this->db->get();
+		return $query->result();
+    }
+
+    function update_mail_template($email_key,$email_desc,$default_subject,$default_body){
+    	$template_zhtw = array(
+			"email_desc"      => $email_desc["zhtw"],
+			"default_subject" => $default_subject["zhtw"],
+			"default_body"    => $default_body["zhtw"]
+		);
+		$template_eng = array(
+			"email_desc"      => $email_desc["eng"],
+			"default_subject" => $default_subject["eng"],
+			"default_body"    => $default_body["eng"]
+		);
+		return $this->db->update("email_about", $template_zhtw, array("email_key" => $email_key,"email_lang" => "zhtw")) &&
+		$this->db->update("email_about", $template_eng, array("email_key" => $email_key,"email_lang" => "eng"));
+    }
 }

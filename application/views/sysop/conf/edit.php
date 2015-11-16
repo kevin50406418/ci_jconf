@@ -5,8 +5,8 @@
 	<div class="tabbable-line">
 		<ul class="nav nav-tabs nav-tabs-center">
 			<li class="active"> <a href="#tab_info" data-toggle="tab"> 研討會資訊 </a> </li>
-			<!--<li> <a href="#tab_author" data-toggle="tab"> 研討管理員 </a> </li>
-			<li> <a href="#tab_file" data-toggle="tab"> 研討會ID更換 </a> </li>
+			<li> <a href="<?php echo base_url("sysop/conf/admin/".$conf_config['conf_id'])?>"> 研討管理員 </a> </li>
+			<!--<li> <a href="#tab_file" data-toggle="tab"> 研討會ID更換 </a> </li>
 			<li> <a href="#tab_review" data-toggle="tab"> 審查資料 </a> </li>-->
 		</ul>
 		<div class="tab-content">

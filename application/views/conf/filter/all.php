@@ -27,16 +27,6 @@
 							<a href="#" class="ui button red disabled">刪除</a>
 						</td>
 					</tr>
-					<tr>
-						<td>
-							<div class="ui red horizontal label">系統</div>
-							本投稿在未上傳投稿資料前，輸入的資料，將不列入本次研討會資料。
-						</td>
-						<td>
-							<a href="#" class="ui button blue disabled">編輯</a>
-							<a href="#" class="ui button red disabled">刪除</a>
-						</td>
-					</tr>
 					<?php if(!empty($filters)){?>
 					<?php foreach ($filters as $key => $filter) {?>
 					<tr>
@@ -64,16 +54,6 @@
 						<td>
 							<div class="ui red horizontal label">系統</div>
 							本稿件從未出版過，同時也未曾在其他研討會中發表過 (或者提供相關的解釋與說明給主編)。
-						</td>
-						<td>
-							<a href="#" class="ui button blue disabled">編輯</a>
-							<a href="#" class="ui button red disabled">刪除</a>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<div class="ui red horizontal label">系統</div>
-							本投稿在未上傳投稿資料前，輸入的資料，將不列入本次研討會資料。
 						</td>
 						<td>
 							<a href="#" class="ui button blue disabled">編輯</a>

@@ -107,6 +107,10 @@ class Topic extends MY_Topic {
 			exit;
 		}
 
+		$this->assets->add_css(asset_url().'style/bootstrap-datetimepicker.min.css');
+		$this->assets->add_js('//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.js"');
+		$this->assets->add_js(asset_url().'js/bootstrap-datetimepicker.min.js');
+
 		$user_login = $this->user_login;
 		
 		$paper_author=$this->Submit->show_mypaper($user_login,$conf_id);
@@ -148,18 +152,39 @@ class Topic extends MY_Topic {
 					$data['not_reviewers'] = $not_reviewers;//無法被分派審查帳號(作者群+審查人)
 					$data['pedding_count'] = count($data['pedding_reviewers']);
 					if( $data['paper']->sub_status == 1 ){
-						$this->form_validation->set_rules('user_login[]', '帳號', 'required');
-						$this->form_validation->set_rules('type', '', 'required');
 						
-						if ($this->form_validation->run()){
-							$type = $this->input->post('type');
+						$this->form_validation->set_rules('type', '', 'required');
+						$type = $this->input->post('type');
+
+						if( $type == "time"){
+							$this->form_validation->set_rules('review_timeout[]', '審查期限', 'required');
+							$review_timeout = $this->input->post('review_timeout');
+						}else{
+							$this->form_validation->set_rules('user_login[]', '帳號', 'required');
 							$user_logins = $this->input->post('user_login');
+						}
+						if( $type == "add" ){
+							$this->form_validation->set_rules('review_timeout', '審查期限', 'required');
+							$review_timeout = $this->input->post('review_timeout');
+							$review_timeout = strtotime($review_timeout);
+						}
+						if ($this->form_validation->run()){
 							switch($type){
+								case "time":
+									foreach ($review_timeout as $user_login => $timeout) {
+										if( $this->topic->update_reviewer_pedding_timeout($paper_id,$user_login,$this->conf_id,strtotime($timeout)) ){
+											$this->alert->show("s","成功更新使用者 <strong>".$user_login."</strong>審查期限為:".$timeout);
+										}else{
+											$this->alert->show("d","更新使用者 <strong>".$user_login."</strong> 審查期限失敗");
+										}
+									}
+									$this->alert->refresh(2);
+								break;
 								case "add":
 									if( $data['pedding_count']+count($user_logins)<=5 ){
 										foreach ($user_logins as $key => $user_login) {
 											if( !in_array($user_login, $data['not_reviewers']) ){
-												if( $this->topic->assign_reviewer_pedding($paper_id,$user_login) ){
+												if( $this->topic->assign_reviewer_pedding($paper_id,$user_login,$this->conf_id,$review_timeout) ){
 													$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 加入本篇稿件審查");
 												}else{
 													$this->alert->show("d","將使用者 <strong>".$user_login."</strong> 加入本篇稿件審查失敗");
@@ -176,6 +201,11 @@ class Topic extends MY_Topic {
 								case "confirm":
 									if($data['pedding_count']<=5){
 										if( $data['pedding_count']%2 == 1 ){
+											$review_timeout = array();
+											foreach ($pedding_reviewers as $key => $p_reviewer) {
+												$review_timeout[$p_reviewer->user_login] = $p_reviewer->review_timeout;
+											}
+											
 											foreach ($is_pedding as $key => $user_login) {
 												if( !in_array($user_login, $data['not_reviewers']) ){
 													$this->alert->show("d","使用者 <strong>".$user_login."</strong> 無法審查本篇稿件!!");
@@ -184,7 +214,7 @@ class Topic extends MY_Topic {
 												}
 											}
 											foreach ($is_pedding as $key => $user_login) {
-												if( $this->topic->assign_reviewer($paper_id,$user_login) ){
+												if( $this->topic->assign_reviewer($paper_id,$user_login,$this->conf_id,$review_timeout[$user_login]) ){
 													$this->Submit->paper_to_reviewing($conf_id,$paper_id);
 													$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 加入本篇稿件審查");
 												}else{
@@ -201,7 +231,7 @@ class Topic extends MY_Topic {
 								break;
 								case "del":
 									foreach ($user_logins as $key => $user_login) {
-										if( $this->topic->del_reviewer_pedding($paper_id,$user_login) ){
+										if( $this->topic->del_reviewer_pedding($paper_id,$user_login,$this->conf_id) ){
 											$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 移除本篇稿件審查");
 										}else{
 											$this->alert->show("d","將使用者 <strong>".$user_login."</strong> 移除本篇稿件審查失敗");

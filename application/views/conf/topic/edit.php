@@ -8,26 +8,26 @@
 	<div class="modal-body">
 		<?php echo form_open(get_url("dashboard",$conf_id,"topic","edit")."?id=".$topic['topic_id'],array("class"=>"form-horizontal"))?>
 			<div class="form-group">
-				<label for="topic_name" class="col-sm-2 control-label">主題名稱(中)</label>
+				<label for="topic_name" class="col-sm-2 control-label">主題名稱(中) <span class="text-danger">*</span></label>
 				<div class="col-sm-10">
 					<input name="topic_name" type="text" class="form-control" id="topic_name" value="<?php echo $topic['topic_name']?>">
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="topic_ename" class="col-sm-2 control-label">主題名稱(英)</label>
+				<label for="topic_ename" class="col-sm-2 control-label">主題名稱(英) <span class="text-danger">*</span></label>
 				<div class="col-sm-10">
 					<input name="topic_ename" type="text" class="form-control" id="topic_ename" value="<?php echo $topic['topic_name_eng']?>">
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="topic_abbr" class="col-sm-2 control-label">主題簡稱</label>
+				<label for="topic_abbr" class="col-sm-2 control-label">主題簡稱 <span class="text-danger">*</span></label>
 				<div class="col-sm-2">
 					<input name="topic_abbr" type="text" class="form-control" id="topic_abbr" value="<?php echo $topic['topic_abbr']?>">
 				</div>
 				<div class="col-sm-8"></div>
 			</div>
 			<div class="form-group">
-				<label for="topic_info" class="col-sm-2 control-label">主題說明</label>
+				<label for="topic_info" class="col-sm-2 control-label">主題說明 <span class="text-danger">*</span></label>
 				<div class="col-sm-10">
 					<textarea name="topic_info" rows="5" class="form-control" id="topic_info"><?php echo $topic['topic_info']?></textarea>
 				</div>

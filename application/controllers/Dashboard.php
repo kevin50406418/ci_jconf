@@ -128,6 +128,11 @@ class Dashboard extends MY_Conference {
 						$int_register = array_map("strtotime", $register);
 						$int_finish = array_map("strtotime", $finish);
 						
+						// sp($int_hold);
+						// sp($int_submit);
+						// sp($int_early_bird);
+						// sp($int_register);
+						// sp($int_finish);
 						$time = 2;
 						if( $this->conf->update_schedule($conf_id,"hold",$int_hold['start'],$int_hold['end']) ){
 							$this->alert->show("s","成功更新時間:會議舉行日期");
@@ -136,7 +141,7 @@ class Dashboard extends MY_Conference {
 							$time++;
 						}
 
-						if( $int_submit['end'] < $int_hold['start'] && $int_submit['end'] > $int_submit['start']){
+						if( $int_submit['end'] < $int_hold['start'] && $int_submit['end'] >= $int_submit['start']){
 							if( $this->conf->update_schedule($conf_id,"submit",$int_submit['start'],$int_submit['end']) ){
 								$this->alert->show("s","成功更新時間:論文徵稿");
 							}else{
@@ -147,7 +152,7 @@ class Dashboard extends MY_Conference {
 							$this->alert->show("d","更新失敗時間:論文徵稿無法設置於會議舉行日期後");
 							$time++;
 						}
-						if( $int_early_bird['end'] < $int_hold['start'] && $int_early_bird['end'] > $int_early_bird['start']){
+						if( $int_early_bird['end'] < $int_hold['start'] && $int_early_bird['end'] >= $int_early_bird['start']){
 							if( $this->conf->update_schedule($conf_id,"early_bird",$int_early_bird['start'],$int_early_bird['end']) ){
 								$this->alert->show("s","成功更新時間:早鳥繳費");
 							}else{
@@ -158,7 +163,7 @@ class Dashboard extends MY_Conference {
 							$this->alert->show("d","更新失敗時間:早鳥繳費無法設置於會議舉行日期後");
 							$time++;
 						}
-						if( $int_register['end'] < $int_hold['start'] && $int_register['end'] > $int_register['start']){
+						if( $int_register['end'] < $int_hold['start'] && $int_register['end'] >= $int_register['start']){
 							if( $this->conf->update_schedule($conf_id,"register",$int_register['start'],$int_register['end']) ){
 								$this->alert->show("s","成功更新時間:線上註冊");
 							}else{
@@ -365,10 +370,6 @@ class Dashboard extends MY_Conference {
 		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		
-		if( !$this->user->is_conf() && !$this->user->is_sysop() ){
-			$this->conf->show_permission_deny($data);
-		}
-
 		if( $do=="all"){
 			$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
 			$this->assets->add_js(asset_url().'js/repeatable.js',true);
@@ -802,23 +803,20 @@ class Dashboard extends MY_Conference {
 					$this->load->view('conf/news/all',$data);
 				break;
 				case "add":
-					switch ($this->conf_config['default_lang']) {
-						default:
-						case 'zhtw':
-							$this->form_validation->set_rules('news_title', '公告標題', 'required');
-							$this->form_validation->set_rules('news_content', '公告內容', 'required');
-						break;
-						case 'eng':
-							$this->form_validation->set_rules('news_title_eng', '公告標題(英)', 'required');
-							$this->form_validation->set_rules('news_content_eng', '公告內容(英)', 'required');
-						break;
+					$conf_lang = explode(",", $this->conf_config['conf_lang']);
+					if( in_array("zhtw",$conf_lang) ){
+						$this->form_validation->set_rules('news_title', '公告標題', 'required');
+						$this->form_validation->set_rules('news_content', '公告內容', 'required');
 					}
-					
+					if( in_array("eng",$conf_lang) ){
+						$this->form_validation->set_rules('news_title_eng', '公告標題(英)', 'required');
+						$this->form_validation->set_rules('news_content_eng', '公告內容(英)', 'required');
+					}
 					if ($this->form_validation->run()){
-						$news_title       = $this->input->post('news_title');
-						$news_content     = $this->input->post('news_content',false);
-						$news_title_eng   = $this->input->post('news_title_eng');
-						$news_content_eng = $this->input->post('news_content_eng',false);
+						$news_title       = in_array("zhtw",$conf_lang)?$this->input->post('news_title'):"";
+						$news_content     = in_array("zhtw",$conf_lang)?$this->input->post('news_content',false):"";
+						$news_title_eng   = in_array("eng",$conf_lang)?$this->input->post('news_title_eng'):"";
+						$news_content_eng = in_array("eng",$conf_lang)?$this->input->post('news_content_eng',false):"";
 						if( $this->conf->add_news($conf_id,$news_title,$news_content,$news_title_eng,$news_content_eng) ){
 							$this->alert->show("s","成功建立公告",get_url("dashboard",$conf_id,"news","add"));
 						}else{
@@ -1576,6 +1574,24 @@ class Dashboard extends MY_Conference {
 		}
 		$this->load->view('common/footer',$data);
 		
+	}
+
+	public function export($conf_id=''){
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
+		
+		$this->load->view('common/header');
+		$this->load->view('common/nav',$data);
+		$this->load->view('conf/conf_nav',$data);
+		//$this->load->view('conf/conf_schedule',$data);
+		
+		$this->load->view('conf/menu_conf',$data);
+
+		$this->load->view('common/footer',$data);
 	}
 
 	// Template

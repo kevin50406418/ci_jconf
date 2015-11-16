@@ -73,7 +73,7 @@ class Submit extends MY_Conference {
 			exit;
 		}
 
-		if( $now > $schedule_submit->end_value ){
+		if( $now > $schedule_submit->end_value+86400 ){
 			$this->alert->js("投稿截止",get_url("main",$conf_id));
 			$this->load->view('common/footer',$data);
 			$this->output->_display();
@@ -90,7 +90,7 @@ class Submit extends MY_Conference {
 			case 2:
 				$data['step_class']=array(1=>"completed",2=>"active",3=>"disabled",4=>"disabled",5=>"disabled",6=>"disabled");
 				$num = $this->conf->get_filter_count($conf_id);
-				if(count($this->input->post('list')) == ($num+2) ){
+				if(count($this->input->post('list')) == ($num+1) ){
 					$this->assets->add_css(asset_url().'style/chosen.css');
 					$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
 					$this->assets->add_js(asset_url().'js/repeatable.js',true);
@@ -108,250 +108,65 @@ class Submit extends MY_Conference {
 			case 3:
 				$data['step_class']=array(1=>"completed",2=>"completed",3=>"active",4=>"disabled",5=>"disabled",6=>"disabled");
 				$data['show_file'] = false;
-				$show_upload = false;
-				if(is_null($this->input->get("upload"))){
-					//author
-					$this->form_validation->set_rules('user_fname[]', '名字', 'required');
-					$this->form_validation->set_rules('user_lname[]', '姓氏', 'required');
-					$this->form_validation->set_rules('user_email[]', '電子信箱', 'required|valid_email');
-					$this->form_validation->set_rules('user_org[]', '所屬機構', 'required');
-					$this->form_validation->set_rules('user_country[]', '國別', 'required');
+				
+				//author
+				$this->form_validation->set_rules('user_fname[]', '名字', 'required');
+				$this->form_validation->set_rules('user_lname[]', '姓氏', 'required');
+				$this->form_validation->set_rules('user_email[]', '電子信箱', 'required|valid_email');
+				$this->form_validation->set_rules('user_org[]', '所屬機構', 'required');
+				$this->form_validation->set_rules('user_country[]', '國別', 'required');
 
-					// paper info
-					$this->form_validation->set_rules('sub_topic', '徵稿主題', 'required');
-					$this->form_validation->set_rules('sub_title', '題目', 'required');
-					$this->form_validation->set_rules('sub_summary', '摘要', 'required');
-					$this->form_validation->set_rules(
-				        'sub_keywords', '關鍵字',
-				        'trim|required|min_length[1]',
-				        array(
-							'required'   => '您必須填寫%s.',
-							'min_length' => '至少輸入一組%s'
-				        )
-					);
-					$this->form_validation->set_rules('sub_lang', '語言', 'required');
+				// paper info
+				$this->form_validation->set_rules('sub_topic', '徵稿主題', 'required');
+				$this->form_validation->set_rules('sub_title', '題目', 'required');
+				$this->form_validation->set_rules('sub_summary', '摘要', 'required');
+				$this->form_validation->set_rules(
+			        'sub_keywords', '關鍵字',
+			        'trim|required|min_length[1]',
+			        array(
+						'required'   => '您必須填寫%s.',
+						'min_length' => '至少輸入一組%s'
+			        )
+				);
+				$this->form_validation->set_rules('sub_lang', '語言', 'required');
+				
+				if ($this->form_validation->run()){
+					$sub_title    =$this->input->post('sub_title');
+					$sub_summary  =$this->input->post('sub_summary');
+					$sub_keyword  =empty($this->input->post('sub_keywords'))?"":$this->input->post('sub_keywords');
+					$sub_topic    =$this->input->post('sub_topic');
+					$sub_lang     =$this->input->post('sub_lang');
+					$sub_sponsor  =$this->input->post('sub_sponsor');
 					
-					if ($this->form_validation->run()){
-						$sub_title    =$this->input->post('sub_title');
-						$sub_summary  =$this->input->post('sub_summary');
-						$sub_keyword  =empty($this->input->post('sub_keywords'))?"":$this->input->post('sub_keywords');
-						$sub_topic    =$this->input->post('sub_topic');
-						$sub_lang     =$this->input->post('sub_lang');
-						$sub_sponsor  =$this->input->post('sub_sponsor');
-						
-						$main_contact = $this->input->post('main_contact');
-						$user_fname   = $this->input->post('user_fname');
-						$user_lname   = $this->input->post('user_lname');
-						$user_email   = $this->input->post('user_email');
-						$user_org     = $this->input->post('user_org');
-						$user_country = $this->input->post('user_country');
+					$main_contact = $this->input->post('main_contact');
+					$user_fname   = $this->input->post('user_fname');
+					$user_lname   = $this->input->post('user_lname');
+					$user_email   = $this->input->post('user_email');
+					$user_org     = $this->input->post('user_org');
+					$user_country = $this->input->post('user_country');
 
-						$this->Submit->add_paper($sub_title,$sub_summary,$sub_keyword,$sub_topic,$sub_lang,$sub_sponsor,$conf_id);
-            			$insert_id = $this->session->userdata($conf_id.'_insert_id');
-            			$data['paper_id'] = $insert_id;
-            			foreach ($user_fname as $key => $value) {
-            				$contact_author = 0;
-            				$user_login = NULL;
-            				if($main_contact == $key+1){
-            					$contact_author = 1;
-            				}
-            				$user_info = $this->user->email_find($user_email[$key]);
-            				if( is_array($user_info) ){
-            					$user_login = $user_info['user_login'];
-            				}
-            				$this->Submit->add_author($insert_id,$user_login,$user_fname[$key],$user_lname[$key],$user_email[$key],$user_org[$key],$user_country[$key],$contact_author,$key+1);
-            			}
-            			$show_upload = true;
-            		}
-        		}else{
-        			if(!$this->session->has_userdata($conf_id.'_insert_id') ){
-						$this->alert->js("請以正常方式投稿或投稿逾時。",get_url("submit",$conf_id,"add"));
-						$this->load->view('common/footer',$data);
-						$this->output->_display();
-						exit;
-					}else{
-						$paper_id = $this->session->userdata($conf_id.'_insert_id');
-						$data['paper_id'] = $paper_id;
-						$this->Submit->add_time($conf_id,$paper_id);
-					}
-            		$config['upload_path']= $this->conf->get_paperdir($conf_id);
-	                $config['allowed_types']= 'pdf';
-	                $config['encrypt_name']= true;
-
-	                $this->load->library('upload', $config);
-	                
-	                if ( $this->upload->do_upload('paper_file')){
-                        $upload_data = $this->upload->data();
-                        $data['upload_data'] = $upload_data;
-                        $arrayLevel = arrayLevel($upload_data);
-                        if( $arrayLevel >1 ){
-							$this->alert->js("投稿檔案僅限一份");
-                        }
-                        if(!$this->session->has_userdata($conf_id.'_file_id')){
-                       		$this->Submit->add_file($conf_id,$paper_id,$upload_data['client_name'],$upload_data['file_name'],"F");
-                    	}else{
-                    		$fid = $this->session->userdata($conf_id.'_file_id');
-                    		$del_file = $this->Submit->get_otherfile($paper_id);
-                    		//delete_files($this->conf->get_paperdir($conf_id).$del_file->file_system); //bug
-                    		$this->Submit->update_file($conf_id,$paper_id,$fid,$upload_data['client_name'],$upload_data['file_name']);
-                    	}
-	                	$data['show_file'] = true;
-	                	$data['otherfile'] = $this->Submit->get_otherfile($paper_id);
-
-	                }
-	                $show_upload = true;
-	            }
-	            $this->load->view('submit/add/step',$data);
-        		if($show_upload){$this->load->view('submit/add/step3',$data);}else{echo validation_errors('<div class="ui message red">', '<a href="javascript:history.back();">返回上一頁</a></div>');}
-			break;
-			case 4:
-				$data['step_class']=array(1=>"completed",2=>"completed",3=>"completed",4=>"active",5=>"disabled",6=>"disabled");
-				if(!$this->session->has_userdata($conf_id.'_insert_id') ){
-					$this->alert->js("請以正常方式投稿或投稿逾時。",get_url("submit",$conf_id,"add"));
-					$this->load->view('common/footer',$data);
-					$this->output->_display();
-					exit;
-				}else{
-					$paper_id = $this->session->userdata($conf_id.'_insert_id');
-					$data['paper_id'] = $paper_id;
-					$this->Submit->add_time($conf_id,$paper_id);
-				}
-                
-				if(is_null($this->input->get("upload"))){
-
-				}else{
-					$config['upload_path']= $this->conf->get_paperdir($conf_id);
-	                $config['allowed_types']= 'pdf';
-	                $config['encrypt_name']= true;
-
-	                $this->load->library('upload', $config);
-	                if ( $this->upload->do_upload('paper_file')){
-                        $upload_datas = $this->upload->data();
-                        $arrayLevel = arrayLevel($upload_datas);
-                        if( $arrayLevel ==1 ){
-	                       	$this->Submit->add_file($conf_id,$paper_id,$upload_datas['client_name'],$upload_datas['file_name'],"O");
-                        }else if($arrayLevel == 2){
-                        	foreach ($upload_datas as $key => $upload_data) {
-	                       		$this->Submit->add_file($conf_id,$paper_id,$upload_data['client_name'],$upload_data['file_name'],"O");
-	                        }
-                        }
-                    }
-				}
-				
-				$files = array();
-				$otherfiles = $this->Submit->get_otherfiles($paper_id);
-				$data['otherfiles'] = $otherfiles;
-
-				foreach ($otherfiles as $key => $otherfile) {
-					array_push($files,$otherfile->fid);
-				}
-				if(!is_null($this->input->get("delfile"))){
-					$del_files = $this->input->post("del_file");
-					if( is_array($del_files) ){
-						foreach ($del_files as $key => $del_file) {
-							if( in_array($del_file,$files) ){
-								if( $this->Submit->del_file($conf_id,$paper_id,$del_file) ){
-									$this->alert->show("s","成功刪除檔案",get_url("submit",$conf_id,"add")."?step=4");
-								}else{
-									$this->alert->show("d","刪除檔案失敗",get_url("submit",$conf_id,"add")."?step=4");
-								}
-							}else{
-								$this->alert->show("s","無法刪除檔案編號 ".$del_file."(非本篇稿件檔案)",get_url("submit",$conf_id,"add")."?step=4");
-							}
-						}
-					}
-				}
-				$this->load->view('submit/add/step',$data);
-				$this->load->view('submit/add/step4',$data);
-			break;
-			case 5:
-				$data['step_class']=array(1=>"completed",2=>"completed",3=>"completed",4=>"completed",5=>"active",6=>"disabled");
-				if(!$this->session->has_userdata($conf_id.'_insert_id') ){
-					$this->alert->js("請以正常方式投稿或投稿逾時。",get_url("submit",$conf_id,"add"));
-					$this->load->view('common/footer',$data);
-					$this->output->_display();
-					exit;
-				}else{
-					$paper_id = $this->session->userdata($conf_id.'_insert_id');
-					$data['paper_id'] = $paper_id;
-					$this->Submit->add_time($conf_id,$paper_id);
-				}
-				$data['paper'] = $this->Submit->get_paperinfo($conf_id,$paper_id,$this->user_login);
-				
-				$bool_paper["bool_paper"]     =false;
-				$bool_otherfile               =false;
-				$bool_authors["bool_authors"] =false;
-
-				if(!empty($data['paper'])){
-					$data['authors'] = $this->Submit->get_author($paper_id);
-					$data['otherfile'] = $this->Submit->get_otherfile($paper_id);
-					$data['otherfiles'] = $this->Submit->get_otherfiles($paper_id);
-
-					$data['bool_paper'] = $this->Submit->check_paper($data['paper']);
-					$data['bool_otherfile'] = $this->Submit->check_otherfile($data['otherfile']);
-					$data['bool_authors'] = $this->Submit->check_authors($data['authors']);
-				}
-				$this->load->view('submit/add/step',$data);
-				$this->load->view('submit/add/step5',$data);
-			break;
-			case 6:
-				$data['step_class']=array(1=>"completed",2=>"completed",3=>"completed",4=>"completed",5=>"completed",6=>"active");
-				if(!$this->session->has_userdata($conf_id.'_insert_id') ){
-					$this->alert->js("請以正常方式投稿或投稿逾時。",get_url("submit",$conf_id,"add"));
-					$this->load->view('common/footer',$data);
-					$this->output->_display();
-					exit;
-				}else{
-					$paper_id = $this->session->userdata($conf_id.'_insert_id');
-					$data['paper_id'] = $paper_id;
-					$this->Submit->add_time($conf_id,$paper_id);
-				}
-
-				$this->load->view('submit/add/step',$data);
-
-				$paper = $this->Submit->get_paperinfo($conf_id,$paper_id,$this->user_login);
-				$bool_paper["bool_paper"]     =false;
-				$bool_otherfile               =false;
-				$bool_authors["bool_authors"] =false;
-				if(!empty($paper)){
-					$authors = $this->Submit->get_author($paper_id);
-					$otherfile = $this->Submit->get_otherfile($paper_id);
-
-					$bool_paper = $this->Submit->check_paper($paper);
-					$bool_otherfile = $this->Submit->check_otherfile($otherfile);
-					$bool_authors = $this->Submit->check_authors($authors);
-
-					$this->form_validation->set_rules(
-				        'submit', '送出審查',
-				        'required',
-				        array(
-							'required'   => '請透過表單送出審查'
-				        )
-					);
-
-					if ($this->form_validation->run()){
-						if($bool_paper["bool_paper"] && $bool_otherfile && $bool_authors["bool_authors"]){
-							if( $this->Submit->paper_to_review($conf_id,$paper_id) ){
-								$this->alert->js("稿件已送出審查");
-								$this->alert->show("s","稿件已送出審查",get_url("submit",$conf_id));
-							}else{
-								$this->alert->js("稿件送出審查失敗");
-								$this->alert->show("d","稿件送出審查失敗",get_url("submit",$conf_id));
-							}
-						}else{
-							$this->alert->js("稿件送審資格不符合，送審失敗");
-							$this->alert->show("d","稿件送審資格不符合，送審失敗",get_url("submit",$conf_id));
-						}
-					}
-				}else{
-					$this->alert->js("查無本篇稿件資料",get_url("submit",$conf_id));
-				}
+					$insert_id = $this->Submit->add_paper($sub_title,$sub_summary,$sub_keyword,$sub_topic,$sub_lang,$sub_sponsor,$conf_id);
+        			$data['paper_id'] = $insert_id;
+        			foreach ($user_fname as $key => $value) {
+        				$contact_author = 0;
+        				$user_login = NULL;
+        				if($main_contact == $key+1){
+        					$contact_author = 1;
+        				}
+        				$user_info = $this->user->email_find($user_email[$key]);
+        				if( is_array($user_info) ){
+        					$user_login = $user_info['user_login'];
+        				}
+        				$this->Submit->add_author($insert_id,$user_login,$user_fname[$key],$user_lname[$key],$user_email[$key],$user_org[$key],$user_country[$key],$contact_author,$key+1);
+        			}
+        			$show_upload = true;
+        			redirect(get_url("submit",$conf_id,"edit",$insert_id)."?step=3", 'location', 301);
+        		}
 			break;
 		}
 		//sp($this->session->all_userdata());
 		$this->load->view('common/footer',$data);
 		
-	
 	}
 	public function edit($conf_id='',$paper_id=''){
 		if( empty($conf_id) || empty($paper_id) ){
@@ -441,7 +256,7 @@ class Submit extends MY_Conference {
 				$this->load->view('submit/edit/step2',$data);
 			break;
 			case 3:
-				$data['step_class']=array(1=>"completed",2=>"completed",3=>"active",4=>"completed",5=>"completed",6=>"disabled");
+				$data['step_class']=array(1=>"completed",2=>"completed",3=>"active",4=>"",5=>"",6=>"disabled");
 				$data['show_file'] = true;
 				$data['otherfile'] = $this->Submit->get_otherfile($paper_id);
 				//author
@@ -530,7 +345,7 @@ class Submit extends MY_Conference {
         		$this->load->view('submit/edit/step3',$data);
 			break;
 			case 4:	
-				$data['step_class']=array(1=>"completed",2=>"completed",3=>"completed",4=>"active",5=>"completed",6=>"disabled");
+				$data['step_class']=array(1=>"completed",2=>"completed",3=>"completed",4=>"active",5=>"",6=>"disabled");
 				if(!is_null($this->input->get("upload"))){
 					$config['upload_path']= $this->conf->get_paperdir($conf_id);
 	                $config['allowed_types']= 'pdf';
@@ -630,6 +445,8 @@ class Submit extends MY_Conference {
 							$this->alert->js("稿件送審資格不符合，送審失敗");
 							$this->alert->show("d","稿件送審資格不符合，送審失敗",get_url("submit",$conf_id));
 						}
+					}else{
+						$this->alert->js("請透過表單送出審查",get_url("submit",$conf_id,"edit",$paper_id)."?step=5");
 					}
 				}else{
 					$this->alert->js("查無本篇稿件資料",get_url("submit",$conf_id));

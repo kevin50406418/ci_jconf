@@ -25,13 +25,14 @@ class Sysop extends MY_Sysop {
 	}
 
 	public function index(){
-		$data['col_nav'] = $this->col_nav;
-		$data['col_right'] = $this->col_right;
+		//$data['col_nav'] = $this->col_nav;
+		$data['col_right'] = 12;
 		$data['active'] = $this->active;
-		$data['body_class'] = $this->body_class;
+		$data['body_class'] = "container";
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
-		$this->load->view('sysop/nav',$data);
+		//$this->load->view('sysop/nav',$data);
+		$this->load->view('sysop/sysop',$data);
 		$this->load->view('common/footer',$data);
 	}
 
@@ -42,10 +43,19 @@ class Sysop extends MY_Sysop {
 		$data['active'] = $this->active;
 		$data['body_class'] = $this->body_class;
 		$data['do']=$type;
-		$this->load->view('common/header');
-		$this->load->view('common/nav',$data);
-		$this->load->view('sysop/nav',$data);
+
+		if( $type=="admin" ){
+			$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
+			$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
+			$this->assets->add_js(asset_url().'js/dataTables.bootstrap.js',true);
+		}
+
+		
 		if( empty($conf_id) ){
+			$this->load->view('common/header');
+			$this->load->view('common/nav',$data);
+			$this->load->view('sysop/nav',$data);
+
 			switch($type){
 				default:
 				case "all": // Conference Admin index
@@ -94,13 +104,13 @@ class Sysop extends MY_Sysop {
 					$this->load->view('sysop/conf/add',$data);
 				break;
 			}
+			$this->load->view('common/footer',$data);
 		}else{
 			switch($type){
-				default:
-				case "view": // View Conference information
-
-				break;
 				case "status": // Edit Conference information
+					$this->load->view('common/header');
+					$this->load->view('common/nav',$data);
+					$this->load->view('sysop/nav',$data);
 					if( $this->conf->confid_exists( $conf_id , 1) ){
 						$this->form_validation->set_rules('conf_staus', '顯示/隱藏', 'required');
 						if ($this->form_validation->run()){
@@ -117,8 +127,12 @@ class Sysop extends MY_Sysop {
 							}
 						}
 					}
+					$this->load->view('common/footer',$data);
 				break;
 				case "edit": // Edit Conference information
+					$this->load->view('common/header');
+					$this->load->view('common/nav',$data);
+					$this->load->view('sysop/nav',$data);
 					if( $this->conf->confid_exists( $conf_id , 1) ){
 						$this->form_validation->set_rules('conf_id', '研討會ID', 'required');
 						$this->form_validation->set_rules('conf_name', '研討會名稱', 'required');
@@ -131,7 +145,7 @@ class Sysop extends MY_Sysop {
 						$this->form_validation->set_rules('conf_host', '主辦單位', 'required');
 						$this->form_validation->set_rules('conf_place', '大會地點', 'required');
 
-						if ($this->form_validation->run() == TRUE){
+						if ( $this->form_validation->run() ){
 							$conf_name    = $this->input->post('conf_name', TRUE);
 							$conf_master  = $this->input->post('conf_master', TRUE);
 							$conf_email   = $this->input->post('conf_email', TRUE);
@@ -157,15 +171,60 @@ class Sysop extends MY_Sysop {
 						$data['conf_lang'] = explode(",", $data['conf_config']['conf_lang']);
 						$this->load->view('sysop/conf/edit',$data);
 					}else{
-						$this->alert->js("研討會不存在",base_url("sysop/conf/"));
+						$this->alert->js("研討會不存在",base_url("sysop/conf"));
 					}
+					$this->load->view('common/footer',$data);
 				break;
 				case "admin": // auth Conference administrator
-					
+					$this->load->view('common/header');
+					$this->load->view('common/nav',$data);
+					$this->load->view('sysop/nav',$data);
+					if( $this->conf->confid_exists( $conf_id , 1) ){
+						$data['conf_id'] = $conf_id;
+						$data['users']=$this->user->get_all_users(10);
+						$data['confs']=$this->user->get_conf_array($conf_id);
+
+						$this->load->view('sysop/conf/admin',$data);
+					}else{
+						$this->alert->js("研討會不存在",base_url("sysop/conf"));
+					}
+					$this->load->view('common/footer',$data);
+				break;
+				case "add_admin": // auth Conference administrator
+					$user_logins = $this->input->post('user_login');
+					if( $this->input->is_ajax_request() ){
+						$this->form_validation->set_rules('type', '操作', 'required');
+						$this->form_validation->set_rules('user_login[]', '帳號', 'required');
+					    if ($this->form_validation->run()){
+					    	$type = $this->input->post('type');
+					    	$user_logins = $this->input->post('user_login');
+					    	switch($type){
+					    		case "add_admin":
+					    			foreach ($user_logins as $key => $user_login) {
+					    				if( $this->user->add_conf($conf_id,$user_login) ){
+					    					$this->alert->show("s","成功將使用者 <strong>".$user_login."<strong> 設為研討會管理員");
+					    				}else{
+					    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 設為研討會管理員失敗");
+					    				}
+					    			}
+					    		break;
+					    		case "del_admin":
+					    			foreach ($user_logins as $key => $user_login) {
+					    				if( $this->user->del_conf($conf_id,$user_login) ){
+					    					$this->alert->show("s","將使用者 <strong>".$user_login."<strong> 取消設為研討會管理員");
+					    				}else{
+					    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 取消研討會管理員失敗");
+					    				}
+					    			}
+					    		break;
+					    	}
+					    	$this->alert->refresh(2);
+					    }
+					}
 				break;
 			}
 		}
-		$this->load->view('common/footer',$data);
+		
 	}
 
 	public function user($do="all",$user_login=""){
@@ -429,6 +488,92 @@ class Sysop extends MY_Sysop {
 	    	}
 	    }
 		$this->load->view('sysop/setting/index',$data);
+		$this->load->view('common/footer',$data);
+	}
+
+	public function email($do="all"){
+		$data['col_nav'] = $this->col_nav;
+		$data['col_right'] = $this->col_right;
+		$data['active'] = $this->active;
+		$data['body_class'] = $this->body_class;
+		$data['do']=$do;
+		
+		switch($do){
+			default:
+			case "all":
+				$data['template_zhtw'] = $this->sysop->get_mail_templates("zhtw");
+				$data['template_eng']  = $this->sysop->get_mail_templates("eng");
+
+				$this->load->view('common/header');
+				$this->load->view('common/nav',$data);
+				$this->load->view('sysop/nav',$data);
+				$this->load->view('sysop/email/list',$data);
+			break;
+			case "add":
+				$this->assets->add_js(base_url().'tinymce/tinymce.min.js');
+				$this->load->view('common/header');
+				$this->load->view('common/nav',$data);
+				$this->load->view('sysop/nav',$data);
+				$this->load->view('common/tinymce',$data);
+
+				$this->form_validation->set_rules('email_key', '電子郵件識別碼', 'required');
+				$this->form_validation->set_rules('email_desc[]', '郵件樣版說明', 'required');
+				$this->form_validation->set_rules('default_subject[]', '信件主旨', 'required');
+				$this->form_validation->set_rules('default_body[]', '信件內容', 'required');
+				if ($this->form_validation->run()){
+					$email_key       = $this->input->post('email_key');
+					$email_desc      = $this->input->post('email_desc', false);
+					$default_subject = $this->input->post('default_subject');
+					$default_body    = $this->input->post('default_body', false);
+					if( $this->sysop->add_mail_template($email_key,$email_desc,$default_subject,$default_body) ){
+						$this->alert->js("電子郵件樣版新增成功");
+					}else{
+						$this->alert->js("電子郵件樣版新增失敗");
+					}
+					$this->alert->refresh(0);
+				}
+				
+				$this->load->view('sysop/email/add',$data);
+			break;
+			case "edit":
+				$this->assets->add_js(base_url().'tinymce/tinymce.min.js');
+
+				$this->load->view('common/header');
+				$this->load->view('common/nav',$data);
+				$this->load->view('sysop/nav',$data);
+				
+				$id = $this->input->get("id");
+				if( empty($id) ){
+					$this->alert->js("找不到電子郵件樣版",base_url("sysop/email"));
+				}else{
+					$mail_template = $this->sysop->get_mail_template($id);
+					if( !empty($mail_template) ){
+						$data['id'] = $id;
+						$data['mail_template'] = $mail_template;
+						$this->form_validation->set_rules('email_desc[]', '郵件樣版說明', 'required');
+						$this->form_validation->set_rules('default_subject[]', '信件主旨', 'required');
+						$this->form_validation->set_rules('default_body[]', '信件內容', 'required');
+						if ($this->form_validation->run()){
+							$email_desc      = $this->input->post('email_desc', false);
+							$default_subject = $this->input->post('default_subject');
+							$default_body    = $this->input->post('default_body', false);
+							if( $this->sysop->update_mail_template($id,$email_desc,$default_subject,$default_body) ){
+								$this->alert->js("電子郵件樣版更新成功");
+							}else{
+								$this->alert->js("電子郵件樣版更新失敗");
+							}
+							$this->alert->refresh(0);
+						}
+
+						$this->load->view('common/tinymce',$data);
+						$this->load->view('sysop/email/edit',$data);
+					}else{
+						$this->alert->js("找不到電子郵件樣版",base_url("sysop/email"));
+					}
+				}
+			break;
+		}
+
 		$this->load->view('common/footer',$data);
 	}
 	public function login(){

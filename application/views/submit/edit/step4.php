@@ -24,7 +24,7 @@ if(!is_null($this->input->get("upload"))){
 	</div>
 	<?php echo form_close()?>
 	<div class="text-center">
-		<?php echo form_open(get_url("submit",$conf_id,"add")."?step=5")?>
+		<?php echo form_open(get_url("submit",$conf_id,"edit",$paper_id)."?step=5")?>
 			<input name="sub_4" type="submit" class="ui blue button" id="sub_4" value="下一步" >
 			<a href="<?php echo get_url("main",$conf_id)?>" class="ui red button" onClick="return confirm('本操作將會失去所有資料');">放棄填寫</a>
 		<?php echo form_close()?>
@@ -89,6 +89,7 @@ $(document).ready(function(){
 	$("#paper_file").fileinput({
 		language: "zh-TW",
 	    autoReplace: true,
+	    allowedPreviewTypes: [],
 	    allowedFileExtensions: ["pdf"],
 	    removeIcon: '<i class="fa fa-trash"></i>',
 	    

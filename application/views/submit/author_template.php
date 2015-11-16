@@ -10,36 +10,36 @@
 	<div class="col-sm-offset-2 col-sm-10">
 		<div class="radio">
 			<label>
-				<input name="main_contact" type="radio" required id="main_contact" value="1">主要聯絡人</label>
+				<input name="main_contact" type="radio" required id="main_contact" value="1">通訊作者</label>
 		</div>
 	</div>
 </div>
 <div class="form-group">
-	<label class="col-sm-2 control-label">名字</label>
+	<label class="col-sm-2 control-label">名字 <span class="text-danger">*</span></label>
 	<div class="col-sm-10">
 		<input name="user_fname[]" type="text" required class="form-control" id="user_fname" >
 	</div>
 </div>
 <div class="form-group">
-	<label class="col-sm-2 control-label">姓氏</label>
+	<label class="col-sm-2 control-label">姓氏 <span class="text-danger">*</span></label>
 	<div class="col-sm-10">
 		<input name="user_lname[]" type="text" required class="form-control" id="user_lname" >
 	</div>
 </div>
 <div class="form-group">
-	<label class="col-sm-2 control-label">電子信箱</label>
+	<label class="col-sm-2 control-label">電子信箱 <span class="text-danger">*</span></label>
 	<div class="col-sm-10">
 		<input name="user_email[]" type="email" required class="form-control" id="user_email" >
 	</div>
 </div>
 <div class="form-group">
-	<label class="col-sm-2 control-label">所屬機構</label>
+	<label class="col-sm-2 control-label">所屬機構 <span class="text-danger">*</span></label>
 	<div class="col-sm-10">
 		<textarea name="user_org[]" maxlength="40" required class="form-control" id="user_org"></textarea>
 	</div>
 </div>
 <div class="form-group">
-	<label class="col-sm-2 control-label">國別</label>
+	<label class="col-sm-2 control-label">國別 <span class="text-danger">*</span></label>
 	<div class="col-sm-10">
 		<?php echo form_dropdown('user_country[]', $country_list, "TW", 'class="form-control chosen-select" data-placeholder="請選擇國家...""');?>
 	</div>

@@ -19,6 +19,7 @@ class Topic_model extends CI_Model {
 		if( !is_null($topic_id) ){
 			$this->db->where('auth_topic.topic_id', $topic_id);
 		}
+		$this->db->order_by('sub_id', 'ASC');
 		$query = $this->db->get();
 		return $query->result();
     }
@@ -62,13 +63,34 @@ class Topic_model extends CI_Model {
 		return $query->row();
     }
 
-    function assign_reviewer_pedding($paper_id,$user_login){
+    function assign_reviewer_pedding($paper_id,$user_login,$conf_id,$review_timeout){
 		$reviewer = array(
-			"paper_id"      => $paper_id,
-			"user_login"   => $user_login
+			"paper_id"       => $paper_id,
+			"user_login"     => $user_login,
+			"conf_id"        => $conf_id,
+			"review_timeout" => $review_timeout
 		);
-		$this->conf->add_log("topic","assign_reviewer_pedding",$conf_id,$reviewer);
-		return $this->db->insert('paper_review_pedding', $reviewer);
+		if( $this->db->insert('paper_review_pedding', $reviewer) ){
+			$this->conf->add_log("topic","assign_reviewer_pedding",$conf_id,$reviewer);
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	function update_reviewer_pedding_timeout($paper_id,$user_login,$conf_id,$review_timeout){
+		$reviewer = array(
+			"review_timeout" => $review_timeout
+		);
+		$this->db->where("paper_id",$paper_id);
+		$this->db->where("user_login",$user_login);
+		$this->db->where("conf_id",$conf_id);
+		if( $this->db->update('paper_review_pedding', $reviewer) ){
+			$this->conf->add_log("topic","update_pedding_timeout",$conf_id,$reviewer);
+			return true;
+		}else{
+			return false;
+		}
 	}
 
     function get_reviewer_pedding($conf_id,$paper_id){
@@ -77,27 +99,37 @@ class Topic_model extends CI_Model {
 		$this->db->from('auth_reviewer');
 		$this->db->join('users','users.user_login = auth_reviewer.user_login');
 		$this->db->join('paper_review_pedding','paper_review_pedding.user_login = users.user_login');
-		$this->db->where('conf_id', $conf_id);
+		$this->db->where('auth_reviewer.conf_id', $conf_id);
 		$this->db->where('paper_id', $paper_id);
 		$this->db->where_in('user_staus', $staus);
 		$query = $this->db->get();
 		return $query->result();
 	}
 
-	function del_reviewer_pedding($paper_id,$user_login){
+	function del_reviewer_pedding($paper_id,$user_login,$conf_id){
 		$this->db->where('user_login', $user_login);
 		$this->db->where('paper_id', $paper_id);
-		$this->conf->add_log("topic","del_reviewer_pedding",$conf_id,array("user_login"=>$user_login,"paper_id"=>$paper_id));
-		return $this->db->delete('paper_review_pedding');;
+		if( $this->db->delete('paper_review_pedding') ){
+			$this->conf->add_log("topic","del_reviewer_pedding",$conf_id,array("user_login"=>$user_login,"paper_id"=>$paper_id));
+			return true;
+		}else{
+			return false;
+		}
 	}
 
-	function assign_reviewer($paper_id,$user_login){
+	function assign_reviewer($paper_id,$user_login,$conf_id,$review_timeout){
 		$reviewer = array(
-			"paper_id"      => $paper_id,
-			"user_login"   => $user_login
+			"paper_id"       => $paper_id,
+			"user_login"     => $user_login,
+			"review_timeout" => $review_timeout
 		);
-		$this->conf->add_log("topic","assign_reviewer",$conf_id,$reviewer);
-		return $this->db->insert('paper_review', $reviewer);
+		
+		if( $this->db->insert('paper_review', $reviewer) ){
+			$this->conf->add_log("topic","assign_reviewer",$conf_id,$reviewer);
+			return true;
+		}else{
+			return false;
+		}
 	}
 
 	function get_reviewer($paper_id){
@@ -117,10 +149,13 @@ class Topic_model extends CI_Model {
 		$this->email->to($user_email);
 		$this->email->subject('[審查提醒]'.$conf_name.'稿件審查');
 		$this->email->message($message);
-
-		$this->conf->add_log("topic","notice_reviewer",$conf_id,array("user_login" =>$user_login));
 		
-		return $this->email->send();
+		if( $this->email->send() ){
+			$this->conf->add_log("topic","notice_reviewer",$conf_id,array("user_login" =>$user_login));
+			return true;
+		}else{
+			return false;
+		}
 	}
 
 	function count_reviewer($conf_id,$topic_id){

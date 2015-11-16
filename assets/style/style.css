@@ -948,3 +948,9 @@ fieldset[disabled] .btn-olive.active {
 	    display: block;
 	}
 }
+textarea.form-control {
+    height: 100%;
+}
+.ui.button,.ui.statistic>.label, .ui.statistics .statistic>.label {
+	font-family: "Microsoft JhengHei UI", "Microsoft JhengHei", sans-serif !important;
+}

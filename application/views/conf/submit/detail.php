@@ -64,7 +64,7 @@
 						<td><?php echo $author->author_order?></td>
 						<td>
 							<?php echo $author->user_first_name?> <?php echo $author->user_last_name?>
-							<?php if( $author->main_contract ){?><span class="ui label green">主要</span><?php }?>
+							<?php if( $author->main_contract ){?><span class="ui label green">通訊作者</span><?php }?>
 						</td>
 						<td><?php echo $author->user_email?></td>
 						<td><?php echo $author->user_org?></td>

@@ -14,13 +14,13 @@
 		</div>
 		<?php echo form_open('user/login',array('class'=>"form-horizontal")) ?>
 			<div class="form-group">
-				<label for="user_login" class="col-sm-2 control-label">帳號</label>
+				<label for="user_login" class="col-sm-2 control-label">帳號 <span class="text-danger">*</span></label>
 				<div class="col-sm-10">
 					<input type="text" class="form-control" id="user_login" name="user_login">
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="user_pass" class="col-sm-2 control-label">密碼</label>
+				<label for="user_pass" class="col-sm-2 control-label">密碼 <span class="text-danger">*</span></label>
 				<div class="col-sm-10">
 					<input type="password" class="form-control" id="user_pass" name="user_pass">
 				</div>

@@ -21,8 +21,10 @@
 				<a class="item" href="<?php echo get_url("index",$conf->conf_id);?>"><i class="fa fa-home icon fa-lg"></i> 研討會首頁</a>
 				<a class="item" href="<?php echo get_url("main",$conf->conf_id);?>"><i class="fa fa-pencil-square-o icon fa-lg"></i> 研討會系統</a>
 				<a class="item" href="<?php echo get_url("news",$conf->conf_id);?>"><i class="fa fa-bullhorn icon fa-lg"></i> 最新消息</a>
-				<?php if($this->user->is_conf($conf_id) || $this->user->is_sysop()){?>
+				<?php if($this->user->is_login()){?>
+				<?php if($this->user->is_conf($conf->conf_id) || $this->user->is_sysop()){?>
 				<a class="item" href="<?php echo get_url("dashboard",$conf->conf_id);?>"> 網站編輯</a>
+				<?php }?>
 				<?php }?>
 			</div>
 		</div>

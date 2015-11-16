@@ -13,6 +13,16 @@
 			</div>
 		</div>
 		<?php }?>
+		<table class="table table-bordered">
+			<tr>
+				<th width="10%">
+					審查期限
+				</th>
+				<td>
+					<input type="text" name="review_timeout" class="form-control datetimepicker_inline">
+				</td>
+			</tr>
+		</table>
 		<table class="table table-hover table-bordered">
 			<thead>
 				<tr>
@@ -48,3 +58,27 @@
 		<button type="submit" class="ui button blue<?php if($pedding_count>=5){?> disabled<?php }?>">新增審查人</button>
 	</div>
 <?php echo form_close()?>
+<script type="text/javascript">
+$(function () {
+    $('.datetimepicker_inline').datetimepicker({
+    	format: 'YYYY/MM/DD hh:mm',
+    	minDate: '<?php echo $schedule["submit"]["start"]?>',
+    	maxDate: '<?php echo $schedule["hold"]["start"]?>',
+    	sideBySide: true,
+    	inline: true,
+    	sideBySide: true,
+    	locale: "zh-tw",
+        icons: {
+            time: "fa fa-clock-o",
+            date: "fa fa-calendar",
+            up: "fa fa-arrow-up",
+            down: "fa fa-arrow-down",
+            previous: "fa fa-chevron-left",
+            next: "fa fa-chevron-right",
+            today: "fa fa-screenshot",
+            clear: "fa fa-trash",
+            close: "fa fa-remov"
+        }
+    });
+});
+</script>

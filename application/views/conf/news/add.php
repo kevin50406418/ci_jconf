@@ -8,26 +8,26 @@
 	<div class="modal-body">
 		<?php echo form_open(get_url("dashboard",$conf_id,"news","add"),array("class"=>"form-horizontal"))?>
 			<div class="form-group">
-				<label for="news_title" class="col-sm-2 control-label">公告標題</label>
+				<label for="news_title" class="col-sm-2 control-label">公告標題 <span class="text-danger">*</span></label>
 				<div class="col-sm-10">
 					<input type="text" name="news_title" id="news_title" class="form-control">
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="news_content" class="col-sm-2 control-label">公告內容</label>
+				<label for="news_content" class="col-sm-2 control-label">公告內容 <span class="text-danger">*</span></label>
 				<div class="col-sm-10">
 					<textarea name="news_content" rows="5" class="form-control ckeditor" id="news_content"></textarea>
 				</div>
 			</div>
 			<hr>
 			<div class="form-group">
-				<label for="news_title_eng" class="col-sm-2 control-label">公告標題(英)</label>
+				<label for="news_title_eng" class="col-sm-2 control-label">公告標題(英) <span class="text-danger">*</span></label>
 				<div class="col-sm-10">
 					<input type="text" name="news_title_eng" id="news_title_eng" class="form-control">
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="news_content_eng" class="col-sm-2 control-label">公告內容(英)</label>
+				<label for="news_content_eng" class="col-sm-2 control-label">公告內容(英) <span class="text-danger">*</span></label>
 				<div class="col-sm-10">
 					<textarea name="news_content_eng" rows="5" class="form-control ckeditor" id="news_content_eng"></textarea>
 				</div>

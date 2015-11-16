@@ -7,7 +7,7 @@
 	</div>
 	<div class="modal-body">
 		<div class="form-group">
-			<label for="content" class="col-sm-2 control-label">網頁簡稱</label>
+			<label for="content" class="col-sm-2 control-label">網頁簡稱 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<input type="text" class="form-control" id="page_id" name="page_id">
 			</div>
@@ -19,7 +19,7 @@
 	</div>
 	<div class="modal-body">
 		<div class="form-group">
-			<label for="content" class="col-sm-2 control-label">標題</label>
+			<label for="content" class="col-sm-2 control-label">標題 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<input type="text" class="form-control" id="page_title" name="page_title[zhtw]">
 			</div>
@@ -38,7 +38,7 @@
 	</div>
 	<div class="modal-body">
 		<div class="form-group">
-			<label for="content" class="col-sm-2 control-label">標題</label>
+			<label for="content" class="col-sm-2 control-label">標題 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<input type="text" class="form-control" id="page_title" name="page_title[en]">
 			</div>

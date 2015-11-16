@@ -12,13 +12,13 @@ CKEDITOR.config.shiftEnterMode = CKEDITOR.ENTER_BR;
 	<div class="modal-body">
 		<?php echo form_open(get_url("dashboard",$conf_id,"filter","add"),array("class"=>"form-horizontal"))?>
 			<div class="form-group">
-				<label for="content" class="col-sm-2 control-label">檢核清單內容</label>
+				<label for="content" class="col-sm-2 control-label">檢核清單內容 <span class="text-danger">*</span></label>
 				<div class="col-sm-10">
 					<textarea name="content" rows="5" class="form-control ckeditor" id="content"><?php echo set_value('content')?></textarea>
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="econtent" class="col-sm-2 control-label">檢核清單內容(英)</label>
+				<label for="econtent" class="col-sm-2 control-label">檢核清單內容(英) <span class="text-danger">*</span></label>
 				<div class="col-sm-10">
 					<textarea name="econtent" rows="5" class="form-control ckeditor" id="econtent"><?php echo set_value('econtent')?></textarea>
 				</div>

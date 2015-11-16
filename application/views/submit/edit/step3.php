@@ -58,6 +58,7 @@ $("#paper_file").fileinput({
 	language: "zh-TW",
     autoReplace: true,
     maxFileCount: 1,
+    allowedPreviewTypes: [],
     allowedFileExtensions: ["pdf"],
     removeIcon: '<i class="fa fa-trash"></i>',
     

@@ -18,7 +18,7 @@
 	<h2>徵稿主題</h2>
 	<?php if(is_array($topics)){?>
 	<div class="form-group">
-		<label class="col-sm-2 control-label" for="sub_topic">主題</label>
+		<label class="col-sm-2 control-label" for="sub_topic">主題 <span class="text-danger">*</span></label>
 		<div class="col-sm-10">
 			<select name="sub_topic" id="sub_topic" class="form-control">
 				<?php foreach ($topics as $key => $topic) {?>
@@ -49,15 +49,15 @@
 <div class="ui blue segment">
 	<h2>篇名和摘要</h2>
 	<div class="form-group">
-		<label class="col-sm-2 control-label">題目</label>
+		<label class="col-sm-2 control-label">題目 <span class="text-danger">*</span></label>
 		<div class="col-sm-10">
 			<input name="sub_title" type="text" required class="form-control" id="sub_title">
 		</div>
 	</div>
 	<div class="form-group">
-		<label class="col-sm-2 control-label">摘要</label>
+		<label class="col-sm-2 control-label">摘要 <span class="text-danger">*</span></label>
 		<div class="col-sm-10">
-			<textarea name="sub_summary" required id="sub_summary" class="form-control"></textarea>
+			<textarea name="sub_summary" required id="sub_summary" class="form-control" rows="5"></textarea>
 		</div>
 	</div>
 
@@ -65,14 +65,14 @@
 <div class="ui blue segment">
 	<h2>檢索和計畫補助單位</h2>
 	<div class="form-group">
-		<label class="col-sm-2 control-label">關鍵字</label>
+		<label class="col-sm-2 control-label">關鍵字 <span class="text-danger">*</span></label>
 		<div class="col-sm-10">
 			<input name="sub_keywords" type="text" required class="form-control" id="sub_keywords">
 			<p class="help-block">提供一個或更多描述投稿內容的專有名詞。以半形逗號「,」來將這些專有名詞分開(專有名詞1,專有名詞2,專有名詞3)。例如：資訊安全</p>
 		</div>
 	</div>
 	<div class="form-group">
-		<label class="col-sm-2 control-label">語言</label>
+		<label class="col-sm-2 control-label">語言 <span class="text-danger">*</span></label>
 		<div class="col-sm-10">
 			<select name="sub_lang" id="sub_lang" class="form-control">
 				<option value="zhtw" selected="selected">繁體中文(Traditional Chinese)</option>

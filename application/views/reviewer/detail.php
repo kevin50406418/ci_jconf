@@ -64,7 +64,7 @@
 						<td><?php echo $author->author_order?></td>
 						<td>
 							<?php echo $author->user_first_name?> <?php echo $author->user_last_name?>
-							<?php if( $author->main_contract ){?><span class="ui label green">主要</span><?php }?>
+							<?php if( $author->main_contract ){?><span class="ui label green">通訊作者</span><?php }?>
 						</td>
 						<td><?php echo $author->user_email?></td>
 						<td><?php echo $author->user_org?></td>
@@ -127,8 +127,9 @@
 						<tr>
 							<th style="width:10%">審查人</th>
 							<th style="width:10%">審查狀態</th>
+							<th style="width:10%">審查期限</th>
 							<th style="width:10%">審查時間</th>
-							<th style="width:70%">審查建議</th>
+							<th style="width:60%">審查建議</th>
 						</tr>
 					</thead>
 					<?php foreach ($reviewers as $key => $reviewer) {?>
@@ -136,6 +137,9 @@
 						<td><?php echo $reviewer->user_login?></td>
 						<td>
 							<?php echo $this->Submit->sub_status($reviewer->review_status,true)?>
+						</td>
+						<td class="text-center">
+							<?php echo date("Y-m-d H:i",$reviewer->review_timeout)?>
 						</td>
 						<td>
 							<?php

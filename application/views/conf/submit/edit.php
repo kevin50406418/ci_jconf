@@ -18,19 +18,19 @@
 				<?php echo form_hidden('update', 'info');?>
 				<table class="table table-bordered">
 					<tr>
-						<th>題目</th>
+						<th>題目 <span class="text-danger">*</span></th>
 						<td>
 							<input name="sub_title" type="text" required class="form-control" id="sub_title" value="<?php echo $paper->sub_title?>">
 						</td>
 					</tr>
 					<tr>
-						<th>摘要</th>
+						<th>摘要 <span class="text-danger">*</span></th>
 						<td>
 							<textarea name="sub_summary" required id="sub_summary" class="form-control"><?php echo $paper->sub_summary?></textarea>
 						</td>
 					</tr>
 					<tr>
-						<th>主題</th>
+						<th>主題 <span class="text-danger">*</span></th>
 						<td>
 							<select name="sub_topic" id="sub_topic" class="form-control"<?php if( !in_array($paper->sub_status,array(-1,1)) ){?> disabled<?php }?>>
 								<?php foreach ($topics as $key => $topic) {?>
@@ -40,11 +40,11 @@
 						</td>
 					</tr>
 					<tr>
-						<th>稿件狀態</th>
+						<th>稿件狀態 <span class="text-danger">*</span></th>
 						<td><?php echo $this->Submit->sub_status($paper->sub_status,true)?></td>
 					</tr>
 					<tr>
-						<th>語言</th>
+						<th>語言 <span class="text-danger">*</span></th>
 						<td>
 							<select name="sub_lang" id="sub_lang" class="form-control">
 								<option value="zhtw"<?php if($paper->sub_lang=="zhtw"){?> selected="selected" class="bg-info"<?php }?>>繁體中文(Traditional Chinese)</option>
@@ -53,7 +53,7 @@
 						</td>
 					</tr>
 					<tr>
-						<th>關鍵字</th>
+						<th>關鍵字 <span class="text-danger">*</span></th>
 						<td>
 							<input name="sub_keywords" type="text" required class="form-control" id="sub_keywords" value="<?php echo $paper->sub_keyword?>">
 							<p class="help-block">提供一個或更多描述投稿內容的專有名詞。以半形逗號「,」來將這些專有名詞分開(專有名詞1,專有名詞2,專有名詞3)。例如：資訊安全</p>
@@ -83,11 +83,11 @@
 							<td colspan="6"><span class="add ui green button"><i class="fa fa-plus"></i></span></td>
 						</tr>
 						<tr>
-							<th>主要</th>
-							<th>姓名</th>
-							<th>電子信箱</th>
-							<th>所屬機構</th>
-							<th>國別</th>
+							<th>主要 <span class="text-danger">*</span></th>
+							<th>姓名 <span class="text-danger">*</span></th>
+							<th>電子信箱 <span class="text-danger">*</span></th>
+							<th>所屬機構 <span class="text-danger">*</span></th>
+							<th>國別 <span class="text-danger">*</span></th>
 							<th>操作</th>
 						</tr>
 					</thead>
@@ -169,7 +169,7 @@
 								<?php if(!empty($otherfile)){?><input type="checkbox" name="del_file[]" value="<?php echo $otherfile->fid?>"><?php }?>
 							</td>
 							<td><?php if(!empty($otherfile)){echo $otherfile->fid;}?></td>
-							<td>投稿資料</td>
+							<td>投稿資料 <span class="text-danger">*</span></td>
 							<td>
 								<?php if(!empty($otherfile)){?>
 								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" target="_blank"><?php echo $otherfile->file_name?></a>
@@ -212,7 +212,7 @@
 					<h2>上傳投稿文件</h2>
 					<table class="table table-bordered form-horizontal">
 						<tr>
-							<th class="col-sm-2 control-label">投稿文件</th>
+							<th class="col-sm-2 control-label">投稿文件 <span class="text-danger">*</span></th>
 							<td class="col-sm-10">
 								<?php echo form_open_multipart(get_url("dashboard",$conf_id,"submit","edit",$paper->sub_id),array("class"=>"form-horizontal"));?>
 									<?php echo form_hidden('update', 'file');?>
