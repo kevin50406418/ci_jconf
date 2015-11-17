@@ -406,12 +406,17 @@ class User_model extends CI_Model {
 			"user_pass" => hash('sha256',$user_pass)
 		);
 		$this->db->where('user_login', $user_login);
-		if( $login_staus==2 ){
-			$this->add_login_log($user_login,2);
-		}else if( $login_staus==3 ){
-			$this->add_login_log($user_login,3);
+		
+		if( $this->db->update('users', $user) ){
+			if( $login_staus==2 ){
+				$this->add_login_log($user_login,2);
+			}else if( $login_staus==3 ){
+				$this->add_login_log($user_login,3);
+			}
+			return true;
+		}else{
+			return false;
 		}
-		return $this->db->update('users', $user);
 	}
 
 	function generator_password($password_len){

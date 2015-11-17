@@ -88,7 +88,7 @@
 				<a class="btn btn-sm btn-primary"><i class="fa fa-envelope"></i> 寄信給 <?php echo $user->user_login?></a>
 				<span class="pull-right">
 					<a href="<?php echo base_url("sysop/user/edit/".$user->user_login)?>" class="btn btn-sm btn-success"><i class="fa fa-edit"></i>編輯使用者</a>
-					<a href="<?php echo base_url("sysop/user/edit/".$user->user_login)?>" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i>重置密碼</a>
+					<a href="<?php echo base_url("sysop/user/reset/".$user->user_login)?>" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i>重置密碼</a>
 				</span>
 			</div>
 		</div>

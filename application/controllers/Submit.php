@@ -281,12 +281,12 @@ class Submit extends MY_Conference {
 				$this->form_validation->set_rules('sub_lang', '語言', 'required');
 				
 				if ($this->form_validation->run()){
-					$sub_title    =$this->input->post('sub_title');
-					$sub_summary  =$this->input->post('sub_summary');
-					$sub_keyword  =empty($this->input->post('sub_keywords'))?"":$this->input->post('sub_keywords');
-					$sub_topic    =$this->input->post('sub_topic');
-					$sub_lang     =$this->input->post('sub_lang');
-					$sub_sponsor  =$this->input->post('sub_sponsor');
+					$sub_title    = $this->input->post('sub_title');
+					$sub_summary  = $this->input->post('sub_summary');
+					$sub_keyword  = empty($this->input->post('sub_keywords'))?"":$this->input->post('sub_keywords');
+					$sub_topic    = $this->input->post('sub_topic');
+					$sub_lang     = $this->input->post('sub_lang');
+					$sub_sponsor  = $this->input->post('sub_sponsor');
 					
 					$main_contact = $this->input->post('main_contact');
 					$user_fname   = $this->input->post('user_fname');

@@ -969,12 +969,13 @@ class Conf_model extends CI_Model {
 		$login_user = $this->session->userdata('user_login');
 
 		$conf_log = array(
-			"login_user"=>$login_user,
-			"log_type"=>$log_type,
-			"log_act"=>$log_act,
-			"log_time"=>time(),
-			"log_conf"=>$log_conf,
-			"log_to"=>json_encode($log_to)
+			"login_user" => $login_user,
+			"log_type"   => $log_type,
+			"log_act"    => $log_act,
+			"log_time"   => time(),
+			"log_ip"     => $this->input->ip_address(),
+			"log_conf"   => $log_conf,
+			"log_to"     => json_encode($log_to,JSON_UNESCAPED_UNICODE)
 		);
 		$this->db->insert('conf_log', $conf_log);
 	}

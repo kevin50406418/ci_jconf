@@ -15,6 +15,8 @@ class Home extends MY_Controller {
 		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
 		if(empty($conf_id)){
 			$data['confs']=$this->conf->all_conf_config($user_sysop);
+			$data['test_conf'] = in_array($this->user_login,$this->config->item("tester"))?array():$this->config->item("test_conf");
+			
 			$this->cinfo['show_confinfo'] = false;
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);

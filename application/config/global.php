@@ -4,7 +4,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 //$config['assets_url'] = "http://120.108.113.38/conf/assets/";
 $config['site_name'] = "亞大研討會系統";
 $config['spage']=array("index","news","main","dashboard","submit","topic","reviewer");
-
+$config['test_conf'] = array("test2015","test2013","test2014"); // for developer test conf(will not show for other user)
+$config['tester'] = array("jingxun","kevin50406418","lai418","test01","test02","test03","test04","test05","test06","test07","test08","test09","test10");
 $config['developer'] = array("jingxun"); // developer account: can not cancel sysop group
 $config['ban'] = array(""); // ban user: can not add sysop group
 

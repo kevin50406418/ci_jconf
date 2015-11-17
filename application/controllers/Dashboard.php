@@ -1,6 +1,10 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+/*
+摘要：可以換行
+主編及審查人那邊稿件狀態新增審查中>待分派審查中(原投稿完成)
 
+ */
 class Dashboard extends MY_Conference {
 	public function __construct(){
 		parent::__construct();

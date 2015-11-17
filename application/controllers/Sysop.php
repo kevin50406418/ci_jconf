@@ -59,6 +59,7 @@ class Sysop extends MY_Sysop {
 			switch($type){
 				default:
 				case "all": // Conference Admin index
+					$data['test_conf'] = $this->config->item("test_conf");
 					$data['confs']=$this->conf->all_conf_config(true);
 					$this->load->view('sysop/conf/list',$data);
 				break;
