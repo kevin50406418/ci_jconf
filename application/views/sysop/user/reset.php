@@ -7,7 +7,7 @@
 	<div class="modal-body">
 		<?php echo form_open(base_url("sysop/user/reset/".$user_login),array("class"=>"form-horizontal"))?>
 		<div class="form-group">
-			<label for="user_id" class="col-sm-2 control-label">新密碼</label>
+			<label for="user_id" class="col-sm-2 control-label">新密碼 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<div class="input-group">
 					<input name="user_pass" type="text" class="form-control" autocomplete="off" value="<?php echo $passwd?>">

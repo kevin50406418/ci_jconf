@@ -39,9 +39,11 @@ class Reviewer_model extends CI_Model {
         );
         $this->db->where('paper_id', $paper_id);
         $this->db->where('user_login', $user_login);
-        $this->conf->add_log("review","update_review",$conf_id,$review);
-
-        return $this->db->update('paper_review', $review);
+        if( $this->db->update('paper_review', $review) ){
+        	$this->conf->add_log("review","update_review",$conf_id,$review);
+        	return true;
+        }
+        return false;
 	}
 }
 ?>

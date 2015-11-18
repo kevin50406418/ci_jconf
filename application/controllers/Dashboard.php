@@ -1,10 +1,5 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-/*
-摘要：可以換行
-主編及審查人那邊稿件狀態新增審查中>待分派審查中(原投稿完成)
-
- */
 class Dashboard extends MY_Conference {
 	public function __construct(){
 		parent::__construct();
@@ -871,15 +866,15 @@ class Dashboard extends MY_Conference {
 		
 	}
 
-	public function email($conf_id=''){
-		$data['conf_id']      = $conf_id;
-		$data['body_class']   = $this->body_class;
+	public function email($conf_id='',$act='all'){
+		$data['conf_id']        = $conf_id;
+		$data['body_class']     = $this->body_class;
 		
-		$data['spage']        = $this->config->item('spage');
-		$data['conf_config']  = $this->conf_config;
-		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-		$data['conf_content'] = $this->conf->conf_content($conf_id);
-
+		$data['spage']          = $this->config->item('spage');
+		$data['conf_config']    = $this->conf_config;
+		$data['schedule']       = $this->conf->get_schedules($this->conf_id);
+		$data['conf_content']   = $this->conf->conf_content($conf_id);
+		$this->assets->add_js(base_url().'tinymce/tinymce.min.js');
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
 
@@ -887,9 +882,24 @@ class Dashboard extends MY_Conference {
 		//$this->load->view('conf/conf_schedule',$data);
 
 		$this->load->view('conf/menu_conf',$data);
-		//$this->load->view('conf/setting',$data);
-		$this->load->view('common/footer',$data);
 		
+		switch($act){
+			default:
+			case "all":
+				$data['mail_templates'] = $this->conf->get_mail_templates($conf_id);
+				$this->load->view('conf/email/list',$data);
+			break;
+			case "edit":
+				$email_key = $this->input->get("key");
+				if($data['template'] = $this->conf->get_mail_template($conf_id,$email_key,$this->_lang)){
+					$this->load->view('common/tinymce',$data);
+					$this->load->view('conf/email/edit',$data);
+				}else{
+					$this->alert->js("找不到信件樣版",get_url("dashboard",$conf_id,"email"));
+				}
+			break;
+		}
+		$this->load->view('common/footer',$data);
 	}
 
 	public function submit($conf_id='',$act='',$paper_id=''){

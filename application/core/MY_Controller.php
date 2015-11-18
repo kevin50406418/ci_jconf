@@ -63,6 +63,7 @@ class MY_Controller extends CI_Controller{
 				$tmp_url = $this->session->redirected;
 				$this->session->set_userdata('redirected', uri_string(current_url()));
 				$this->session->set_userdata('redirect', $tmp_url);
+
 			}
 		}
 		

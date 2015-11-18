@@ -44,6 +44,7 @@ $(function(){
 			<?php }?>
 		<?php }?>
 	<?php }?>
+	<?php if(count($conf_content)>8){?>
 	<div class="ui dropdown item">
 		其他資訊 <i class="dropdown icon"></i>
 		<div class="menu">
@@ -59,6 +60,7 @@ $(function(){
 			<?php }?>
 		</div>
 	</div>
+	<?php }?>
 	<div class="right menu">
 		<?php if( is_login() ){?>
 		<div class="item">您好，<?php echo get_current_user_login()?></div>

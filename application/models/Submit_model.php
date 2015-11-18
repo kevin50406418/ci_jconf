@@ -28,7 +28,7 @@ class Submit_model extends CI_Model {
         return $query->result();
     }
 
-    function sub_status($submit_staus,$style=false){
+    function sub_status($submit_staus,$style=false,$is_topic = false){
     	$html_class="";
     	$staus_text="";
     	$desc="";
@@ -56,22 +56,28 @@ class Submit_model extends CI_Model {
             case 0:
                 $staus_text="編輯後審查";
                 $html_class="teal";
-                $desc="搞件進入審查";
+                $desc="稿件進入審查";
             break;
     		case 1:
-    			$staus_text=$this->lang->line('status_review');
-    			$html_class="orange";
-    			$desc="搞件進入審查";
+                if( $is_topic ){
+                    $staus_text="待分派審查";
+                    $html_class="yellow";
+                    $desc="稿件待分派審查";  
+                }else{
+                    $staus_text=$this->lang->line('status_review');
+                    $html_class="orange";
+                    $desc="稿件進入審查";
+                }
     		break;
     		case 2:
     			$staus_text=$this->lang->line('status_pending');
     			$html_class="yellow";
-    			$desc="搞件將於大會時決議";
+    			$desc="稿件將於大會時決議";
     		break;
     		case 3:
     			$staus_text=$this->lang->line('status_review');
     			$html_class="orange";
-    			$desc="搞件進入審查";
+    			$desc="稿件進入審查";
     		break;
     		case 4:
     			$staus_text=$this->lang->line('status_accepte');
@@ -81,7 +87,7 @@ class Submit_model extends CI_Model {
     		case 5:
     			$staus_text=$this->lang->line('status_complete');
     			$html_class="blue";
-    			$desc="完成搞件最後上傳資料";
+    			$desc="完成稿件最後上傳資料";
     		break;
     		default:
     			$staus_text="-";
@@ -156,8 +162,11 @@ class Submit_model extends CI_Model {
 
     function del_author($paper_id){
         $this->db->where('paper_id', $paper_id);
-        $this->conf->add_log("submit","del_author",$conf_id,array("paper_id"=>$paper_id));
-        return $this->db->delete('paper_author');
+        if( $this->db->delete('paper_author') ){
+            //$this->conf->add_log("submit","del_author",$conf_id,array("paper_id"=>$paper_id));
+            return true;
+        }
+        return false;
     }
 
     function get_author($paper_id){
@@ -187,8 +196,6 @@ class Submit_model extends CI_Model {
         return $query->row();
     }
 
-    
-
     function add_file($conf_id,$paper_id,$file_name,$file_system,$file_type){
         $paper_file = array(
             "paper_id"=>$paper_id,
@@ -196,11 +203,12 @@ class Submit_model extends CI_Model {
             "file_system"=>$file_system,
             "file_type"=>$file_type
         ); 
-        $this->conf->add_log("submit","add_file",$conf_id,$paper_file);
+        
         if( $this->db->insert('paper_file', $paper_file) ){
             if($file_type == "F"){
                 $this->session->set_flashdata($conf_id.'_file_id', $this->db->insert_id());
             }
+            // $this->conf->add_log("submit","add_file",$conf_id,$paper_file);
             return true;
         }else{
             return false;
@@ -214,8 +222,11 @@ class Submit_model extends CI_Model {
         ); 
         $this->db->where("fid",$fid);
         $this->db->where("paper_id",$paper_id);
-        $this->conf->add_log("submit","update_file",$conf_id,$paper_file);
-        return $this->db->update('paper_file', $paper_file);
+        if( $this->db->update('paper_file', $paper_file) ){
+            // $this->conf->add_log("submit","update_file",$conf_id,$paper_file);
+            return true;
+        }
+        return false;
     }
 
     function del_file($conf_id,$paper_id,$fid){
@@ -228,8 +239,12 @@ class Submit_model extends CI_Model {
         //$this->db->where("conf_id",$conf_id);
         $this->db->where("fid",$fid);
         $this->db->where("paper_id",$paper_id);
-        $this->conf->add_log("submit","del_file",$conf_id,array("paper_id"=>$paper_id,"fid"=>$fid));
-        return $this->db->delete('paper_file');
+        if( $this->db->delete('paper_file') ){
+            // $this->conf->add_log("submit","del_file",$conf_id,array("paper_id"=>$paper_id,"fid"=>$fid));
+            return true;
+        }
+        
+        return false;
     }
 
     function get_otherfile($paper_id){
@@ -329,7 +344,7 @@ class Submit_model extends CI_Model {
         $this->db->where("conf_id",$conf_id);
         $this->db->where("sub_id",$paper_id);
         if( $this->db->update('paper', $paper) ){
-            $this->conf->add_log("submit","paper_to_review",$conf_id,$paper);
+            // $this->conf->add_log("submit","paper_to_review",$conf_id,$paper);
             return true;
         }else{
             return false;
@@ -342,9 +357,10 @@ class Submit_model extends CI_Model {
         );
         $this->db->where("conf_id",$conf_id);
         $this->db->where("sub_id",$paper_id);
-        $this->conf->add_log("submit","paper_to_reviewing",$conf_id,$paper);
+        
         if( $this->db->update('paper', $paper) ){
-            $this->session->unset_userdata($conf_id.'_insert_id');
+            $this->conf->add_log("submit","paper_to_reviewing",$conf_id,$paper);
+            // $this->session->unset_userdata($conf_id.'_insert_id');
             return true;
         }else{
             return false;
@@ -416,8 +432,11 @@ class Submit_model extends CI_Model {
             "report_meal"     => $report_meal,
             "report_mealtype" => $report_mealtype
         );
-        $this->conf->add_log("submit","add_most_report",$conf_id,$most_report);
-        return $this->db->insert('most_report', $most_report);
+        if( $this->db->insert('most_report', $most_report) ){
+            $this->conf->add_log("submit","add_most_report",$conf_id,$most_report);
+            return true;
+        }
+        return false;
     }
 
     function add_most_file($most_id,$conf_id,$most_auth,$most_result,$most_poster,$most_auth_name,$most_result_name,$most_poster_name){
@@ -431,8 +450,13 @@ class Submit_model extends CI_Model {
             "most_result_name" => $most_result_name,
             "most_poster_name" => $most_poster_name
         );
-        $this->conf->add_log("submit","add_most_report",$conf_id,$most_report);
-        return $this->db->insert('most_file', $most_file);
+        
+        
+        if( $this->db->insert('most_file', $most_file) ){
+            $this->conf->add_log("submit","add_most_file",$conf_id,$most_report);
+            return true;
+        }
+        return false;
     }
 
     function get_mosts($conf_id,$user_login){
@@ -559,8 +583,12 @@ class Submit_model extends CI_Model {
         $this->db->where('most_id', $most_id);
         $this->db->where('user_login', $user_login);
         $this->db->where('conf_id', $conf_id);
-        $this->conf->add_log("submit","update_most",$conf_id,$most);
-        return $this->db->update('most', $most);
+       
+        if( $this->db->update('most', $most) ){
+            $this->conf->add_log("submit","update_most",$conf_id,$most);
+            return true;
+        }
+        return false;
     }
 
     function update_most_report($most_id,$report_name,$report_uni,$report_dept,$report_title,$report_email,$report_phone,$report_meal,$report_mealtype){
@@ -575,8 +603,12 @@ class Submit_model extends CI_Model {
             "report_mealtype" => $report_mealtype
         );
         $this->db->where('most_id', $most_id);
-        $this->conf->add_log("submit","update_most_report",$conf_id,$most_report);
-        return $this->db->update('most_report', $most_report);
+        
+        if( $this->db->update('most_report', $most_report) ){
+            $this->conf->add_log("submit","update_most_report",$conf_id,$most_report);
+            return true;
+        }
+        return false;
     }
 
     function update_most_file($most_id,$key,$file,$file_name){
@@ -602,8 +634,11 @@ class Submit_model extends CI_Model {
             break;
         }
         $this->db->where('most_id', $most_id);
-        $this->conf->add_log("submit","update_most_file",$conf_id,array_merge(array("type"=>$key),$most_file));
-        return $this->db->update('most_file', $most_file);
+        if( $this->db->update('most_file', $most_file) ){
+            $this->conf->add_log("submit","update_most_file",$conf_id,array_merge(array("type"=>$key),$most_file));
+            return true;
+        }
+        return false;
     }
 
     function submit_most($conf_id,$most_id,$user_login){
@@ -613,8 +648,13 @@ class Submit_model extends CI_Model {
         $this->db->where('conf_id', $conf_id);
         $this->db->where('most_id', $most_id);
         $this->db->where('user_login', $user_login);
-        $this->conf->add_log("submit","submit_most",$conf_id,$most);
-        return $this->db->update('most', $most);
+        
+        if( $this->db->update('most', $most) ){
+            $this->conf->add_log("submit","submit_most",$conf_id,$most);
+            return true;
+        }
+        return false;
+
     }
 
     function get_registers($conf_id,$user_login){
@@ -678,8 +718,11 @@ class Submit_model extends CI_Model {
             "meal_id"     => $meal_id,
             "meal_type"   => $meal_type
         );
-        $this->conf->add_log("submit","add_register_meal",$conf_id,$register_meal);
-        return $this->db->insert('register_meal', $register_meal);
+        if( $this->db->insert('register_meal', $register_meal) ){
+            // $this->conf->add_log("submit","add_register_meal",$conf_id,$register_meal);
+            return true;
+        }
+        return false;
     }
 
     function add_register_paper($user_login,$paper_id,$register_id){
@@ -688,8 +731,11 @@ class Submit_model extends CI_Model {
             "user_login"  => $user_login,
             "paper_id"   => $paper_id
         );
-        $this->conf->add_log("submit","add_register_paper",$conf_id,$register_paper);
-        return $this->db->insert('register_paper', $register_paper);
+        if( $this->db->insert('register_paper', $register_paper) ){
+            // $this->conf->add_log("submit","add_register_paper",$conf_id,$register_paper);
+            return true;
+        }
+        return false;
     }
 
     function register_status($register_status,$style=false){
@@ -736,8 +782,11 @@ class Submit_model extends CI_Model {
         $this->db->where('conf_id', $conf_id);
         $this->db->where('user_login', $user_login);
         $this->db->where('register_id', $register_id);
-        $this->conf->add_log("submit","update_register_pay_bill",$conf_id,$pay);
-        return $this->db->update('register', $pay);
+        if( $this->db->update('register', $pay) ){
+            // $this->conf->add_log("submit","update_register_pay_bill",$conf_id,$pay);
+            return true;
+        }
+        return false;
     }
 
     function update_register_status($register_status,$conf_id,$register_id){
@@ -747,9 +796,12 @@ class Submit_model extends CI_Model {
         );
         $this->db->where('conf_id', $conf_id);
         $this->db->where('register_id', $register_id);
-        $this->conf->add_log("submit","update_register_status",$conf_id,$pay);
-        return $this->db->update('register', $pay);
+        
+        return ;
+        if( $this->db->update('register', $pay) ){
+            $this->conf->add_log("submit","update_register_status",$conf_id,$pay);
+            return true;
+        }
+        return false;
     }
-
-    
 }

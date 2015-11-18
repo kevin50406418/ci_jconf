@@ -84,6 +84,12 @@ class Sysop_model extends CI_Model {
 		return $this->db->insert_batch('email_about', $template);
     }
 
+    function get_all_mail_templates(){
+    	$this->db->from('email_about');
+    	$query = $this->db->get();
+		return $query->result();
+    }
+
     function get_mail_templates($email_lang){
     	$this->db->from('email_about');
     	$this->db->where('email_lang', $email_lang);

@@ -66,7 +66,7 @@
 				<?php }?>
 			</td>
 			<td class="text-center">
-				<?php echo $this->Submit->sub_status($paper->sub_status,true)?>
+				<?php echo $this->Submit->sub_status($paper->sub_status,true,true)?>
 			</td>
 			<td class="text-center">
 			<?php if(in_array($paper->sub_id,$paper_author)){?>

@@ -132,7 +132,7 @@ class Submit extends MY_Conference {
 				
 				if ($this->form_validation->run()){
 					$sub_title    =$this->input->post('sub_title');
-					$sub_summary  =$this->input->post('sub_summary');
+					$sub_summary  =str_replace(PHP_EOL,"<br>",$this->input->post('sub_summary'));
 					$sub_keyword  =empty($this->input->post('sub_keywords'))?"":$this->input->post('sub_keywords');
 					$sub_topic    =$this->input->post('sub_topic');
 					$sub_lang     =$this->input->post('sub_lang');
@@ -248,10 +248,11 @@ class Submit extends MY_Conference {
 				$this->assets->add_js(asset_url().'js/repeatable.js',true);
 				$this->assets->add_js(asset_url().'js/chosen.jquery.js');
 				$country_list = config_item('country_list');
-				$data['paper'] = $this->Submit->get_paperinfo($conf_id,$paper_id, $this->user_login);
-				$data['country_list'] = $country_list['zhtw'];
-				$data['topics'] = $this->conf->get_topic($conf_id);
-				$data['authors'] = $this->Submit->get_author($paper_id);
+				$data['paper']              = $this->Submit->get_paperinfo($conf_id,$paper_id, $this->user_login);
+				$data['paper']->sub_summary =str_replace("<br>",PHP_EOL,$data['paper']->sub_summary);
+				$data['country_list']       = $country_list['zhtw'];
+				$data['topics']             = $this->conf->get_topic($conf_id);
+				$data['authors']            = $this->Submit->get_author($paper_id);
 				$this->load->view('submit/edit/step',$data);
 				$this->load->view('submit/edit/step2',$data);
 			break;

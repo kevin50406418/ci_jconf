@@ -5,55 +5,55 @@
 	<?php echo validation_errors('<div class="ui message red">', '</div>');?>
 	<?php echo form_open(base_url("sysop/conf/add"),array("class"=>"form-horizontal"))?>
 		<div class="form-group">
-			<label for="conf_id" class="col-sm-2 control-label text-info">研討會ID</label>
+			<label for="conf_id" class="col-sm-2 control-label">研討會ID <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<input type="text" class="form-control" id="conf_id" name="conf_id" value="<?php echo set_value('conf_id'); ?>">
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="conf_name" class="col-sm-2 control-label text-info">研討會名稱</label>
+			<label for="conf_name" class="col-sm-2 control-label">研討會名稱 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<input type="text" class="form-control" id="conf_name" name="conf_name" value="<?php echo set_value('conf_name'); ?>">
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="conf_master" class="col-sm-2 control-label text-info">主要聯絡人</label>
+			<label for="conf_master" class="col-sm-2 control-label">主要聯絡人 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<input type="text" class="form-control" id="conf_master" name="conf_master" value="<?php echo set_value('conf_master'); ?>">
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="conf_email" class="col-sm-2 control-label text-info">聯絡信箱</label>
+			<label for="conf_email" class="col-sm-2 control-label">聯絡信箱 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<input type="text" class="form-control" id="conf_email" name="conf_email" value="<?php echo set_value('conf_email'); ?>">
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="conf_phone" class="col-sm-2 control-label text-info">聯絡電話</label>
+			<label for="conf_phone" class="col-sm-2 control-label">聯絡電話 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<input type="text" class="form-control" id="conf_phone" name="conf_phone" value="<?php echo set_value('conf_phone'); ?>">
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="conf_address" class="col-sm-2 control-label text-info">通訊地址</label>
+			<label for="conf_address" class="col-sm-2 control-label">通訊地址 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<input type="text" class="form-control" id="conf_address" name="conf_address" value="<?php echo set_value('conf_address'); ?>">
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="conf_fax" class="col-sm-2 control-label text-info">主辦單位</label>
+			<label for="conf_fax" class="col-sm-2 control-label">主辦單位 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<input name="conf_host" type="text" class="form-control" id="conf_host" value="<?php echo set_value('conf_host');?>">
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="conf_place" class="col-sm-2 control-label">大會地點</label>
+			<label for="conf_place" class="col-sm-2 control-label">大會地點 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<input name="conf_place" type="text" class="form-control" id="conf_place" value="<?php echo set_value('conf_place');?>">
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="conf_lang" class="col-sm-2 control-label text-info">語言</label>
+			<label for="conf_lang" class="col-sm-2 control-label">語言 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<div class="btn-group" data-toggle="buttons">
 					<label class="btn btn-success active">
@@ -66,7 +66,7 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="conf_staus" class="col-sm-2 control-label text-info">顯示/隱藏</label>
+			<label for="conf_staus" class="col-sm-2 control-label">顯示/隱藏 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<div class="btn-group" data-toggle="buttons">
 					<label class="btn btn-primary<?php if(set_value('conf_staus') == 0){?> active<?php }?>">
@@ -85,7 +85,7 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="conf_desc" class="col-sm-2 control-label">關於研討會</label>
+			<label for="conf_desc" class="col-sm-2 control-label">關於研討會 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<textarea class="form-control" id="conf_desc" name="conf_desc"><?php echo set_value('conf_desc'); ?></textarea>
 			</div>

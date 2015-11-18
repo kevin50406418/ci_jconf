@@ -329,13 +329,21 @@ class User_model extends CI_Model {
 			"user_login" =>$user_login,
 			"auth_time"  =>time()
 		);
-		return $this->db->insert('auth_conf', $admin);
+		if( $this->db->insert('auth_conf', $admin) ){
+			$this->conf->add_log("conf","add_conf_admin",$conf_id,$admin);
+			return true;
+		}
+		return false;
 	}
 
 	function del_conf($conf_id,$user_login){
 		$this->db->where('conf_id', $conf_id);
 		$this->db->where('user_login', $user_login);
-		return $this->db->delete('auth_conf');
+		if( $this->db->delete('auth_conf') ){
+			$this->conf->add_log("conf","del_conf_admin",$conf_id,array('user_login'=>$user_login));
+			return true;
+		}
+		return false;
 	}
 
 	function add_reviewer($conf_id,$user_login){
@@ -344,13 +352,21 @@ class User_model extends CI_Model {
 			"user_login" =>$user_login,
 			"auth_time"  =>time()
 		);
-		return $this->db->insert('auth_reviewer', $reviewer);
+		if( $this->db->insert('auth_reviewer', $reviewer) ){
+			$this->conf->add_log("conf","add_reviewer",$conf_id,$reviewer);
+			return true;
+		}
+		return false;
 	}
 
 	function del_reviewer($conf_id,$user_login){
 		$this->db->where('conf_id', $conf_id);
 		$this->db->where('user_login', $user_login);
-		return $this->db->delete('auth_reviewer');
+		if( $this->db->delete('auth_reviewer') ){
+			$this->conf->add_log("conf","del_reviewer",$conf_id,array('user_login'=>$user_login));
+			return true;
+		}
+		return false;
 	}
 
 	function get_conf($conf_id){

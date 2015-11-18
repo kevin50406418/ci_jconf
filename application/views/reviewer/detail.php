@@ -14,7 +14,7 @@
 				<h3>稿件資訊</h3>
 				<table class="table table-bordered">
 					<tr>
-						<th>題目</th>
+						<th style="width: 15%">題目</th>
 						<td><?php echo $paper->sub_title?></td>
 					</tr>
 					<tr>

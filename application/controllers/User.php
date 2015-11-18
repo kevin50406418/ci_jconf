@@ -81,7 +81,10 @@ class User extends MY_Controller {
 		    	$result = $this->user->login($user_login, $user_pwd);
 		    	if($result){
 		    		$this->form_validation->set_message('login_success', 'Login Success');
-		    		redirect(base_url($redirect), 'refresh');
+		    		if( in_array($redirect,array("favicon.ico")) ){
+						$redirect = "";
+					}
+		    		redirect(base_url($redirect), 'location', 301);
 		    	}else{
 		    		$this->alert->js("帳號或密碼錯誤");
 		    	}
@@ -89,7 +92,6 @@ class User extends MY_Controller {
 		}else{
 			redirect('/', 'location', 301);
 		}
-		
 
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);

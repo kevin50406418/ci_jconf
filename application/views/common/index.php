@@ -31,7 +31,7 @@
 				<?php if($this->user->is_login()){?>
 				<?php if($this->user->is_conf($conf->conf_id)){?>
 				<div class="btn-group" role="group">
-					<a class="btn btn-success btn-lg" href="<?php echo get_url("dashboard",$conf->conf_id);?>"> 網站編輯</a>
+					<a class="btn btn-success btn-lg" href="<?php echo get_url("dashboard",$conf->conf_id);?>"><i class="fa fa-tachometer fa-lg"></i> 網站編輯</a>
 				</div>
 				<?php }?>
 				<?php }?>

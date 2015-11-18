@@ -195,11 +195,13 @@ class Topic_model extends CI_Model {
 	        );
 	        $this->db->where("conf_id",$conf_id);
 	        $this->db->where("sub_id",$paper_id);
-	        $this->conf->add_log("topic","topic_review",$conf_id,$paper);
-	        return $this->db->update('paper', $paper);
-		}else{
-			return false;
+	        if( $this->db->update('paper', $paper) ){
+	        	$this->conf->add_log("topic","topic_review",$conf_id,$paper);
+				return true;
+	        }
 		}
+		return false;
+		
 	}
 
 	function count_paper($conf_id,$topic_id){

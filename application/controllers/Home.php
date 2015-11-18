@@ -89,7 +89,6 @@ class Home extends MY_Controller {
 				$conf_template=$data['conf_config']['conf_template'];
 				$template_dir = "template/".$conf_template."/";
 				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
-				$this->assets->add_css(asset_url().'style/statistic.min.css');
 
 				$schedule = $this->conf->get_schedules($this->conf_id);
 				$data['schedule'] = $schedule;
@@ -251,182 +250,38 @@ class Home extends MY_Controller {
 			$this->alert->js("No direct script access allowed",base_url());
 		}
 	}
-
+	public function page404($conf_id=''){
+		$data['body_class'] = $this->body_class;
+		$data['conf_id'] = $this->conf_id;
+		$this->cinfo['show_confinfo'] = false;
+		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
+		if( !empty($this->conf_id) ){
+			if( $this->conf->confid_exists($this->conf_id,$user_sysop) ){
+				redirect(get_url("index",$this->conf_id), 'location', 301);
+			}else{
+				$this->conf->show_404conf();
+			}
+		}else{
+			$this->conf->show_404conf();
+		}
+	}
 	public function debug(){
 		$data['body_class'] = $this->body_class;
 		$this->cinfo['show_confinfo'] = false;
 		if(!$this->user->is_sysop()){
 			redirect('/', 'location', 301);
 		}
-
-		$conf_configs = $this->conf->all_conf_config(true);
-		foreach ($conf_configs as $key => $conf_config) {
-			$conf_id = $conf_config->conf_id;
-				$conf_content = array(
-			        array(
-						'conf_id'     => $conf_id,
-						'page_id'     => 'index',
-						'page_title'  => "首頁",
-						'page_lang'   => "zhtw",
-						'page_show'   => 1,
-						"page_order"  => 0,
-						"page_edit"   => 1,
-						"page_hidden" => 0,
-						"page_del"    => 0
-			        ),
-			        array(
-						'conf_id'     => $conf_id,
-						'page_id'     => 'index',
-						'page_title'  => "Home",
-						'page_lang'   => "eng",
-						'page_show'   => 1,
-						"page_order"  => 0,
-						"page_edit"   => 1,
-						"page_hidden" => 0,
-						"page_del"    => 0
-			        ),
-			        array(
-						'conf_id'     => $conf_id,
-						'page_id'     => 'main',
-						'page_title'  => "研討會系統",
-						'page_lang'   => "zhtw",
-						'page_show'   => 1,
-						"page_order"  => 1,
-						"page_edit"   => 0,
-						"page_hidden" => 0,
-						"page_del"    => 0
-			        ),
-			        array(
-						'conf_id'     => $conf_id,
-						'page_id'     => 'main',
-						'page_title'  => "Conference System",
-						'page_lang'   => "eng",
-						'page_show'   => 1,
-						"page_order"  => 1,
-						"page_edit"   => 0,
-						"page_hidden" => 0,
-						"page_del"    => 0
-			        ),
-			        array(
-						'conf_id'     => $conf_id,
-						'page_id'     => 'news',
-						'page_title'  => "最新公告",
-						'page_lang'   => "zhtw",
-						'page_show'   => 1,
-						"page_order"  => 2,
-						"page_edit"   => 0,
-						"page_hidden" => 0,
-						"page_del"    => 0
-			        ),
-			        array(
-						'conf_id'     => $conf_id,
-						'page_id'     => 'news',
-						'page_title'  => "News",
-						'page_lang'   => "eng",
-						'page_show'   => 1,
-						"page_order"  => 2,
-						"page_edit"   => 0,
-						"page_hidden" => 0,
-						"page_del"    => 0
-			        ),
-			        array(
-						'conf_id'     => $conf_id,
-						'page_id'     => 'program',
-						'page_title'  => "會議議程",
-						'page_lang'   => "zhtw",
-						'page_show'   => 0,
-						"page_order"  => 3,
-						"page_edit"   => 1,
-						"page_hidden" => 1,
-						"page_del"    => 1
-			        ),
-			        array(
-						'conf_id'     => $conf_id,
-						'page_id'     => 'program',
-						'page_title'  => "Program",
-						'page_lang'   => "eng",
-						'page_show'   => 0,
-						"page_order"  => 3,
-						"page_edit"   => 1,
-						"page_hidden" => 1,
-						"page_del"    => 1
-			        ),
-			        array(
-						'conf_id'     => $conf_id,
-						'page_id'     => 'submission',
-						'page_title'  => "論文投稿",
-						'page_lang'   => "zhtw",
-						'page_show'   => 0,
-						"page_order"  => 4,
-						"page_edit"   => 1,
-						"page_hidden" => 1,
-						"page_del"    => 1
-			        ),
-			        array(
-						'conf_id'     => $conf_id,
-						'page_id'     => 'submission',
-						'page_title'  => "Submission",
-						'page_lang'   => "eng",
-						'page_show'   => 0,
-						"page_order"  => 4,
-						"page_edit"   => 1,
-						"page_hidden" => 1,
-						"page_del"    => 1
-			        ),
-			        array(
-						'conf_id'     => $conf_id,
-						'page_id'     => 'org',
-						'page_title'  => "大會組織",
-						'page_lang'   => "zhtw",
-						'page_show'   => 0,
-						"page_order"  => 5,
-						"page_edit"   => 1,
-						"page_hidden" => 1,
-						"page_del"    => 1
-			        ),
-			        array(
-						'conf_id'     => $conf_id,
-						'page_id'     => 'org',
-						'page_title'  => "Organization",
-						'page_lang'   => "eng",
-						'page_show'   => 0,
-						"page_order"  => 5,
-						"page_edit"   => 1,
-						"page_hidden" => 1,
-						"page_del"    => 1
-			        ),
-			        array(
-						'conf_id'     => $conf_id,
-						'page_id'     => 'supplier',
-						'page_title'  => "協辦及贊助單位",
-						'page_lang'   => "zhtw",
-						'page_show'   => 0,
-						"page_order"  => 6,
-						"page_edit"   => 1,
-						"page_hidden" => 1,
-						"page_del"    => 1
-			        ),
-			        array(
-						'conf_id'     => $conf_id,
-						'page_id'     => 'supplier',
-						'page_title'  => "Supplier",
-						'page_lang'   => "eng",
-						'page_show'   => 0,
-						"page_order"  => 6,
-						"page_edit"   => 1,
-						"page_hidden" => 1,
-						"page_del"    => 1
-			        ),
-
-			    );
-			foreach ($conf_content as $key => $conf_contents) {
-				// $this->db->insert('conf_content',$conf_contents);
-			}
-		}
-
+		// $conf = array();
+		// $confs = $this->conf->all_conf_config(true);
+		// foreach ($confs as $key => $value) {
+		// 	array_push($conf,$value->conf_id);
+		// }
+		// foreach ($conf as $key => $value) {
+		// 	$this->conf->init_conf_content($value);
+		// }
+		//
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
-		
 		$this->load->view('common/footer',$data);
 	}
 

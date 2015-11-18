@@ -4,14 +4,14 @@
 <div class="ui segment">
 	<?php echo form_open(base_url('sysop/user/add'),array("class"=>"form-horizontal","id"=>"register"))?>
 		<div class="form-group">
-			<label for="user_id" class="col-sm-2 control-label">帳號</label>
+			<label for="user_id" class="col-sm-2 control-label">帳號 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<input name="user_id" type="text" required="required" id="user_id" size="20" maxlength="30" class="form-control" autocomplete="off" value="<?php echo set_value('user_id'); ?>">
 				<span class="help-block">使用者名稱僅能包含小寫字母、數字、和連字號/底線。</span>
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="user_pw" class="col-sm-2 control-label">密碼</label>
+			<label for="user_pw" class="col-sm-2 control-label">密碼 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<input name="user_pw" type="password" required="required" id="user_pw" size="20" class="form-control" autocomplete="off">
 				<span class="help-block"><div id="progress_bar" class="progress"></div></span>
@@ -20,19 +20,19 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="user_pw2" class="col-sm-2 control-label">重覆輸入密碼</label>
+			<label for="user_pw2" class="col-sm-2 control-label">重覆輸入密碼 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<input name="user_pw2" type="password" required="required" id="user_pw2" size="20" class="form-control" autocomplete="off">
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="user_email" class="col-sm-2 control-label">電子信箱</label>
+			<label for="user_email" class="col-sm-2 control-label">電子信箱 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<input name="user_email" type="email" required="required" id="user_email" size="30" maxlength="50" class="form-control" autocomplete="off" value="<?php echo set_value('user_email'); ?>">
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="user_title" class="col-sm-2 control-label">稱謂</label>
+			<label for="user_title" class="col-sm-2 control-label">稱謂 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<select name="user_title" required id="user_title" class="form-control">
 						<option value="1">Mr.</option>
@@ -43,33 +43,33 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="user_firstname" class="col-sm-2 control-label">名字</label>
+			<label for="user_firstname" class="col-sm-2 control-label">名字 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<input name="user_firstname" type="text" id="user_firstname" size="20" maxlength="30" class="form-control" autocomplete="off" value="<?php echo set_value('user_firstname'); ?>">
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="user_lastname" class="col-sm-2 control-label">姓氏</label>
+			<label for="user_lastname" class="col-sm-2 control-label">姓氏 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<input name="user_lastname" type="text" required="required" id="user_lastname" size="20" maxlength="20" class="form-control" autocomplete="off" value="<?php echo set_value('user_lastname'); ?>">
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="user_gender" class="col-sm-2 control-label">性別</label>
+			<label for="user_gender" class="col-sm-2 control-label">性別 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<label><input name="user_gender" type="radio" required="required" id="user_gender_1" value="M" checked="checked" class="checkbox-inline">男</label>
 				<label><input name="user_gender" type="radio" required="required" id="user_gender_2" value="F" class="checkbox-inline">女</label>
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="user_org" class="col-sm-2 control-label">所屬機構</label>
+			<label for="user_org" class="col-sm-2 control-label">所屬機構 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<textarea name="user_org" rows="4" maxlength="40" required class="form-control" id="user_affiliation"><?php echo set_value('user_org'); ?></textarea>
 			</div>
 		</div>
 		
 		<div class="form-group">
-			<label for="user_phoneO" class="col-sm-2 control-label">電話(公)</label>
+			<label for="user_phoneO" class="col-sm-2 control-label">電話(公) <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<div class="col-sm-10">
 					<div class="input-group">
@@ -85,7 +85,7 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="user_cellphone" class="col-sm-2 control-label">手機</label>
+			<label for="user_cellphone" class="col-sm-2 control-label">手機 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<input name="user_cellphone" type="tel" required="required" id="user_cellphone" size="15" maxlength="15" class="form-control" autocomplete="off" value="<?php echo set_value('user_cellphone'); ?>">
 			</div>
@@ -97,7 +97,7 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="user_postadd" class="col-sm-2 control-label">聯絡地址</label>
+			<label for="user_postadd" class="col-sm-2 control-label">聯絡地址 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<div id="addr_6" class="row form-inline">
 					<div data-role="zipcode" data-readonly="true" class="col-sm-3" data-value="<?php echo set_value('user_postcode'); ?>"></div>
@@ -110,13 +110,13 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="user_country" class="col-sm-2 control-label">國別</label>
+			<label for="user_country" class="col-sm-2 control-label">國別 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<?php echo form_dropdown('user_country', $country_list, "TW", 'class="form-control chosen-select" data-placeholder="請選擇國家..."');?>
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="user_lang" class="col-sm-2 control-label">語言</label>
+			<label for="user_lang" class="col-sm-2 control-label">語言 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<select name="user_lang" id="user_lang" class="form-control">
 					<option value="zhtw" selected="selected">繁體中文(Traditional Chinese)</option>
@@ -125,7 +125,7 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="user_research" class="col-sm-2 control-label">研究領域</label>
+			<label for="user_research" class="col-sm-2 control-label">研究領域 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<textarea name="user_research" rows="5" required class="form-control" id="user_research"><?php echo set_value('user_research'); ?></textarea>
 			</div>
