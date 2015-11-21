@@ -71,5 +71,29 @@
 $(function() {
 	$("#topic_id").change(function() {$("form#act").submit();});
 	$("#status").change(function() {$("form#act").submit();});
+	$('.datatable').dataTable( {
+		"order": [[ 0, "desc" ]],
+		columnDefs: [
+			
+			{ orderable: false, "targets": -1 },
+		],
+		stateSave: true,
+        "language": {
+            "lengthMenu": "每頁顯示 _MENU_ 筆資料",
+            "zeroRecords": "找不到論文",
+            "info": "第 _PAGE_ 頁，共 _PAGES_ 頁",
+            "infoEmpty": "目前尚無任何論文",
+            "infoFiltered": "(filtered from _MAX_ total records)",
+			"loadingRecords": "載入中...",
+			"processing":     "處理中...",
+			"search":         "論文資料搜尋：",
+			"paginate": {
+				"first":      "首頁",
+				"last":       "最後一頁",
+				"next":       "下一頁",
+				"previous":   "上一頁"
+			},
+        }
+    } );
 });
 </script>

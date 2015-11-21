@@ -17,11 +17,7 @@
 		<tr>
 			<td class="text-center"><?php echo $paper->sub_id?></td>
 			<td>
-				<?php if(!in_array($paper->sub_id,$paper_author)){?>
-				<a href="#" title="<?php echo $paper->sub_summary?>"><?php echo $paper->sub_title?></a>
-				<?php }else{?>
-					<?php echo $paper->sub_title?>
-				<?php }?>
+				<?php echo $paper->sub_title?>
 			</td>
 			<td>
 				<?php if($_lang=="zhtw"){?>

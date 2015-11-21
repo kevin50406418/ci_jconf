@@ -14,7 +14,7 @@
 			<?php echo validation_errors('<div class="ui message red">', '</div>');?>
 			<div class="tab-pane active container-fluid" id="tab_info">
 				<h3>稿件資訊</h3>
-				<?php echo form_open(get_url("dashboard",$conf_id,"submit","edit",$paper->sub_id));?>
+				<?php echo form_open(get_url("dashboard",$conf_id,"submit","edit",$paper->sub_id),array("class"=>"form-horizontal"));?>
 				<?php echo form_hidden('update', 'info');?>
 				<table class="table table-bordered">
 					<tr>
@@ -26,7 +26,7 @@
 					<tr>
 						<th>摘要 <span class="text-danger">*</span></th>
 						<td>
-							<textarea name="sub_summary" required id="sub_summary" class="form-control"><?php echo $paper->sub_summary?></textarea>
+							<textarea name="sub_summary" required id="sub_summary" class="form-control" rows="8"><?php echo $paper->sub_summary?></textarea>
 						</td>
 					</tr>
 					<tr>

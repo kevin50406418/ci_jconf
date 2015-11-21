@@ -283,6 +283,9 @@ class Home extends MY_Controller {
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
 		$this->load->view('common/footer',$data);
+		// sp($this->Submit->sendmail_submit_success(54,"test2015"));
+		// sp($this->Submit->sendmail_submit_success(60,"test2015"));
+		// sp($this->topic->notice_editor("test2015",60));
 	}
 
 	public function _ckeditor(){

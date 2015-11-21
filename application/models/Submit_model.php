@@ -339,11 +339,14 @@ class Submit_model extends CI_Model {
 
     function paper_to_review($conf_id,$paper_id){
         $paper = array(
-            "sub_status"=>1
+            "sub_status"=>1,
+            "sub_review"=>time()
         );
         $this->db->where("conf_id",$conf_id);
         $this->db->where("sub_id",$paper_id);
         if( $this->db->update('paper', $paper) ){
+            $this->sendmail_submit_success($paper_id,$conf_id);
+            $this->topic->notice_editor($conf_id,$paper_id);
             // $this->conf->add_log("submit","paper_to_review",$conf_id,$paper);
             return true;
         }else{
@@ -803,5 +806,45 @@ class Submit_model extends CI_Model {
             return true;
         }
         return false;
+    }
+
+    function mail_get_paper($conf_id,$paper_id){
+        $this->db->from('paper');
+        $this->db->join('topic', 'paper.sub_topic = topic.topic_id');
+        $this->db->join('paper_author', 'paper.sub_id = paper_author.paper_id');
+        $this->db->join('conf', 'paper.conf_id = conf.conf_id');
+        $this->db->where('main_contract', 1);
+        $this->db->where("sub_id",$paper_id);
+        $this->db->where("paper.conf_id",$conf_id);
+        $query = $this->db->get();
+        return $query->row();
+    }
+
+    function sendmail_submit_success($paper_id,$conf_id){
+        $paper = $this->mail_get_paper($conf_id,$paper_id);
+        $author_name   = preg_match("/[\x{4e00}-\x{9fa5}]/u", $paper->user_last_name)?$paper->user_last_name.$paper->user_first_name:$paper->user_first_name." ".$paper->user_last_name;
+        $author        = is_null($paper->user_login)?'<a href="'.base_url("user/signup").'">未註冊帳號,前往註冊帳號 / Unregistered Account,Go To Signup Account</a> )':$paper->user_login;
+        $paper_title   = $paper->sub_title;
+        $paper_summary = $paper->sub_summary;
+        $conf_name = $paper->conf_name;
+        $conf_link = base_url($conf_id);
+        $submit_link = get_url("submit",$conf_id);
+        $user_email = $paper->user_email;
+        $conf_email =  $paper->conf_email;
+
+        $search = array("{author_name}","{author}","{paper_title}","{paper_summary}","{conf_name}","{conf_link}","{submit_link}");
+        $replace = array($author_name,$author,$paper_title,$paper_summary,$conf_name,$conf_link,$submit_link);
+
+
+        $mail_template = $this->conf->mail_get_template($conf_id,"thank_submit");
+        $mail_subject = str_replace($search,$replace,$mail_template->email_subject_zhtw);
+        $mail_content = str_replace($search,$replace,$mail_template->email_body_zhtw);
+        
+        $this->email->from($conf_email, $conf_name);
+        $this->email->to($user_email);
+        $this->email->subject($mail_subject);
+        $this->email->message($mail_content);
+        
+        $this->email->send();
     }
 }

@@ -121,11 +121,14 @@ class Topic_model extends CI_Model {
 		$reviewer = array(
 			"paper_id"       => $paper_id,
 			"user_login"     => $user_login,
-			"review_timeout" => $review_timeout
+			"review_timeout" => $review_timeout,
+			"review_confirm" => -1,
+			"review_token"   => hash('sha1',uniqid(rand(),true))
 		);
 		
 		if( $this->db->insert('paper_review', $reviewer) ){
 			$this->conf->add_log("topic","assign_reviewer",$conf_id,$reviewer);
+			//send mail
 			return true;
 		}else{
 			return false;
@@ -166,6 +169,7 @@ class Topic_model extends CI_Model {
 		$this->db->from('paper_review');
 		$this->db->join('paper','paper.sub_id = paper_review.paper_id');
 		$this->db->where('conf_id', $conf_id);
+		$this->db->where('review_confirm', 1);
 		$this->db->where_in('sub_topic', $topic_id);
 		$this->db->group_by("paper_id");
 		$query = $this->db->get();
@@ -182,6 +186,7 @@ class Topic_model extends CI_Model {
 		$this->db->where('conf_id', $conf_id);
 		$this->db->where_in('sub_topic', $topic_id);
 		$this->db->where('review_time >', 0);
+		$this->db->where('review_confirm', 1);
 		$this->db->group_by("paper_id");
 		$query = $this->db->get();
 		return $query->result();
@@ -215,5 +220,58 @@ class Topic_model extends CI_Model {
 		$this->db->where('paper.conf_id', $conf_id);
 		$query = $this->db->get();
 		return $query->row();
+	}
+
+	function mail_get_topic($conf_id,$paper_id){
+		$this->db->select("users.user_login,users.user_email,users.user_first_name,users.user_last_name,conf.conf_name,conf.conf_email,paper.sub_title");
+		$this->db->from('paper');
+        $this->db->join('topic', 'paper.sub_topic = topic.topic_id');
+        $this->db->join('auth_topic', 'auth_topic.topic_id = topic.topic_id');
+        $this->db->join('users', 'users.user_login = auth_topic.user_login');
+        $this->db->join('conf', 'conf.conf_id = paper.conf_id');
+        $this->db->where('paper.conf_id', $conf_id);
+        $this->db->where('sub_id', $paper_id);
+        $query = $this->db->get();
+		return $query->result();
+	}
+
+	function notice_editor($conf_id,$paper_id){
+		$editors = $this->mail_get_topic($conf_id,$paper_id);
+		foreach ($editors as $key => $editor) {
+			$editor_name =preg_match("/[\x{4e00}-\x{9fa5}]/u", $editor->user_last_name)?$editor->user_last_name.$editor->user_first_name:$editor->user_first_name." ".$editor->user_last_name;
+			$user_login  = $editor->user_login;
+			$conf_name   = $editor->conf_name;
+			$paper_title = $editor->sub_title;
+			$user_email  = $editor->user_email;
+			$conf_email  = $editor->conf_email;
+			$search = array("{editor_name}","{editor}","{conf_name}","{paper_title}");
+			$replace = array($editor_name,$user_login,$conf_name,$paper_title);
+
+			$mail_template = $this->conf->mail_get_template($conf_id,"editor_paper_assign");
+			$mail_subject = str_replace($search,$replace,$mail_template->email_subject_zhtw);
+        	$mail_content = str_replace($search,$replace,$mail_template->email_body_zhtw);
+
+        	$this->email->from($conf_email, $conf_name);
+			$this->email->to($user_email);
+			$this->email->subject($mail_subject);
+			$this->email->message($mail_content);
+			$this->email->send();
+		}
+	}
+
+	function get_check_review($review_token){
+		$this->db->from('paper_review');
+        $this->db->where("review_token",$review_token);
+        $this->db->where("review_confirm",-1);
+        $query = $this->db->get();
+        return $query->row();
+	}
+
+	function review_confirm($review_token,$review_confirm){
+		$review = array(
+			"review_confirm" => $review_confirm
+		);
+		$this->db->where('review_token', $review_token);
+		return $this->db->update('paper_review', $review);
 	}
 }

@@ -26,12 +26,13 @@ class Reviewer_model extends CI_Model {
 	function is_review($paper_id,$user_login){
 		$this->db->from('paper_review');
 		$this->db->where('user_login', $user_login);
+		$this->db->where('review_confirm', 1);
 		$this->db->where('paper_id', $paper_id);
 		$query = $this->db->get();
 		return $query->row();
 	}
 
-	function update_review($paper_id,$user_login,$review_status,$review_comment){
+	function update_review($conf_id,$paper_id,$user_login,$review_status,$review_comment){
 		$review = array(
             "review_time"   =>time(),
             "review_status" =>$review_status,
@@ -39,6 +40,8 @@ class Reviewer_model extends CI_Model {
         );
         $this->db->where('paper_id', $paper_id);
         $this->db->where('user_login', $user_login);
+        $this->db->where('review_confirm', 1);
+        $this->db->where('review_status', 3);
         if( $this->db->update('paper_review', $review) ){
         	$this->conf->add_log("review","update_review",$conf_id,$review);
         	return true;

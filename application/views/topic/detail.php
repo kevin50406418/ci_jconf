@@ -48,7 +48,7 @@
 					<tr>
 						<th>稿件狀態</th>
 						<td class="row">
-							<?php echo $this->Submit->sub_status($paper->sub_status,true)?>
+							<?php echo $this->Submit->sub_status($paper->sub_status,true,true)?>
 						</td>
 					</tr>
 					<tr>
@@ -160,13 +160,18 @@
 						</tr>
 					</thead>
 					<?php foreach ($reviewers as $key => $reviewer) {?>
+					
 					<tr>
 						<td class="text-center">
-							<input type="checkbox" value="<?php echo $reviewer->user_login?>" name="user_login[]"<?php if( in_array($reviewer->review_status, array(-2,2,4)) ){ $cnt++;?> disabled<?php }?>>
+							<input type="checkbox" value="<?php echo $reviewer->user_login?>" name="user_login[]"<?php if( in_array($reviewer->review_status, array(-2,2,4)) || $reviewer->review_confirm == -1 ){ $cnt++;?> disabled<?php }?>>
 						</td>
 						<td><?php echo $reviewer->user_login?></td>
 						<td>
+							<?php if( $reviewer->review_confirm == -1  ){?>
+							<span class="ui grey label">確認中</span>
+							<?php }else{?>
 							<?php echo $this->Submit->sub_status($reviewer->review_status,true)?>
+							<?php }?>
 						</td>
 						<td class="text-center">
 							<?php echo date("Y-m-d H:i",$reviewer->review_timeout)?>
@@ -182,6 +187,7 @@
 							<?php echo $reviewer->review_comment?>
 						</td>
 					</tr>
+					
 					<?php }?>
 				</table>
 				<?php if($cnt != count($reviewers)){?><button class="ui button orange" name="type" value="remind">提醒審查</button><?php }?>
@@ -205,7 +211,7 @@ $(function() {
 });
 </script>
 <?php if( $paper->sub_status == 3 ){?>
-<?php if($cnt == count($reviewers)){?>
+<?php if($cnt == count($reviewers)){  // bug: willnot show with confirm reviewer?>
 <div class="ui segment raised">
 	<div class="modal-header">
 		<h3 class="modal-title">主編審查</h3>

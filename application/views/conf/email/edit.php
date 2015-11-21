@@ -4,7 +4,7 @@
 		<h2>編輯電子郵件樣版</h2>
 	</div>
 	<?php echo validation_errors('<div class="ui message red">', '</div>');?>
-	<?php echo form_open("?key=".$template->email_key,array("class"=>"form-horizontal"))?>
+	<?php echo form_open(get_url("dashboard",$conf_id,"email","edit")."?key=".$template->email_key,array("class"=>"form-horizontal"))?>
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h3 class="panel-title">說明</h3>
@@ -17,25 +17,25 @@
 		<tr>
 			<th>中文信件主旨 <span class="text-danger">*</span></th>
 			<td>
-				<input type="text" name="default_subject[zhtw]" class="form-control" value="<?php echo set_value("default_subject[zhtw]",$template->email_subject_zhtw)?>">
+				<input type="text" name="subject_zhtw" class="form-control" value="<?php echo set_value("subject_zhtw",$template->email_subject_zhtw)?>">
 			</td>
 		</tr>
 		<tr>
 			<th>中文信件內容 <span class="text-danger">*</span></th>
 			<td>
-				<textarea name="default_body[zhtw]" class="form-control tinymce" rows="10"><?php echo set_value("default_body[zhtw]",$template->email_body_zhtw)?></textarea>
+				<textarea name="body_zhtw" class="form-control tinymce" rows="10"><?php echo set_value("body_zhtw",$template->email_body_zhtw)?></textarea>
 			</td>
 		</tr>
 		<tr>
 			<th>英文信件主旨 <span class="text-danger">*</span></th>
 			<td>
-				<input type="text" name="default_subject[eng]" class="form-control" value="<?php echo set_value("default_subject[eng]",$template->email_subject_eng)?>">
+				<input type="text" name="subject_eng" class="form-control" value="<?php echo set_value("subject_eng",$template->email_subject_eng)?>">
 			</td>
 		</tr>
 		<tr>
 			<th>英文信件內容 <span class="text-danger">*</span></th>
 			<td>
-				<textarea name="default_body[eng]" class="form-control tinymce" rows="10"><?php echo set_value("default_body[eng]",$template->email_body_eng)?></textarea>
+				<textarea name="body_eng" class="form-control tinymce" rows="10"><?php echo set_value("body_eng",$template->email_body_eng)?></textarea>
 			</td>
 		</tr>
 	</table>

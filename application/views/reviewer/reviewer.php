@@ -18,6 +18,7 @@
 					<select class="form-control" name="review_status">
 						<option>請選擇</option>
 						<option value="-2"<?php if( $review->review_status == -2){?> class="bg-info" selected<?php }?>>拒絕</option>
+						<option value="0"<?php if( $review->review_status == 1){?> class="bg-info" selected<?php }?>>編輯後再審</option>
 						<option value="2"<?php if( $review->review_status == 2){?> class="bg-info" selected<?php }?>>大會待決</option>
 						<option value="4"<?php if( $review->review_status == 4){?> class="bg-info" selected<?php }?>>接受</option>
 					</select>
@@ -26,7 +27,7 @@
 			<div class="form-group">
 				<label class="col-sm-2 control-label">審查建議 <span class="text-danger">*</span></label>
 				<div class="col-sm-10">
-					<textarea class="form-control" rows="3" name="review_comment"><?php echo $review->review_comment?></textarea>
+					<textarea class="form-control" name="review_comment"><?php echo $review->review_comment?></textarea>
 					<span class="help-block">不支援html語法</span>
 				</div>
 			</div>

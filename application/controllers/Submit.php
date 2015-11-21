@@ -22,6 +22,10 @@ class Submit extends MY_Conference {
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 		
+		$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
+		$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
+		$this->assets->add_js(asset_url().'js/dataTables.bootstrap.js',true);
+		
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
 
@@ -283,7 +287,7 @@ class Submit extends MY_Conference {
 				
 				if ($this->form_validation->run()){
 					$sub_title    = $this->input->post('sub_title');
-					$sub_summary  = $this->input->post('sub_summary');
+					$sub_summary  = str_replace(PHP_EOL,"<br>",$this->input->post('sub_summary'));
 					$sub_keyword  = empty($this->input->post('sub_keywords'))?"":$this->input->post('sub_keywords');
 					$sub_topic    = $this->input->post('sub_topic');
 					$sub_lang     = $this->input->post('sub_lang');

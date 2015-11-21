@@ -1108,6 +1108,32 @@ class Conf_model extends CI_Model {
 		return $query->row();
 	}
 
+	function update_mail_template($email_key,$conf_id,$email_subject_zhtw,$email_body_zhtw,$email_subject_eng,$email_body_eng){
+    	$template = array(
+    		"email_subject_zhtw" => $email_subject_zhtw,
+    		"email_body_zhtw" => $email_body_zhtw,
+    		"email_subject_eng" => $email_subject_eng,
+    		"email_body_eng" => $email_body_eng
+    	);
+    	$this->db->where("email_key",$email_key);
+        $this->db->where("conf_id",$conf_id);
+		if( $this->db->update("email_templates", $template) ){
+			array_push($template,array("email_key"=>$email_key));
+			$this->add_log("conf","update_mail_template",$conf_id,$template);
+			return true;
+		}else{
+			return false;
+		}
+    }
+
+	function mail_get_template($conf_id,$email_key){
+		$this->db->from('email_templates');
+    	$this->db->where('conf_id', $conf_id);
+    	$this->db->where('email_key', $email_key);
+    	$query = $this->db->get();
+		return $query->row();
+	}
+
 	function dw_paper($conf_id){
 		// $this->load->library('zip');
 	}

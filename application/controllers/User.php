@@ -340,4 +340,33 @@ class User extends MY_Controller {
 			}
 		}
 	}
+
+	public function review_confirm($type="",$review_token=""){
+		$data['body_class'] = $this->body_class;
+		$check_review = $this->topic->get_check_review($review_token);
+		$this->load->view('common/header');
+		$this->load->view('common/nav',$data);
+		// sp($check_review);
+		if( !in_array($type,array("accept","reject") ) ){
+			$this->alert->js("連結無效",base_url());
+		}else{
+			if( !empty($check_review) ){
+				switch( $type ){
+					case "accept":
+						if( $this->topic->review_confirm($review_token,1) ){
+							$this->alert->show("s","感謝協助審查",base_url());
+						}
+					break;
+					case "reject":
+						if( $this->topic->review_confirm($review_token,0) ){
+							$this->alert->show("s","非常感謝你答覆審查意願",base_url());
+						}
+					break;
+				}
+			}else{
+				$this->alert->js("連結無效",base_url());
+			}
+		}
+		$this->load->view('common/footer',$data);
+	}
 }

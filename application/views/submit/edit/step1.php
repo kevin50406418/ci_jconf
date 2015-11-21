@@ -18,12 +18,6 @@
 		</tr>
 		<?php }?>
 		<?php }?>
-		<tr>
-			<td class="text-success"><i class="fa fa-check-square-o fa-lg"></i></td>
-			<td>
-				<label>本投稿在未上傳投稿資料前，輸入的資料，將不列入本次研討會資料。</label>
-			</td>
-		</tr>
 	</table>
 	<br><br>
 	<div class="text-center">

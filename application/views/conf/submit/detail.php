@@ -14,7 +14,7 @@
 				<h3>稿件資訊</h3>
 				<table class="table table-bordered">
 					<tr>
-						<th>題目</th>
+						<th style="width: 10%;">題目</th>
 						<td><?php echo $paper->sub_title?></td>
 					</tr>
 					<tr>
@@ -27,7 +27,7 @@
 					</tr>
 					<tr>
 						<th>稿件狀態</th>
-						<td><?php echo $this->Submit->sub_status($paper->sub_status,true)?></td>
+						<td><?php echo $this->Submit->sub_status($paper->sub_status,true,true)?></td>
 					</tr>
 					<tr>
 						<th>語言</th>

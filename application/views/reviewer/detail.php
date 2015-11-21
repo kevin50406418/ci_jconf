@@ -122,29 +122,30 @@
 			<?php if( $paper->sub_status >= 3 ){?>
 			<div class="tab-pane container-fluid" id="tab_review">
 				<h3>審查資料</h3>
-				<table class="table table-striped">
+				<table class="table table-striped table-bordered">
 					<thead>
 						<tr>
-							<th style="width:10%">審查人</th>
-							<th style="width:10%">審查狀態</th>
-							<th style="width:10%">審查期限</th>
-							<th style="width:10%">審查時間</th>
-							<th style="width:60%">審查建議</th>
+							<th class="text-center" style="width:15%">審查人</th>
+							<th class="text-center" style="width:10%">審查狀態</th>
+							<th class="text-center" style="width:10%">審查期限</th>
+							<th class="text-center" style="width:10%">審查時間</th>
+							<th class="text-center" style="width:55%">審查建議</th>
 						</tr>
 					</thead>
 					<?php foreach ($reviewers as $key => $reviewer) {?>
+					<?php if( $reviewer->review_confirm == 1 ){?>
 					<tr>
 						<td><?php echo $reviewer->user_login?></td>
-						<td>
+						<td class="text-center">
 							<?php echo $this->Submit->sub_status($reviewer->review_status,true)?>
 						</td>
 						<td class="text-center">
 							<?php echo date("Y-m-d H:i",$reviewer->review_timeout)?>
 						</td>
-						<td>
+						<td class="text-center">
 							<?php
-								if( in_array($reviewer->review_status, array(-2,2,4)) ){
-									echo date('Y/m/d H:i', $reviewer->review_time);	
+								if( in_array($reviewer->review_status, array(-2,0,2,4)) ){
+									echo date('Y-m-d H:i', $reviewer->review_time);	
 								}
 							?>
 						</td>
@@ -152,6 +153,7 @@
 							<?php echo $reviewer->review_comment?>
 						</td>
 					</tr>
+					<?php }?>
 					<?php }?>
 				</table>
 			</div>

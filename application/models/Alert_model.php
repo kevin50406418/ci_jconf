@@ -4,10 +4,12 @@ class Alert_model extends CI_Model {
 		parent::__construct();
     }
 
-    function show($type='i',$text,$refresh=-1){
+    function show($type='i',$text,$refresh=-1,$header="",$class=""){
 		$data['class']   = "";
 		$data['text']    = $text;
 		$data['refresh'] = $refresh;
+		$data['header'] = $header;
+
 		switch($type){
 			case 's':
 				$data['class']="positive";
@@ -49,6 +51,7 @@ class Alert_model extends CI_Model {
 				$data['class']="info";
 			break;
 		}
+		$data['class'].= $class;
 		$this->load->view('common/alert',$data);
     }
 

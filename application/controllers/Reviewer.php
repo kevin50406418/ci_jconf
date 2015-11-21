@@ -68,8 +68,7 @@ class Reviewer extends MY_Conference {
 			$this->output->_display();
 			exit;
 		}
-		$user_login = $this->session->userdata('user_login');
-		$paper_author=$this->Submit->show_mypaper($user_login,$conf_id);
+		$paper_author=$this->Submit->show_mypaper($this->user_login,$conf_id);
 		$paper_array = array();
 		if(is_array($paper_author)){
 			foreach ($paper_author as $key => $pa) {
@@ -91,8 +90,8 @@ class Reviewer extends MY_Conference {
 				$data['reviewers']  = $this->reviewer->get_reviewer($paper_id);
 			}
 			$this->load->view('reviewer/detail',$data);
-
-			$paper_is_review = $this->reviewer->is_review($paper_id,$user_login);
+			$paper_is_review = $this->reviewer->is_review($paper_id,$this->user_login);
+			
 			if( $paper_is_review->review_status == 3 ){
 				$data['review']  = $paper_is_review;
 				$this->form_validation->set_rules('review_status', '審查狀態', 'required');
@@ -100,8 +99,8 @@ class Reviewer extends MY_Conference {
 			    if ( $this->form_validation->run() ){
 					$review_status  = $this->input->post('review_status', TRUE);
 					$review_comment = $this->input->post('review_comment', TRUE);
-					if( in_array($review_status,array(-2,2,4)) ){
-						if( $this->reviewer->update_review($paper_id,$user_login,$review_status,$review_comment) ){
+					if( in_array($review_status,array(-2,0,2,4)) ){
+						if( $this->reviewer->update_review($this->conf_id,$paper_id,$this->user_login,$review_status,$review_comment) ){
 							if( $paper_is_review->review_status == 3 ){
 								$this->alert->js("成功送出審查意見");
 							}else{

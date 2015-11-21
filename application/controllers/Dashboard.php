@@ -892,6 +892,22 @@ class Dashboard extends MY_Conference {
 			case "edit":
 				$email_key = $this->input->get("key");
 				if($data['template'] = $this->conf->get_mail_template($conf_id,$email_key,$this->_lang)){
+					$this->form_validation->set_rules('subject_zhtw', '中文信件主旨', 'required');
+					$this->form_validation->set_rules('body_zhtw', '中文信件內容', 'required');
+					$this->form_validation->set_rules('subject_eng', '英文信件主旨', 'required');
+					$this->form_validation->set_rules('body_eng', '英文信件內容', 'required');
+					if ($this->form_validation->run()){
+						$subject_zhtw = $this->input->post('subject_zhtw');
+						$body_zhtw    = $this->input->post('body_zhtw',false);
+						$subject_eng  = $this->input->post('subject_eng');
+						$body_eng     = $this->input->post('body_eng',false);
+						if( $this->conf->update_mail_template($email_key,$this->conf_id,$subject_zhtw,$body_zhtw,$subject_eng,$body_eng) ){
+							$this->alert->show("s","電子郵件樣版更新成功");
+						}else{
+							$this->alert->js("電子郵件樣版更新失敗");
+						}
+						$this->alert->refresh(2);
+					}
 					$this->load->view('common/tinymce',$data);
 					$this->load->view('conf/email/edit',$data);
 				}else{
@@ -912,7 +928,10 @@ class Dashboard extends MY_Conference {
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
 
 		$this->assets->add_css(asset_url().'style/chosen.css');
-		
+		$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
+		$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
+		$this->assets->add_js(asset_url().'js/dataTables.bootstrap.js',true);
+
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
 
@@ -958,7 +977,7 @@ class Dashboard extends MY_Conference {
 						$this->assets->add_js(asset_url().'js/repeatable.js',true);
 						$this->assets->add_js(asset_url().'js/chosen.jquery.js',true);
 						$data['topics'] = $this->conf->get_topic($conf_id);
-						
+						$data['paper']->sub_summary =str_replace("<br>",PHP_EOL,$data['paper']->sub_summary);
 						$country_list = config_item('country_list');
 						$data['country_list'] = $country_list[$this->_lang];
 						$update = $this->input->post("update");
@@ -971,7 +990,7 @@ class Dashboard extends MY_Conference {
 								
 								if ($this->form_validation->run()){
 									$sub_title    = $this->input->post('sub_title');
-									$sub_summary  = $this->input->post('sub_summary');
+									$sub_summary  = str_replace(PHP_EOL,"<br>",$this->input->post('sub_summary'));
 									$sub_keyword  = $this->input->post('sub_keywords');
 									$sub_topic    = in_array($paper->sub_status,array(-1,1))?$this->input->post('sub_topic'):$paper->topic_id;
 									$sub_lang     = $this->input->post('sub_lang');
@@ -1242,6 +1261,10 @@ class Dashboard extends MY_Conference {
 		$data['conf_logs']    = $this->conf->get_logs($conf_id);
 
 		$this->lang->load("log",$this->_lang);
+
+		$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
+		$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
+		$this->assets->add_js(asset_url().'js/dataTables.bootstrap.js',true);
 
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
