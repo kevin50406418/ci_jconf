@@ -6,7 +6,7 @@
 			<li class="active"> <a href="#tab_info" data-toggle="tab"> 稿件資訊 </a> </li>
 			<li> <a href="#tab_author" data-toggle="tab"> 作者資訊 </a> </li>
 			<li> <a href="#tab_file" data-toggle="tab"> 稿件檔案 </a> </li>
-			<?php if( $paper->sub_status >= 3 || $paper->sub_status == -2){?><li> <a href="#tab_review" data-toggle="tab"> 審查資料 </a> </li><?php }?>
+			<?php if( $paper->sub_status >= 3 || $paper->sub_status == -2 || $paper->sub_status == 0){?><li> <a href="#tab_review" data-toggle="tab"> 審查資料 </a> </li><?php }?>
 			<?php if( $paper->sub_status < 3 && $paper->sub_status >= -1){?>
 			<?php echo form_open(get_url("topic",$conf_id,"operating",$paper->sub_id),array("class"=>"pull-right","id"=>"paper_act"))?>
 				操作：
@@ -141,14 +141,14 @@
 					<?php }?>
 				</table>
 			</div>
-			<?php if( $paper->sub_status >= 3 || $paper->sub_status == -2){?>
+			<?php if( $paper->sub_status >= 3 || $paper->sub_status == -2 || $paper->sub_status == 0){?>
 			<div class="tab-pane container-fluid" id="tab_review">
 				<h3>審查資料</h3>
 				<?php $cnt = 0;?>
 				<div class="table-responsive">
 				<?php echo form_open(get_url("topic",$conf_id,"detail",$paper->sub_id))?>
 				<?php echo form_hidden('do', 'notice');?>
-				<table class="table table-striped">
+				<table class="table">
 					<thead>
 						<tr>
 							<th style="width:5%"> </th>
@@ -160,8 +160,7 @@
 						</tr>
 					</thead>
 					<?php foreach ($reviewers as $key => $reviewer) {?>
-					
-					<tr>
+					<tr<?php if( $reviewer->topic_review == 1 ){?> class="active"<?php }?>>
 						<td class="text-center">
 							<input type="checkbox" value="<?php echo $reviewer->user_login?>" name="user_login[]"<?php if( in_array($reviewer->review_status, array(-2,2,4)) || $reviewer->review_confirm == -1 ){ $cnt++;?> disabled<?php }?>>
 						</td>
@@ -176,9 +175,9 @@
 						<td class="text-center">
 							<?php echo date("Y-m-d H:i",$reviewer->review_timeout)?>
 						</td>
-						<td>
+						<td class="text-center">
 							<?php
-								if( in_array($reviewer->review_status, array(-2,2,4)) ){
+								if( in_array($reviewer->review_status, array(-2,2,0,4)) ){
 									echo date('Y/m/d H:i', $reviewer->review_time);	
 								}
 							?>
@@ -190,7 +189,9 @@
 					
 					<?php }?>
 				</table>
-				<?php if($cnt != count($reviewers)){?><button class="ui button orange" name="type" value="remind">提醒審查</button><?php }?>
+				<?php if($cnt != count($reviewers)){?>
+				<button class="ui button orange" name="type" value="remind">提醒審查</button>
+				<?php }?>
 				<?php echo form_close()?>	
 				</div>			
 			</div>
@@ -211,7 +212,6 @@ $(function() {
 });
 </script>
 <?php if( $paper->sub_status == 3 ){?>
-<?php if($cnt == count($reviewers)){  // bug: willnot show with confirm reviewer?>
 <div class="ui segment raised">
 	<div class="modal-header">
 		<h3 class="modal-title">主編審查</h3>
@@ -242,5 +242,4 @@ $(function() {
 		<?php echo form_close()?>
 	</div>
 </div>
-<?php }?>
 <?php }?>

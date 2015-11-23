@@ -253,7 +253,7 @@ class Submit extends MY_Conference {
 				$this->assets->add_js(asset_url().'js/chosen.jquery.js');
 				$country_list = config_item('country_list');
 				$data['paper']              = $this->Submit->get_paperinfo($conf_id,$paper_id, $this->user_login);
-				$data['paper']->sub_summary =str_replace("<br>",PHP_EOL,$data['paper']->sub_summary);
+				$data['paper']->sub_summary = str_replace("<br>",PHP_EOL,$data['paper']->sub_summary);
 				$data['country_list']       = $country_list['zhtw'];
 				$data['topics']             = $this->conf->get_topic($conf_id);
 				$data['authors']            = $this->Submit->get_author($paper_id);

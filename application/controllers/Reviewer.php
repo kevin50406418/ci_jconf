@@ -91,35 +91,37 @@ class Reviewer extends MY_Conference {
 			}
 			$this->load->view('reviewer/detail',$data);
 			$paper_is_review = $this->reviewer->is_review($paper_id,$this->user_login);
-			
-			if( $paper_is_review->review_status == 3 ){
-				$data['review']  = $paper_is_review;
-				$this->form_validation->set_rules('review_status', '審查狀態', 'required');
-			    $this->form_validation->set_rules('review_comment', '審查建議', 'required');
-			    if ( $this->form_validation->run() ){
-					$review_status  = $this->input->post('review_status', TRUE);
-					$review_comment = $this->input->post('review_comment', TRUE);
-					if( in_array($review_status,array(-2,0,2,4)) ){
-						if( $this->reviewer->update_review($this->conf_id,$paper_id,$this->user_login,$review_status,$review_comment) ){
-							if( $paper_is_review->review_status == 3 ){
-								$this->alert->js("成功送出審查意見");
+			if( !empty($paper_is_review) ){
+				if( $paper_is_review->review_status == 3 ){
+					$data['review']  = $paper_is_review;
+					$this->form_validation->set_rules('review_status', '審查狀態', 'required');
+				    $this->form_validation->set_rules('review_comment', '審查建議', 'required');
+				    if ( $this->form_validation->run() ){
+						$review_status  = $this->input->post('review_status', TRUE);
+						$review_comment = $this->input->post('review_comment', TRUE);
+						if( in_array($review_status,array(-2,0,2,4)) ){
+							if( $this->reviewer->update_review($this->conf_id,$paper_id,$this->user_login,$review_status,$review_comment) ){
+								if( $paper_is_review->review_status == 3 ){
+									$this->alert->js("成功送出審查意見");
+								}else{
+									$this->alert->js("成功更新審查意見");
+								}
 							}else{
-								$this->alert->js("成功更新審查意見");
+								if( $paper_is_review->review_status == 3 ){
+									$this->alert->js("審查意見送出失敗");
+								}else{
+									$this->alert->js("審查意見更新失敗");
+								}
 							}
 						}else{
-							if( $paper_is_review->review_status == 3 ){
-								$this->alert->js("審查意見送出失敗");
-							}else{
-								$this->alert->js("審查意見更新失敗");
-							}
+							$this->alert->js("請選擇正確審查狀態");
 						}
-					}else{
-						$this->alert->js("請選擇正確審查狀態");
-					}
-					$this->alert->refresh(2);
-			    }
-				$this->load->view('reviewer/reviewer',$data);
+						$this->alert->refresh(2);
+				    }
+					$this->load->view('reviewer/reviewer',$data);
+				}
 			}
+			
 		}else{
 			$this->alert->js("由於您為本篇稿件作者之一，無法審查本篇稿件",get_url("reviewer",$conf_id,"index"));
 		}

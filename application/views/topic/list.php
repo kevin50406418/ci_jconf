@@ -80,7 +80,9 @@
 					<?php if($paper->sub_status == 3){?>
 					<span class="ui green label basic"><i class="fa fa-check-circle-o"></i> 完成審查</span>
 					<?php }else{?>
-						
+						<?php echo $had_count[$paper->sub_id]?>
+						/
+						<?php echo $assign_count[$paper->sub_id]?>
 					<?php }?>
 				<?php }else{?>
 					<?php echo $had_count[$paper->sub_id]?>
@@ -93,10 +95,12 @@
 				<div class="small icon ui buttons basic">
 				<?php if(!in_array($paper->sub_id,$paper_author)){?>
 					<?php if($had_count[$paper->sub_id] == $assign_count[$paper->sub_id] && $assign_count[$paper->sub_id] != 0){?>
-						<?php if($paper->sub_status != 3){?>
-							<a href="<?php echo get_url("topic",$conf_id,"detail",$paper->sub_id)?>" class="ui button">查看稿件</a>
-						<?php }else{?>
+						<?php if($paper->sub_status == 3 ){?>
 							<a href="<?php echo get_url("topic",$conf_id,"detail",$paper->sub_id)?>" class="ui button basic green">主編審查</a>
+						<?php }elseif($paper->sub_status == 1){?>
+							<a href="<?php echo get_url("topic",$conf_id,"detail",$paper->sub_id)?>" class="ui teal button basic">分派審查</a>
+						<?php }else{?>
+							<a href="<?php echo get_url("topic",$conf_id,"detail",$paper->sub_id)?>" class="ui button">查看稿件</a>
 						<?php }?>
 					<?php }else{?>
 						<a href="<?php echo get_url("topic",$conf_id,"detail",$paper->sub_id)?>" class="ui teal button basic">分派審查</a>

@@ -63,6 +63,10 @@ class Topic_model extends CI_Model {
 		return $query->row();
     }
 
+    function del_pedding_reviewer($paper_id,$conf_id){
+
+    }
+    
     function assign_reviewer_pedding($paper_id,$user_login,$conf_id,$review_timeout){
 		$reviewer = array(
 			"paper_id"       => $paper_id,
@@ -170,6 +174,7 @@ class Topic_model extends CI_Model {
 		$this->db->join('paper','paper.sub_id = paper_review.paper_id');
 		$this->db->where('conf_id', $conf_id);
 		$this->db->where('review_confirm', 1);
+		$this->db->where('topic_review', 0);
 		$this->db->where_in('sub_topic', $topic_id);
 		$this->db->group_by("paper_id");
 		$query = $this->db->get();
@@ -183,17 +188,20 @@ class Topic_model extends CI_Model {
 		$this->db->select('paper_id,count(*) as cnt');
 		$this->db->from('paper_review');
 		$this->db->join('paper','paper.sub_id = paper_review.paper_id');
+		$this->db->where('topic_review', 0);
 		$this->db->where('conf_id', $conf_id);
 		$this->db->where_in('sub_topic', $topic_id);
 		$this->db->where('review_time >', 0);
 		$this->db->where('review_confirm', 1);
+		$this->db->where('topic_review', 0);
+		
 		$this->db->group_by("paper_id");
 		$query = $this->db->get();
 		return $query->result();
 	}
 
 	function topic_review($conf_id,$paper_id,$sub_status){
-		$status = array(-3,-2,2,4);
+		$status = array(-3,-2,0,2,4);
 		if( in_array($sub_status,$status) ){
 			$paper = array(
             	"sub_status"=> $sub_status
@@ -201,12 +209,21 @@ class Topic_model extends CI_Model {
 	        $this->db->where("conf_id",$conf_id);
 	        $this->db->where("sub_id",$paper_id);
 	        if( $this->db->update('paper', $paper) ){
+	        	$this->finish_review($paper_id);
 	        	$this->conf->add_log("topic","topic_review",$conf_id,$paper);
 				return true;
 	        }
 		}
 		return false;
 		
+	}
+
+	function finish_review($paper_id){
+		$review = array(
+        	"topic_review"=> 1
+        );
+        $this->db->where("paper_id",$paper_id);
+		$this->db->update('paper_review', $review);
 	}
 
 	function count_paper($conf_id,$topic_id){

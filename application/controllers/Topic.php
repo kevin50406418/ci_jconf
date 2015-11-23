@@ -246,7 +246,7 @@ class Topic extends MY_Topic {
 						$this->load->view('topic/pedding_reviewers',$data);
 					}
 				}
-				if( $data['paper']->sub_status >= 3 || $data['paper']->sub_status == -2){
+				if( $data['paper']->sub_status >= 3 || $data['paper']->sub_status == -2 || $data['paper']->sub_status == 0){
 					$reviewers = $this->topic->get_reviewer($paper_id);
 					$data['reviewers'] = $reviewers;
 					if( $data['paper']->sub_status == 3){

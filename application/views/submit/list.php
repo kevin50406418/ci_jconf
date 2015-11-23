@@ -22,7 +22,7 @@
 			<td data-order="0">
 				<div class="small icon ui buttons">
 					<a href="<?php echo get_url("submit",$conf_id,"detail",$list->sub_id)?>" class="tiny ui blue button">查看</a>
-					<?php if($list->sub_status==-1){?>
+					<?php if( $list->sub_status==-1 || $list->sub_status== 0){?>
 					<a href="<?php echo get_url("submit",$conf_id,"edit",$list->sub_id)?>" class="tiny ui teal button">編輯</a>
                     <?php }elseif($list->sub_status==5){?>
 					<i class="fa fa-calendar"></i> <?php echo date('Y/m/d H:i', $list->sub_time)?> 完稿

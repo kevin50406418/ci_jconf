@@ -376,7 +376,7 @@ class Submit_model extends CI_Model {
         $this->db->join('paper_author', 'paper.sub_id = paper_author.paper_id');
         $this->db->where('user_login', $user_login);
         $this->db->where("sub_id",$paper_id);
-        $this->db->where("sub_status",-1);
+        $this->db->where_in("sub_status", array(-1,0));
         if( $this->db->count_all_results() ==1 ){
             return false;
         }else{
