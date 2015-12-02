@@ -11,6 +11,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>亞大研討會系統</title>
+<?php //echo $this->assets->show_title()?>
 <?php echo $this->assets->show_meta()?>
 <!--<link rel="shortcut icon" href="favicon.ico" />-->
 <?php echo $this->assets->show_css();?>

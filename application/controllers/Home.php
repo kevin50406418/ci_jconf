@@ -35,6 +35,7 @@ class Home extends MY_Controller {
 				$conf_template=$data['conf_config']['conf_template'];
 				$template_dir = "template/".$conf_template."/";
 				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
+				$this->assets->add_meta_tag("keywords", $data['conf_config']['conf_keywords'], "name");
 
 				$schedule = $this->conf->get_schedules($this->conf_id);
 				$data['schedule'] = $schedule;
@@ -89,7 +90,8 @@ class Home extends MY_Controller {
 				$conf_template=$data['conf_config']['conf_template'];
 				$template_dir = "template/".$conf_template."/";
 				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
-
+				$this->assets->add_meta_tag("keywords", $data['conf_config']['conf_keywords'], "name");
+				
 				$schedule = $this->conf->get_schedules($this->conf_id);
 				$data['schedule'] = $schedule;
 				
@@ -143,6 +145,7 @@ class Home extends MY_Controller {
 				$data['conf_content']=$this->conf->conf_content($conf_id);
 
 				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
+				$this->assets->add_meta_tag("keywords", $data['conf_config']['conf_keywords'], "name");
 				$this->assets->add_css(asset_url().'style/statistic.min.css');
 				$data['schedule'] = $this->conf->get_schedules($this->conf_id);
 				
@@ -192,10 +195,13 @@ class Home extends MY_Controller {
 				$data['conf_content']=$this->conf->conf_content($conf_id);
 				$data['content']=$this->conf->get_content($conf_id,$page_id,$this->_lang);
 				$data['conf_news'] = $this->conf->get_news($conf_id);
+				$schedule = $this->conf->get_schedules($this->conf_id);
+				$data['schedule'] = $schedule;
 				$conf_col=$data['conf_config']['conf_col'];
 				$conf_template=$data['conf_config']['conf_template'];
 				$template_dir = "template/".$conf_template."/";
 				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
+				$this->assets->add_meta_tag("keywords", $data['conf_config']['conf_keywords'], "name");
 				$this->assets->add_css(asset_url().'style/statistic.min.css');
 
 				if( $conf_template == "default"){

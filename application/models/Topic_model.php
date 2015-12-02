@@ -64,7 +64,8 @@ class Topic_model extends CI_Model {
     }
 
     function del_pedding_reviewer($paper_id,$conf_id){
-
+    	$this->db->where('paper_id', $paper_id);
+		return $this->db->delete('paper_review_pedding');
     }
     
     function assign_reviewer_pedding($paper_id,$user_login,$conf_id,$review_timeout){
@@ -122,21 +123,55 @@ class Topic_model extends CI_Model {
 	}
 
 	function assign_reviewer($paper_id,$user_login,$conf_id,$review_timeout){
+		$review_token = hash('sha1',uniqid(rand(),true));
 		$reviewer = array(
 			"paper_id"       => $paper_id,
 			"user_login"     => $user_login,
 			"review_timeout" => $review_timeout,
 			"review_confirm" => -1,
-			"review_token"   => hash('sha1',uniqid(rand(),true))
+			"review_token"   => $review_token
 		);
 		
 		if( $this->db->insert('paper_review', $reviewer) ){
 			$this->conf->add_log("topic","assign_reviewer",$conf_id,$reviewer);
-			//send mail
+			$this->sendmail_notice_reviewer($paper_id,$user_login,$conf_id,$review_timeout,$review_token);
 			return true;
 		}else{
 			return false;
 		}
+	}
+
+	function sendmail_notice_reviewer($paper_id,$user_login,$conf_id,$review_timeout,$review_token){
+		$user_info = $this->user->get_user_info($user_login);
+		$paper     = $this->Submit->mail_get_paper($conf_id,$paper_id);
+
+		$reviewer_email    = $user_info->user_email;
+		$reviewer_name     = preg_match("/[\x{4e00}-\x{9fa5}]/u", $user_info->user_last_name)?$user_info->user_last_name.$user_info->user_first_name:$user_info->user_first_name." ".$user_info->user_last_name;
+		$reviewer          = $user_login;
+		$paper_title       = $paper->sub_title;
+		$paper_summary     = $paper->sub_summary;
+		$conf_name         = $paper->conf_name;
+		$conf_link         = base_url($conf_id);
+		$review_accept     = base_url("review_confirm/accept/".$review_token);
+		$review_reject     = base_url("review_confirm/reject/".$review_token);
+		$review_deadline   = date("Y-m-d H:i:s",$review_timeout);
+		$password_reseturl = base_url("user/lostpwd");
+		$review_url        = get_url("reviewer",$conf_id,"index");
+		$conf_email        = $paper->conf_email;
+
+		$search = array("{reviewer_name}","{reviewer}","{paper_title}","{paper_summary}","{conf_name}","{conf_link}","{review_accept}","{review_reject}","{review_deadline}","{password_reseturl}","{review_url}");
+        $replace = array($reviewer_name,$reviewer,$paper_title,$paper_summary,$conf_name,$conf_link,$review_accept,$review_reject,$review_deadline,$password_reseturl,$review_url);
+		
+		$mail_template = $this->conf->mail_get_template($conf_id,"confirm_review");
+        $mail_subject = str_replace($search,$replace,$mail_template->email_subject_zhtw);
+        $mail_content = str_replace($search,$replace,$mail_template->email_body_zhtw);
+
+        $this->email->from($conf_email, $conf_name);
+        $this->email->to($reviewer_email);
+        $this->email->subject($mail_subject);
+        $this->email->message($mail_content);
+        
+        $this->email->send();
 	}
 
 	function get_reviewer($paper_id){
@@ -146,6 +181,7 @@ class Topic_model extends CI_Model {
 		$query = $this->db->get();
 		return $query->result();
 	}
+
 
 	function notice_reviewer($user_login,$user_email,$conf_name,$conf_id,$paper_name,$topic_name,$topic_name_eng,$topic_login){
 		$site_name = $this->config->item('site_name');

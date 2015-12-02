@@ -33,8 +33,11 @@ class Dashboard extends MY_Conference {
 
 		$this->assets->add_css(asset_url().'style/datepicker.css');
 		$this->assets->add_js(asset_url().'js/bootstrap-datepicker.js');
+		$this->assets->add_js(asset_url().'js/locales/bootstrap-datepicker.zh-TW.js');
 		$schedule = $this->conf->get_schedules($conf_id);
 		$data['schedule'] = $schedule;
+		$data['styles'] = $this->conf->get_style();
+		
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
 
@@ -62,6 +65,18 @@ class Dashboard extends MY_Conference {
 						}
 					}
 				break;
+				case "style":
+					$this->form_validation->set_rules('style', '研討會樣式', 'required');
+					if ($this->form_validation->run()){
+						$style = $this->input->post('style');
+						if( $this->conf->update_confstyle($conf_id,$style) ){
+							$this->alert->js("研討會樣式更新成功");
+						}else{
+							$this->alert->js("研討會樣式更新失敗");
+						}
+						$this->alert->refresh(0);
+					}
+				break;
 				case "config":
 					$this->form_validation->set_rules('conf_name', '研討會名稱', 'required');
 					$this->form_validation->set_rules('conf_master', '主要聯絡人', 'required');
@@ -71,6 +86,7 @@ class Dashboard extends MY_Conference {
 					$this->form_validation->set_rules('conf_host', '主辦單位', 'required');
 					$this->form_validation->set_rules('conf_place', '簡介', 'required');
 					$this->form_validation->set_rules('conf_desc', '簡介', 'required');
+					$this->form_validation->set_rules('conf_keywords', '關鍵字', 'required');
 					if ($this->form_validation->run()){
 						$conf_name    = $this->input->post('conf_name');
 						$conf_master  = $this->input->post('conf_master');
@@ -81,8 +97,8 @@ class Dashboard extends MY_Conference {
 						$conf_address = $this->input->post('conf_address');
 						$conf_place   = $this->input->post('conf_place');
 						$conf_desc    = $this->input->post('conf_desc');
-						
-						if( $this->conf->update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_host,$conf_place,$conf_desc) ){
+						$conf_keywords= $this->input->post('conf_keywords');
+						if( $this->conf->update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_host,$conf_place,$conf_keywords,$conf_desc) ){
 							$this->alert->js("更新成功");
 						}else{
 							$this->alert->js("更新失敗");
@@ -111,81 +127,92 @@ class Dashboard extends MY_Conference {
 					$this->form_validation->set_rules('early_bird[]', '早鳥繳費', 'required');
 					$this->form_validation->set_rules('register[]', '線上註冊', 'required');
 					$this->form_validation->set_rules('finish[]', '上傳完稿截止', 'required');
-					/*if( $this->conf_config['conf_most'] == 1){
+					if( $this->conf_config['conf_most'] == 1){
 						$this->form_validation->set_rules('most[]', '上傳完稿截止', 'required');
-					}*/
+					}
 					if ($this->form_validation->run()){
 						$hold       = $this->input->post("hold");
 						$submit     = $this->input->post("submit");
 						$early_bird = $this->input->post("early_bird");
 						$register   = $this->input->post("register");
 						$finish     = $this->input->post("finish");
-
+						
 						$int_hold = array_map("strtotime", $hold);
 						$int_submit = array_map("strtotime", $submit);
 						$int_early_bird = array_map("strtotime", $early_bird);
 						$int_register = array_map("strtotime", $register);
 						$int_finish = array_map("strtotime", $finish);
-						
-						// sp($int_hold);
-						// sp($int_submit);
-						// sp($int_early_bird);
-						// sp($int_register);
-						// sp($int_finish);
-						$time = 2;
+
+						$success = array();
+						$error = array();
 						if( $this->conf->update_schedule($conf_id,"hold",$int_hold['start'],$int_hold['end']) ){
-							$this->alert->show("s","成功更新時間:會議舉行日期");
+							array_push($success,"會議舉行");
 						}else{
-							$this->alert->show("d","成功失敗時間:會議舉行日期");
-							$time++;
+							array_push($error,"會議舉行");
 						}
 
 						if( $int_submit['end'] < $int_hold['start'] && $int_submit['end'] >= $int_submit['start']){
 							if( $this->conf->update_schedule($conf_id,"submit",$int_submit['start'],$int_submit['end']) ){
-								$this->alert->show("s","成功更新時間:論文徵稿");
+								array_push($success,"論文徵稿");
 							}else{
-								$this->alert->show("d","更新失敗時間:論文徵稿");
-								$time++;
+								array_push($error,"論文徵稿");
 							}
 						}else{
-							$this->alert->show("d","更新失敗時間:論文徵稿無法設置於會議舉行日期後");
-							$time++;
+							$this->alert->show("d","更新失敗時間: <u>論文徵稿</u> 無法設置於會議舉行日期後");
 						}
 						if( $int_early_bird['end'] < $int_hold['start'] && $int_early_bird['end'] >= $int_early_bird['start']){
 							if( $this->conf->update_schedule($conf_id,"early_bird",$int_early_bird['start'],$int_early_bird['end']) ){
-								$this->alert->show("s","成功更新時間:早鳥繳費");
+								array_push($success,"早鳥繳費");
 							}else{
-								$this->alert->show("d","更新失敗時間:早鳥繳費");
-								$time++;
+								array_push($error,"早鳥繳費");
 							}
 						}else{
-							$this->alert->show("d","更新失敗時間:早鳥繳費無法設置於會議舉行日期後");
-							$time++;
+							$this->alert->show("d","更新失敗時間: <u>早鳥繳費</u> 無法設置於會議舉行日期後");
 						}
 						if( $int_register['end'] < $int_hold['start'] && $int_register['end'] >= $int_register['start']){
 							if( $this->conf->update_schedule($conf_id,"register",$int_register['start'],$int_register['end']) ){
-								$this->alert->show("s","成功更新時間:線上註冊");
+								array_push($success,"線上註冊");
 							}else{
-								$this->alert->show("d","更新失敗時間:線上註冊");
-								$time++;
+								array_push($error,"線上註冊");
 							}
 						}else{
-							$this->alert->show("d","更新失敗時間:線上註冊無法設置於會議舉行日期後");
-							$time++;
+							$this->alert->show("d","更新失敗時間: <u>線上註冊</u> 無法設置於會議舉行日期後");
 						}
 						if( $int_finish['end'] < $int_hold['start'] ){
 							if( $this->conf->update_schedule($conf_id,"finish",$int_finish['end'],$int_finish['end']) ){
-								$this->alert->show("s","成功更新時間:上傳完稿截止");
+								array_push($success,"上傳完稿");
 							}else{
-								$this->alert->show("d","更新失敗時間:上傳完稿截止");
-								$time++;
+								array_push($error,"上傳完稿");
 							}
 						}else{
-							$this->alert->show("d","更新失敗時間:上傳完稿截止無法設置於會議舉行日期後");
-							$time++;
+							$this->alert->show("d","更新失敗時間: <u>上傳完稿</u> 截止無法設置於會議舉行日期後");
+						}
+
+						if( $this->conf_config['conf_most'] == 1){
+							$most     = $this->input->post("most");
+							$int_most = array_map("strtotime", $most);
+							if( $int_most['end'] < $int_hold['start'] ){
+								if( $this->conf->update_schedule($conf_id,"most",$int_most['end'],$int_most['end']) ){
+									array_push($success,"科技部成果發表");
+								}else{
+									array_push($error,"科技部成果發表");
+								}
+							}else{
+								$this->alert->show("d","更新失敗時間: <u>科技部成果發表</u> 無法設置於會議舉行日期後");
+							}
+						}
+						$refresh = true;
+						if( count($error) > 0 ){
+							$this->alert->message("更新研討會時間安排失敗:",ul($error, array("class"=>"list")),'d',-1,"check-square-o");
+							$refresh = false;
+						}
+						if( count($success) > 0 ){
+							$this->alert->message("成功更新研討會時間安排：",ul($success, array("class"=>"list")),'s',-1,"check-square-o");
+						}
+						if( $refresh ){
+							$this->alert->refresh(2);
 						}
 					}
-					$this->alert->refresh($time);
 				break;
 			}
 		}
@@ -593,6 +620,7 @@ class Dashboard extends MY_Conference {
 		$data['conf_config']  = $this->conf_config;
 		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
+		$data['topics']       = $this->conf->get_topic($conf_id);
 
 		if( ( empty($user_login) && $do=="add" ) || ( !empty($user_login) && $do=="edit" ) ){
 			$country_list = config_item('country_list');
@@ -677,41 +705,52 @@ class Dashboard extends MY_Conference {
 					    		case "add_admin":
 					    			foreach ($user_logins as $key => $user_login) {
 					    				if( $this->user->add_conf($conf_id,$user_login) ){
-					    					$this->alert->show("s","成功將使用者 <strong>".$user_login."<strong> 設為研討會管理員");
+					    					$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 設為研討會管理員");
 					    				}else{
-					    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 設為研討會管理員失敗");
+					    					$this->alert->show("d","將使用者 <strong>".$user_login."</strong> 設為研討會管理員失敗");
 					    				}
 					    			}
 					    		break;
 					    		case "del_admin":
 					    			foreach ($user_logins as $key => $user_login) {
 					    				if( $this->user->del_conf($conf_id,$user_login) ){
-					    					$this->alert->show("s","將使用者 <strong>".$user_login."<strong> 取消設為研討會管理員");
+					    					$this->alert->show("s","將使用者 <strong>".$user_login."</strong> 取消設為研討會管理員");
 					    				}else{
-					    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 取消研討會管理員失敗");
+					    					$this->alert->show("d","將使用者 <strong>".$user_login."</strong> 取消研討會管理員失敗");
 					    				}
 					    			}
 					    		break;
 					    		case "add_review":
 					    			foreach ($user_logins as $key => $user_login) {
 					    				if( $this->user->add_reviewer($conf_id,$user_login) ){
-					    					$this->alert->show("s","成功將使用者 <strong>".$user_login."<strong> 設為審查人");
+					    					$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 設為審查人");
 					    				}else{
-					    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 設為審查人失敗");
+					    					$this->alert->show("d","將使用者 <strong>".$user_login."</strong> 設為審查人失敗");
 					    				}
 					    			}
 					    		break;
 					    		case "del_review":
 					    			foreach ($user_logins as $key => $user_login) {
 					    				if( $this->user->del_reviewer($conf_id,$user_login) ){
-					    					$this->alert->show("s","成功將使用者 <strong>".$user_login."<strong> 取消設為審查人");
+					    					$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 取消設為審查人");
 					    				}else{
-					    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 取消審查人失敗");
+					    					$this->alert->show("d","將使用者 <strong>".$user_login."</strong> 取消審查人失敗");
 					    				}
 					    			}
 					    		break;
+					    		case "add_topic":
+					    			$topic = $this->input->post('topic');
+					    			// foreach ($user_logins as $key => $user_login) {
+					    			// 	if( $this->user->del_reviewer($conf_id,$user_login) ){
+					    			// 		$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 取消設為審查人");
+					    			// 	}else{
+					    			// 		$this->alert->show("d","將使用者 <strong>".$user_login."</strong> 取消審查人失敗");
+					    			// 	}
+					    			// }
+					    			sp($user_logins);
+					    		break;
 					    	}
-					    	$this->alert->refresh(2);
+					    	// $this->alert->refresh(2);
 					    }
 					}else{
 						$this->load->view('conf/user/all',$data);

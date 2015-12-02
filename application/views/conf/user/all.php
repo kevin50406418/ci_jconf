@@ -1,15 +1,27 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <?php echo form_open(get_url("dashboard",$conf_id,"user"),array("class"=>"ui segment"))?>
-	<div class="ui inverted segment">
-		<a href="<?php echo get_url("dashboard",$conf_id,"user","add")?>" class="ui blue inverted button">新增使用者</a>
-		<div class="ui buttons">
+	<div class="ui inverted segment row">
+		<a href="<?php echo get_url("dashboard",$conf_id,"user","add")?>" class="ui blue inverted button col-md-2">新增使用者</a>
+		<div class="ui buttons col-md-3">
 			<button class="ui teal button action" name="type" value="add_admin">設為研討會管理員</button>
 			<button class="ui pink button action" name="type" value="del_admin">取消研討會管理員</button>
 		</div>
 
-		<div class="ui buttons">
+		<div class="ui buttons col-md-3">
 			<button class="ui orange button action" name="type" value="add_review">設為審查人</button>
 			<button class="ui purple button action" name="type" value="del_review">取消審查人</button>
+		</div>
+		<div class="ui buttons col-md-3">
+			<div class="input-group">
+				<select name="topic" class="form-control">
+					<?php foreach ($topics as $key => $topic) {?>
+					<option value="<?php echo $topic->topic_id?>"><?php echo $topic->topic_name?>(<?php echo $topic->topic_name_eng?>)</option>
+					<?php }?>
+				</select>
+				<span class="input-group-btn">
+					<button class="btn btn-success action" name="type" value="add_topic">設為主題主編</button>
+				</span>
+			</div>
 		</div>
 	</div>
 	<div id="alert"></div>

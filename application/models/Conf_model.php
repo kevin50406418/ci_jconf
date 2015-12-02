@@ -215,7 +215,7 @@ class Conf_model extends CI_Model {
         return false;
 	}
 	
-	function update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_host,$conf_place,$conf_desc=''){
+	function update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_host,$conf_place,$conf_keywords="",$conf_desc=''){
 		$conf = array(
 			"conf_name"    =>$conf_name,
 			"conf_master"  =>$conf_master,
@@ -225,6 +225,7 @@ class Conf_model extends CI_Model {
 			"conf_address" =>$conf_address,
 			"conf_host"    =>$conf_host,
 			"conf_place"   =>$conf_place,
+			"conf_keywords"=>$conf_keywords,
 			"conf_desc"    =>$conf_desc
         );
         $this->db->where("conf_id", $conf_id);
@@ -235,7 +236,7 @@ class Conf_model extends CI_Model {
         return false;
 	}
 
-	function sysop_updateconf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$conf_lang,$conf_host,$conf_place,$conf_fax,$conf_desc=''){
+	function sysop_updateconf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$conf_lang,$conf_host,$conf_place,$conf_fax,$conf_keywords="",$conf_desc=''){
 		$conf_lang = implode(",",$conf_lang);
 		$conf = array(
 			"conf_name"    =>$conf_name,
@@ -248,6 +249,7 @@ class Conf_model extends CI_Model {
 			"conf_place"   =>$conf_place,
 			"conf_lang"    =>$conf_lang,
 			"conf_staus"   =>$conf_staus,
+			"conf_keywords"=>$conf_keywords,
 			"conf_desc"    =>$conf_desc
         );
         $this->db->where("conf_id", $conf_id);
@@ -257,6 +259,18 @@ class Conf_model extends CI_Model {
         }
         return false;
 	}
+
+	function update_confstyle($conf_id,$conf_template){
+		$conf = array(
+			"conf_template" => $conf_template
+		);
+		if( $this->db->update('conf', $conf) ){
+			$this->add_log("conf","update_confstyle",$conf_id,$conf);
+		 	return true;
+		}
+		return false;
+	}
+
 	function get_paperdir($conf_id){
 		return './upload/paper/'.$conf_id.'/';
 	}
@@ -309,7 +323,7 @@ class Conf_model extends CI_Model {
 		return $return;
 	}
 
-	function add_conf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$conf_lang,$conf_host,$conf_place,$conf_fax="",$conf_desc=""){
+	function add_conf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$conf_lang,$conf_host,$conf_place,$conf_fax="",$conf_keywords="",$conf_desc=""){
 		$return = array(
 			"status" => false,
 			"error" => ""
@@ -411,7 +425,7 @@ class Conf_model extends CI_Model {
 				'page_lang'   => "zhtw",
 				'page_show'   => 1,
 				"page_order"  => 0,
-				"page_edit"   => 0,
+				"page_edit"   => 1,
 				"page_hidden" => 0,
 				"page_del"    => 0
 	        ),
@@ -422,7 +436,7 @@ class Conf_model extends CI_Model {
 				'page_lang'   => "en",
 				'page_show'   => 1,
 				"page_order"  => 0,
-				"page_edit"   => 0,
+				"page_edit"   => 1,
 				"page_hidden" => 0,
 				"page_del"    => 0
 	        ),
@@ -1136,5 +1150,11 @@ class Conf_model extends CI_Model {
 
 	function dw_paper($conf_id){
 		// $this->load->library('zip');
+	}
+
+	function get_style(){
+		$this->db->from('style');
+    	$query = $this->db->get();
+		return $query->result();
 	}
 }

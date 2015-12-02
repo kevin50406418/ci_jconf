@@ -549,6 +549,50 @@ class Submit extends MY_Conference {
 		$this->load->view('common/footer',$data);
 	}
 
+	public function finish($conf_id='',$paper_id=''){
+		if( empty($conf_id) || empty($paper_id) ){
+			$this->alert->js("查本篇稿件",get_url("submit",$this->conf_id));
+			$this->load->view('common/footer',$data);
+			$this->output->_display();
+			exit;
+		}
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
+		$data['_lang']        = $this->_lang;
+		$data['spage']        = $this->spage;
+		$data['conf_config']  = $this->conf_config;
+		$data['conf_content'] = $this->conf->conf_content($this->conf_id);
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+
+		$this->assets->add_js(asset_url().'js/fileinput/fileinput.min.js');
+		$this->assets->add_js(asset_url().'js/fileinput/fileinput_locale_zh-TW.js');
+		$this->assets->add_css(asset_url().'style/fileinput.min.css');
+
+		if( !$this->Submit->is_author($paper_id, $this->user_login) ){
+			$this->alert->js("非本篇作者或查無稿件",get_url("submit",$this->conf_id));
+			$this->load->view('common/footer',$data);
+			$this->output->_display();
+			exit;
+		}
+		$data['paper_id'] = $paper_id;
+		$data['spage']=$this->config->item('spage');
+		//$data['schedule']=$this->conf->conf_schedule($conf_id);
+
+		$data['paper'] = $this->Submit->get_paperinfo($this->conf_id,$paper_id,$this->user_login);
+		if(!empty($data['paper'])){
+			$data['authors'] = $this->Submit->get_author($paper_id);
+			$data['otherfile'] = $this->Submit->get_otherfile($paper_id);
+			$data['otherfiles'] = $this->Submit->get_otherfiles($paper_id);
+			$data['reviewers'] = $this->topic->get_reviewer($paper_id);
+		}
+		$this->load->view('common/header');
+		$this->load->view('common/nav',$data);
+		$this->load->view('conf/conf_nav',$data);
+		$this->load->view('conf/menu_submit',$data);
+		$this->load->view('submit/detail',$data);
+		$this->load->view('submit/finish',$data);
+		$this->load->view('common/footer',$data);
+	}
 	// public function remove($conf_id='',$paper_id=''){
 	// 	if( empty($conf_id) || empty($paper_id) ){
 	// 		$this->alert->js("查本篇稿件",get_url("submit",$conf_id));

@@ -162,7 +162,7 @@
 					<?php foreach ($reviewers as $key => $reviewer) {?>
 					<tr<?php if( $reviewer->topic_review == 1 ){?> class="active"<?php }?>>
 						<td class="text-center">
-							<input type="checkbox" value="<?php echo $reviewer->user_login?>" name="user_login[]"<?php if( in_array($reviewer->review_status, array(-2,2,4)) || $reviewer->review_confirm == -1 ){ $cnt++;?> disabled<?php }?>>
+							<input type="checkbox" value="<?php echo $reviewer->user_login?>" name="user_login[]"<?php if( in_array($reviewer->review_status, array(-2,2,0,4)) || $reviewer->review_confirm == -1 ){ $cnt++;?> disabled<?php }?>>
 						</td>
 						<td><?php echo $reviewer->user_login?></td>
 						<td>

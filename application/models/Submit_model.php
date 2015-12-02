@@ -5,7 +5,7 @@ class Submit_model extends CI_Model {
     }
 
     function show_mypaper($user_login,$conf_id){
-        $this->db->select('distinct(paper.sub_id),sub_title,topic_info,topic_name,sub_status');
+        $this->db->select('distinct(paper.sub_id),sub_title,topic_info,topic_name,sub_status,sub_time');
         $this->db->from('paper');
         $this->db->join('topic', 'paper.sub_topic = topic.topic_id');
         $this->db->join('paper_author', 'paper.sub_id = paper_author.paper_id');

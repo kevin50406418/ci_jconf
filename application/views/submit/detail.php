@@ -122,25 +122,27 @@
 			<?php if( $paper->sub_status >= 3 || $paper->sub_status == 1){?>
 			<div class="tab-pane container-fluid" id="tab_review">
 				<h3>審查資料</h3>
-				<?php if( in_array($paper->sub_status,array(-2,4,5)) ){?>
-				<table class="table table-striped">
+				<?php if( in_array($paper->sub_status,array(-2,4,0,5)) ){?>
+				<table class="table table-striped table-bordered">
 					<thead>
 						<tr>
-							<th style="width:10%">審查人</th>
-							<th style="width:10%">審查狀態</th>
-							<th style="width:10%">審查時間</th>
-							<th style="width:70%">審查建議</th>
+							<th class="text-center" style="width:10%">審查人</th>
+							<th class="text-center" style="width:10%">審查狀態</th>
+							<th class="text-center" style="width:10%">審查時間</th>
+							<th class="text-center" style="width:70%">審查建議</th>
 						</tr>
 					</thead>
+					<?php $review_array = array();?>
 					<?php foreach ($reviewers as $key => $reviewer) {?>
-					
+					<?php if( !in_array($reviewer->user_login,$review_array) ){array_push($review_array,$reviewer->user_login);}?>
 					<tr>
-						<td>審查人<?php echo $key+1?></td>
-						
-						<td>
+						<td class="text-center">
+							審查人 <?php echo array_search($reviewer->user_login, $review_array)+1?>
+						</td>						
+						<td class="text-center">
 							<?php echo $this->Submit->sub_status($reviewer->review_status,true);?>
 						</td>
-						<td>
+						<td class="text-center">
 							<?php echo date('Y/m/d H:i', $reviewer->review_time);?>
 						</td>
 						<td>

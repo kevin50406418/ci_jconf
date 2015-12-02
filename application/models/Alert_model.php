@@ -76,4 +76,56 @@ class Alert_model extends CI_Model {
     function js_refresh(){
     	$this->load->view('common/js_refresh');
     }
+
+    function message($header="",$text,$type='i',$refresh=-1,$icon="-",$class=""){
+		$data['class']   = "";
+		$data['text']    = $text;
+		$data['refresh'] = $refresh;
+		$data['header']  = $header;
+		$data['icon']    = $icon;
+
+		switch($type){
+			case 'g':
+				$data['class']="green";
+			break;
+			case 's':
+				$data['class']="positive";
+			break;
+			case 'r':
+				$data['class']="red";
+			break;
+			case 'd':
+				$data['class']="negative";
+			break;
+			case 'w':
+				$data['class']="warning";
+			break;
+			case 'bk':
+				$data['class']="black";
+			break;
+			case 'y':
+				$data['class']="yellow";
+			break;
+			case 'b':
+				$data['class']="blue";
+			break;
+			case 'o':
+				$data['class']="orange";
+			break;
+			case 'pp':
+				$data['class']="purple";
+			break;
+			case 'pk':
+				$data['class']="pink";
+			break;
+			case 't':
+				$data['class']="teal";
+			break;
+			default:
+				$data['class']="info";
+			break;
+		}
+		$data['class'].= " ".$class;
+		$this->load->view('common/message',$data);
+    }
 }

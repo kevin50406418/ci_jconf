@@ -11,6 +11,7 @@ $(function() {
 	$('.input-daterange').datepicker({
 		format: "yyyy-mm-dd",
 		todayBtn: "linked",
+		<?php if($this->_lang == "zhtw"){?>language: "zh-TW",<?php }?>
 		todayHighlight: true,
 	});
 });
@@ -20,7 +21,7 @@ $(function() {
 	<div class="tabbable-line">
 		<ul class="nav nav-tabs nav-tabs-center">
 			<li class="active"> <a href="#tab_config" data-toggle="tab"> <i class="fa fa-info-circle fa-lg"></i> 研討會資訊 </a> </li>
-			<!--<li> <a href="#tab_style" data-toggle="tab"> <i class="fa fa-magic fa-lg"></i> 研討會樣式 </a> </li>-->
+			<li> <a href="#tab_style" data-toggle="tab"> <i class="fa fa-magic fa-lg"></i> 研討會樣式 </a> </li>
 			<li> <a href="#tab_function" data-toggle="tab"> <i class="fa fa-cog fa-lg"></i> 功能設定 </a> </li>
 			<li> <a href="#tab_schedule" data-toggle="tab"> <i class="fa fa-calendar fa-lg"></i> 時間安排 </a> </li>
 			<!--<li> <a href="#tab_org" data-toggle="tab"> <i class="fa fa-users fa-lg"></i> 大會組織 </a> </li>-->
@@ -36,6 +37,7 @@ $(function() {
 		<div class="tab-content">
 			<div class="tab-pane active container-fluid" id="tab_config">
 				<h2><i class="fa fa-info-circle fa-lg"></i> 研討會資訊</h2>
+				<?php echo validation_errors('<div class="ui negative message">', '</div>');?>
 				<?php echo form_open(get_url("dashboard",$conf_id,"setting"),array("class"=>"form-horizontal"))?>
 					<?php echo form_hidden('do', 'config');?>
 					<div class="form-group">
@@ -75,7 +77,7 @@ $(function() {
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="conf_host" class="col-sm-2 control-label">主辦單位 <span class="text-danger">*</span></label>
+						<label for="conf_host" class="col-sm-2 control-label">承辦單位 <span class="text-danger">*</span></label>
 						<div class="col-sm-10">
 							<input name="conf_host" type="text" class="form-control" id="conf_host" value="<?php echo $conf_config['conf_host'];?>">
 						</div>
@@ -93,6 +95,12 @@ $(function() {
 						</div>
 					</div>
 					<div class="form-group">
+						<label for="conf_keywords" class="col-sm-2 control-label">關鍵字 <span class="text-danger">*</span></label>
+						<div class="col-sm-10">
+							<input name="conf_keywords" type="text" class="form-control" id="conf_keywords" value="<?php echo $conf_config['conf_keywords'];?>">
+						</div>
+					</div>
+					<div class="form-group">
 						<label for="conf_desc" class="col-sm-2 control-label">簡介 <span class="text-danger">*</span></label>
 						<div class="col-sm-10">
 							<textarea name="conf_desc" class="form-control" id="conf_desc" rows="5"><?php echo $conf_config['conf_desc'];?></textarea>
@@ -107,9 +115,33 @@ $(function() {
 			</div>
 			<div class="tab-pane container-fluid" id="tab_style">
 				<h2><i class="fa fa-magic fa-lg"></i> 研討會樣式</h2>
+				<?php echo validation_errors('<div class="ui negative message">', '</div>');?>
+				<?php echo form_open(get_url("dashboard",$conf_id,"setting"),array("class"=>"form-horizontal"))?>
+				<?php echo form_hidden('do', 'style');?>
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th> </th>
+							<th>樣式名稱</th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach($styles as $key => $style){?>
+						<tr>
+							<td>
+								<input type="radio" value="<?php echo $style->style_template?>" name="style"<?php if( $conf_config['conf_template']==$style->style_template ){?> checked<?php }?>>
+							</td>
+							<td><?php echo $style->style_title?></td>
+						</tr>
+						<?php }?>
+					</tbody>
+				</table>
+				<input type="submit" name="submit_1" value="修改" class="ui button blue">
+				<?php echo form_close()?>
 			</div>
 			<div class="tab-pane container-fluid" id="tab_function">
 				<h2><i class="fa fa-cog fa-lg"></i> 功能設定</h2>
+				<?php echo validation_errors('<div class="ui negative message">', '</div>');?>
 				<?php echo form_open(get_url("dashboard",$conf_id,"setting"),array("class"=>"form-horizontal"))?>
 				<?php echo form_hidden('do', 'func');?>
 				<div class="form-group">
@@ -161,6 +193,7 @@ $(function() {
 			</div>
 			<div class="tab-pane container-fluid" id="tab_schedule">
 				<h2><i class="fa fa-calendar fa-lg"></i> 時間安排</h2>
+				<?php echo validation_errors('<div class="ui negative message">', '</div>');?>
 				<?php echo form_open(get_url("dashboard",$conf_id,"setting"),array("class"=>"form-horizontal"))?>
 				<?php echo form_hidden('do', 'schedule');?>
 				<div class="form-group">
@@ -168,9 +201,9 @@ $(function() {
 					<div class="col-sm-10">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="input-daterange input-group" id="datepicker">
-								<input type="date" class="input-sm form-control" name="hold[start]" value="<?php echo $schedule['hold']['start']?>">
+								<input type="date" class="input-sm form-control" name="hold[start]" value="<?php echo set_value('hold[start]', $schedule['hold']['start']); ?>">
 								<span class="input-group-addon">~</span>
-								<input type="date" class="input-sm form-control" name="hold[end]" value="<?php echo $schedule['hold']['end']?>">
+								<input type="date" class="input-sm form-control" name="hold[end]" value="<?php echo set_value('hold[end]', $schedule['hold']['end']); ?>">
 							</div>
 						</div>
 					</div>
@@ -181,9 +214,9 @@ $(function() {
 					<div class="col-sm-10">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="input-daterange input-group" id="datepicker">
-								<input type="date" class="input-sm form-control" name="submit[start]" value="<?php echo $schedule['submit']['start']?>">
+								<input type="date" class="input-sm form-control" name="submit[start]" value="<?php echo set_value('submit[start]', $schedule['submit']['start']); ?>">
 								<span class="input-group-addon">~</span>
-								<input type="date" class="input-sm form-control" name="submit[end]" value="<?php echo $schedule['submit']['end']?>">
+								<input type="date" class="input-sm form-control" name="submit[end]" value="<?php echo set_value('submit[end]', $schedule['submit']['end']); ?>">
 							</div>
 						</div>
 					</div>
@@ -194,9 +227,9 @@ $(function() {
 					<div class="col-sm-10">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="input-daterange input-group" id="datepicker">
-								<input type="date" class="input-sm form-control" name="early_bird[start]" value="<?php echo $schedule['early_bird']['start']?>">
+								<input type="date" class="input-sm form-control" name="early_bird[start]" value="<?php echo set_value('early_bird[start]', $schedule['early_bird']['start']); ?>">
 								<span class="input-group-addon">~</span>
-								<input type="date" class="input-sm form-control" name="early_bird[end]" value="<?php echo $schedule['early_bird']['end']?>">
+								<input type="date" class="input-sm form-control" name="early_bird[end]" value="<?php echo set_value('early_bird[end]', $schedule['early_bird']['end']); ?>">
 							</div>
 						</div>
 					</div>
@@ -207,9 +240,9 @@ $(function() {
 					<div class="col-sm-10">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="input-daterange input-group" id="datepicker">
-								<input type="date" class="input-sm form-control" name="register[start]" value="<?php echo $schedule['register']['start']?>">
+								<input type="date" class="input-sm form-control" name="register[start]" value="<?php echo set_value('register[start]', $schedule['register']['start']); ?>">
 								<span class="input-group-addon">~</span>
-								<input type="date" class="input-sm form-control" name="register[end]" value="<?php echo $schedule['register']['end']?>">
+								<input type="date" class="input-sm form-control" name="register[end]" value="<?php echo set_value('register[end]', $schedule['register']['end']); ?>">
 							</div>
 						</div>
 					</div>
@@ -219,8 +252,8 @@ $(function() {
 					<label class="col-sm-2 control-label">上傳完稿截止 <span class="text-danger">*</span></label>
 					<div class="col-sm-10">
 						<div class="col-sm-offset-2 col-sm-10">
-							<div class="input-daterange input-group" id="datepicker">
-								<input type="date" class="input-sm form-control" name="finish[end]" value="<?php echo $schedule['finish']['end']?>">
+							<div class="input-daterange" id="datepicker">
+								<input type="date" class="input-sm form-control" name="finish[end]" value="<?php echo set_value('finish[end]', $schedule['finish']['end']); ?>">
 							</div>
 						</div>
 					</div>
@@ -231,7 +264,7 @@ $(function() {
 					<div class="col-sm-10">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="input-daterange input-group" id="datepicker">
-								<input type="date" class="input-sm form-control" name="most[end]" value="<?php echo $schedule['most']['end']?>">
+								<input type="date" class="input-sm form-control" name="most[end]" value="<?php echo set_value('most[end]', $schedule['most']['end']); ?>">
 							</div>
 						</div>
 					</div>

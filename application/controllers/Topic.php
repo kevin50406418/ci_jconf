@@ -221,6 +221,7 @@ class Topic extends MY_Topic {
 													$this->alert->show("d","將使用者 <strong>".$user_login."</strong> 加入本篇稿件審查失敗");
 												}
 											}
+											$this->topic->del_pedding_reviewer($paper_id,$this->conf_id);
 										}else{
 											$this->alert->js("審查人必須為奇數個");
 										}

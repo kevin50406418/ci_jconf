@@ -41,7 +41,7 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="conf_fax" class="col-sm-2 control-label">主辦單位 <span class="text-danger">*</span></label>
+			<label for="conf_fax" class="col-sm-2 control-label">承辦單位 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
 				<input name="conf_host" type="text" class="form-control" id="conf_host" value="<?php echo set_value('conf_host');?>">
 			</div>
@@ -82,6 +82,12 @@
 			<label for="conf_fax" class="col-sm-2 control-label">傳真</label>
 			<div class="col-sm-10">
 				<input type="text" class="form-control" id="conf_fax" name="conf_fax" value="<?php echo set_value('conf_fax'); ?>">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="conf_keywords" class="col-sm-2 control-label">關鍵字 <span class="text-danger">*</span></label>
+			<div class="col-sm-10">
+				<input name="conf_keywords" type="text" class="form-control" id="conf_keywords" value="<?php echo set_value('conf_keywords'); ?">
 			</div>
 		</div>
 		<div class="form-group">

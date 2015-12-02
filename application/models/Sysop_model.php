@@ -64,7 +64,7 @@ class Sysop_model extends CI_Model {
 		return $this->email->send();
     }
 
-    function add_mail_template($email_key,$email_desc,$default_subject,$default_body){
+    function add_mail_template($email_key,$email_desc,$default_subject,$default_body,$conf_add = false){
     	$template = array(
 			array(
 	            "email_key"       => $email_key,
@@ -81,7 +81,21 @@ class Sysop_model extends CI_Model {
 				"default_body"    => $default_body["eng"]
 			)
 		);
-		return $this->db->insert_batch('email_about', $template);
+		if( $conf_add ){
+			$this->db->insert_batch('email_about', $template);
+			$conf = array();
+			$confs = $this->conf->all_conf_config(true);
+			foreach ($confs as $key => $value) {
+				array_push($conf,$value->conf_id);
+			}
+			foreach ($conf as $key => $v) {
+				$this->conf->add_mail_template($email_key,$v,$default_subject["zhtw"],$default_body["zhtw"],$default_subject["eng"],$default_body["eng"]);
+			}
+			return true;
+		}else{
+			return $this->db->insert_batch('email_about', $template);
+		}
+		
     }
 
     function get_all_mail_templates(){

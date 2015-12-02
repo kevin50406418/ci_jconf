@@ -1,8 +1,5 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');?>
-<?php 
-if(is_null($this->input->get("upload"))){
-	echo validation_errors('<div class="ui message red">', '<a href="javascript:history.back();">返回上一頁</a></div>');
-}?>
+<?php echo validation_errors('<div class="ui message red">', '<a href="javascript:history.back();">返回上一頁</a></div>');?>
 <?php echo form_open_multipart(get_url("submit",$conf_id,"add")."?step=3&upload",array("class"=>"form-horizontal"));?>
 <div class="ui blue segment">
 	<h2>上傳投稿文件</h2>
