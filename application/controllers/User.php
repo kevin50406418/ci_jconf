@@ -4,6 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class User extends MY_Controller {
 	public function __construct() {        
 	    parent::__construct();
+	    $this->lang->load("user",$this->_lang);
 	}
 
 	public function index(){
@@ -12,13 +13,14 @@ class User extends MY_Controller {
 		if(!$this->user->is_login()){
 			redirect('/user/login', 'location', 301);
 		}else{
+
 			$user_login=$this->session->user_login;
 			$data['user_login']=$user_login;
 			$data['user']=$this->user->get_user_info($user_login);
 			$data['user']->user_phone_o=explode(",", $data['user']->user_phone_o);
 			$data['user']->user_postaddr=explode("|", $data['user']->user_postaddr);
 			$country_list = config_item('country_list');
-			$data['country_list'] = $country_list['zhtw'];
+			$data['country_list'] = $country_list[$this->_lang];
 
 			$this->assets->add_css(asset_url().'style/chosen.css');
 			$this->assets->add_js(asset_url().'js/jquery.twzipcode.min.js');
@@ -70,23 +72,23 @@ class User extends MY_Controller {
 	public function login($conf_id=""){
 		$data['body_class'] = $this->body_class;
 		$data['redirect'] = $this->session->redirected;
+
 		if(!$this->user->is_login()){
-			$this->form_validation->set_rules('user_login', '帳號', 'required');
-		    $this->form_validation->set_rules('user_pass', '密碼', 'required');
+			$this->form_validation->set_rules('user_login', lang('account'), 'required');
+		    $this->form_validation->set_rules('user_pass', lang('password'), 'required');
 		    if ( $this->form_validation->run() ){
 		    	$user_login = $this->input->post('user_login', TRUE);
 		    	$user_pwd = $this->input->post('user_pass', TRUE);
 		    	$redirect = $this->input->post('redirect', TRUE);
-
 		    	$result = $this->user->login($user_login, $user_pwd);
 		    	if($result){
 		    		$this->form_validation->set_message('login_success', 'Login Success');
-		    		if( in_array($redirect,array("favicon.ico")) ){
+		    		if( preg_match('/(favicon|clang)/i',$redirect) ){
 						$redirect = "";
 					}
-		    		redirect(base_url($redirect), 'location', 301);
+					redirect(base_url($redirect), 'location', 301);
 		    	}else{
-		    		$this->alert->js("帳號或密碼錯誤");
+		    		$this->alert->js(lang('login_fail'));
 		    	}
 		    }
 		}else{
@@ -150,35 +152,40 @@ class User extends MY_Controller {
 		$data['body_class'] = $this->body_class;
 		if(!$this->user->is_login()){
 			$country_list = config_item('country_list');
-			$data['country_list'] = $country_list['zhtw'];
+			$data['country_list'] = $country_list[$this->_lang];
 
 			$this->assets->add_css(asset_url().'style/chosen.css');
 
 			$this->assets->add_js(asset_url().'js/pwstrength-bootstrap-1.2.3.min.js');
 			$this->assets->add_js(asset_url().'js/pwstrength-setting.js');
 			$this->assets->add_js(asset_url().'js/jquery.validate.min.js');
-			$this->assets->add_js(asset_url().'js/jquery.twzipcode.min.js');
+			if( $this->_lang =="en" ){
+				$this->assets->add_js(asset_url().'js/jquery.twzipcode-en.js');
+			}else{
+				$this->assets->add_js(asset_url().'js/jquery.twzipcode.min.js');
+			}
 			$this->assets->add_js(asset_url().'js/chosen.jquery.js');
 
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
 			$this->load->view('js/signup');
-			$this->form_validation->set_rules('user_id', '帳號', 'required');
-		    $this->form_validation->set_rules('user_pw', '密碼', 'required|min_length[6]');
-		    $this->form_validation->set_rules('user_pw2', '重覆輸入密碼', 'required|matches[user_pw]|min_length[6]');
-		    $this->form_validation->set_rules('user_email', '電子信箱', 'required|valid_email');
-		    $this->form_validation->set_rules('user_title', '稱謂', 'required');
-		    $this->form_validation->set_rules('user_firstname', '名字', 'required');
-		    $this->form_validation->set_rules('user_lastname', '姓氏', 'required');
-		    $this->form_validation->set_rules('user_gender', '性別', 'required');
-		    $this->form_validation->set_rules('user_org', '所屬機構', 'required');
-		    $this->form_validation->set_rules('user_phoneO_1', '電話(公)', 'required');
-		    $this->form_validation->set_rules('user_phoneO_2', '電話(公)', 'required');
-		    $this->form_validation->set_rules('user_postcode', '郵遞區號', 'required');
-		    $this->form_validation->set_rules('user_postadd', '聯絡地址', 'required');
-		    $this->form_validation->set_rules('user_country', '國別', 'required');
-		    $this->form_validation->set_rules('user_lang', '語言', 'required');
-		    $this->form_validation->set_rules('user_title', '研究領域', 'required|min_length[1]');
+			$this->form_validation->set_rules('user_id', lang('account'), 'required');
+		    $this->form_validation->set_rules('user_pw', lang('password'), 'required|min_length[6]');
+		    $this->form_validation->set_rules('user_pw2', lang('confirm_password'), 'required|matches[user_pw]|min_length[6]');
+		    $this->form_validation->set_rules('user_email', lang('user_email'), 'required|valid_email');
+		    $this->form_validation->set_rules('user_title', lang('user_title'), 'required');
+		    $this->form_validation->set_rules('user_firstname', lang('user_firstname'), 'required');
+		    $this->form_validation->set_rules('user_lastname', lang('user_lastname'), 'required');
+		    $this->form_validation->set_rules('user_gender', lang('user_gender'), 'required');
+		    $this->form_validation->set_rules('user_org', lang('user_org'), 'required');
+		    $this->form_validation->set_rules('user_phoneO_1', lang('user_phoneO'), 'required');
+		    $this->form_validation->set_rules('user_phoneO_2', lang('user_phoneO'), 'required');
+		    $this->form_validation->set_rules('user_cellphone', lang('user_cellphone'), 'required');
+		    $this->form_validation->set_rules('user_postcode', lang('user_postcode'), 'required');
+		    $this->form_validation->set_rules('user_postadd', lang('user_postadd'), 'required');
+		    $this->form_validation->set_rules('user_country', lang('user_country'), 'required');
+		    $this->form_validation->set_rules('user_lang', lang('user_lang'), 'required');
+		    $this->form_validation->set_rules('user_title', lang('user_title'), 'required|min_length[1]');
 		    /*
 		    $this->email->from('ccs@asia.edu.tw', '亞大研討會系統');
 			$this->email->to('kevin50406418@gmail.com');
@@ -242,9 +249,9 @@ class User extends MY_Controller {
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
 
-			$this->form_validation->set_rules('old_pass', '舊密碼', 'required|min_length[6]');
-		    $this->form_validation->set_rules('user_pass', '新密碼', 'required|min_length[6]');
-		    $this->form_validation->set_rules('user_pass2', '確認新密碼', 'required|matches[user_pass]|min_length[6]');
+			$this->form_validation->set_rules('old_pass', lang('old_pass'), 'required|min_length[6]');
+		    $this->form_validation->set_rules('user_pass', lang('user_pass'), 'required|min_length[6]');
+		    $this->form_validation->set_rules('user_pass2', lang('user_pass2'), 'required|matches[user_pass]|min_length[6]');
 			if ( $this->form_validation->run() ){
 				$old_pass   = $this->input->post('old_pass', TRUE);
 				$user_pass  = $this->input->post('user_pass', TRUE);
@@ -252,14 +259,14 @@ class User extends MY_Controller {
 				$pass  = $user->user_pass;
 				$pass2 = hash('sha256',$old_pass);
 				if( $pass != $pass2 ){
-					$this->alert->show("d","請輸入正確舊密碼");
+					$this->alert->show("d",lang('true_old_pass'));
 				}else{
 					if( $this->user->change_passwd($user_login,$user_pass) ){
-						$this->alert->show("s","更改密碼成功");
-						$this->alert->js("更改密碼成功");
+						$this->alert->show("s",lang('success_password'));
+						$this->alert->js(lang('success_password'));
 					}else{
-						$this->alert->show("d","更改密碼失敗");
-						$this->alert->js("更改密碼失敗");
+						$this->alert->show("d",lang('fail_password'));
+						$this->alert->js(lang('fail_password'));
 					}
 				}
 				$this->alert->refresh(2);
@@ -280,8 +287,8 @@ class User extends MY_Controller {
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
 
-			$this->form_validation->set_rules('user_login', '帳號', 'required');
-		    $this->form_validation->set_rules('user_email', '電子信箱', 'required|valid_email');
+			$this->form_validation->set_rules('user_login', lang('account'), 'required');
+		    $this->form_validation->set_rules('user_email', lang('user_email'), 'required|valid_email');
 		    $this->form_validation->set_rules('g-recaptcha-response', 'Recaptcha', 'required');
 
 		    if ( $this->form_validation->run() ){
@@ -290,9 +297,9 @@ class User extends MY_Controller {
 		    	$g_recaptcha_response = $this->input->post('g-recaptcha-response');
 
 		    	if( $this->user->passwd_reset($user_login,$user_email,$g_recaptcha_response) ){
-		    		$this->alert->show("s","重置密碼信寄出成功，請查閱信箱(收件匣若無信件，請查閱垃圾信箱)");
+		    		$this->alert->show("s",lang('send_lostpwd_mail'));
 		    	}else{
-		    		$this->alert->show("d","查無此使用者");
+		    		$this->alert->show("d",lang('user_notfound'));
 		    	}
 		    }
 			

@@ -25,7 +25,7 @@ class MY_Controller extends CI_Controller{
 		$this->assets->add_css(asset_url().'style/style.css');
 		$this->assets->add_css(asset_url().'style/statistic.min.css');
 		$this->_lang = $this->user->get_clang();
-
+		$this->config->set_item('language', $this->_lang);
 		$this->lang->load("conf_menu",$this->_lang);
 		$this->lang->load("paper_status",$this->_lang);
 		$this->lang->load("conf",$this->_lang);

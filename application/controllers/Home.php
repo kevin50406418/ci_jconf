@@ -286,12 +286,13 @@ class Home extends MY_Controller {
 		// 	$this->conf->init_conf_content($value);
 		// }
 		//
-		$this->load->view('common/header');
-		$this->load->view('common/nav',$data);
-		$this->load->view('common/footer',$data);
+		// $this->load->view('common/header');
+		// $this->load->view('common/nav',$data);
+		// $this->load->view('common/footer',$data);
 		// sp($this->Submit->sendmail_submit_success(54,"test2015"));
 		// sp($this->Submit->sendmail_submit_success(60,"test2015"));
 		// sp($this->topic->notice_editor("test2015",60));
+		//phpinfo();
 	}
 
 	public function _ckeditor(){

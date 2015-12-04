@@ -3,6 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Dashboard extends MY_Conference {
 	public function __construct(){
 		parent::__construct();
+		$this->lang->load("dashboard",$this->_lang);
 		$this->cinfo['show_confinfo'] = true;
 		$this->user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
 		if( !$this->conf->confid_exists($this->conf_id,$this->user_sysop) ){
@@ -49,44 +50,44 @@ class Dashboard extends MY_Conference {
 			$do = $this->input->post("do");
 			switch($do){
 				case "status":
-					$this->form_validation->set_rules('conf_staus', '研討會狀態設定', 'required');
+					$this->form_validation->set_rules('conf_staus', lang('conf_staus'), 'required');
 					if ($this->form_validation->run()){
 						$conf_staus = $this->input->post('conf_staus');
 						$valid_status = array(0,1);
 						if( in_array($conf_staus,$valid_status) ){
 							if( $this->conf->update_status($conf_id,$conf_staus) ){
-								$this->alert->js("更新成功");
+								$this->alert->js(lang('update_success'));
 							}else{
-								$this->alert->js("更新失敗");
+								$this->alert->js(lang('update_fail'));
 							}
 							$this->alert->refresh(0);
 						}else{
-							$this->alert->js("無效設定，無法更改研討會顯示狀態");
+							$this->alert->js(lang('conf_staus_setting_fail'));
 						}
 					}
 				break;
 				case "style":
-					$this->form_validation->set_rules('style', '研討會樣式', 'required');
+					$this->form_validation->set_rules('style', lang('conf_style'), 'required');
 					if ($this->form_validation->run()){
 						$style = $this->input->post('style');
 						if( $this->conf->update_confstyle($conf_id,$style) ){
-							$this->alert->js("研討會樣式更新成功");
+							$this->alert->js(lang('conf_style').lang('update_success'));
 						}else{
-							$this->alert->js("研討會樣式更新失敗");
+							$this->alert->js(lang('conf_style').lang('update_fail'));
 						}
 						$this->alert->refresh(0);
 					}
 				break;
 				case "config":
-					$this->form_validation->set_rules('conf_name', '研討會名稱', 'required');
-					$this->form_validation->set_rules('conf_master', '主要聯絡人', 'required');
-					$this->form_validation->set_rules('conf_email', '聯絡信箱', 'required');
-					$this->form_validation->set_rules('conf_phone', '聯絡電話', 'required');
-					$this->form_validation->set_rules('conf_address', '通訊地址', 'required');
-					$this->form_validation->set_rules('conf_host', '主辦單位', 'required');
-					$this->form_validation->set_rules('conf_place', '簡介', 'required');
-					$this->form_validation->set_rules('conf_desc', '簡介', 'required');
-					$this->form_validation->set_rules('conf_keywords', '關鍵字', 'required');
+					$this->form_validation->set_rules('conf_name', lang('conf_name'), 'required');
+					$this->form_validation->set_rules('conf_master', lang('conf_master'), 'required');
+					$this->form_validation->set_rules('conf_email', lang('conf_email'), 'required');
+					$this->form_validation->set_rules('conf_phone', lang('conf_phone'), 'required');
+					$this->form_validation->set_rules('conf_address', lang('conf_address'), 'required');
+					$this->form_validation->set_rules('conf_host', lang('conf_host'), 'required');
+					$this->form_validation->set_rules('conf_place', lang('conf_place'), 'required');
+					$this->form_validation->set_rules('conf_desc', lang('conf_desc'), 'required');
+					$this->form_validation->set_rules('conf_keywords', lang('conf_keywords'), 'required');
 					if ($this->form_validation->run()){
 						$conf_name    = $this->input->post('conf_name');
 						$conf_master  = $this->input->post('conf_master');
@@ -99,36 +100,40 @@ class Dashboard extends MY_Conference {
 						$conf_desc    = $this->input->post('conf_desc');
 						$conf_keywords= $this->input->post('conf_keywords');
 						if( $this->conf->update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_host,$conf_place,$conf_keywords,$conf_desc) ){
-							$this->alert->js("更新成功");
+							$this->alert->js(lang('update_success'));
 						}else{
-							$this->alert->js("更新失敗");
+							$this->alert->js(lang('update_fail'));
 						}
 						$this->alert->refresh(1);
 					}
 				break;
 				case "func":
-					$this->form_validation->set_rules('conf_col', '首頁排版', 'required');
-					$this->form_validation->set_rules('conf_most', '科技部成果發表', 'required');
+					$this->form_validation->set_rules('conf_col', lang('home_layout'), 'required');
+					$this->form_validation->set_rules('conf_most', lang('conf_most'), 'required');
 					if ($this->form_validation->run()){
 						$conf_col    = $this->input->post('conf_col');
 						$conf_most    = $this->input->post('conf_most');
 						if( $this->conf->update_confcol($conf_id,$conf_col) ){
-							$this->alert->show("s","首頁排版更新成功");
+							$this->alert->show("s",lang('home_layout').lang('update_success'));
+						}else{
+							$this->alert->show("s",lang('home_layout').lang('update_fail'));
 						}
 						if( $this->conf->update_confmost($conf_id,$conf_most) ){
-							$this->alert->show("s","科技部成果發表更新成功");
+							$this->alert->show("s",lang('conf_most').lang('update_success'));
+						}else{
+							$this->alert->show("s",lang('conf_most').lang('update_fail'));
 						}
 						$this->alert->refresh(1);
 					}
 				break;
 				case "schedule":
-					$this->form_validation->set_rules('hold[]', '會議舉行日期', 'required');
-					$this->form_validation->set_rules('submit[]', '論文徵稿', 'required');
-					$this->form_validation->set_rules('early_bird[]', '早鳥繳費', 'required');
-					$this->form_validation->set_rules('register[]', '線上註冊', 'required');
-					$this->form_validation->set_rules('finish[]', '上傳完稿截止', 'required');
+					$this->form_validation->set_rules('hold[]', lang('schedule_hold'), 'required');
+					$this->form_validation->set_rules('submit[]', lang('schedule_submit'), 'required');
+					$this->form_validation->set_rules('early_bird[]', lang('schedule_early_bird'), 'required');
+					$this->form_validation->set_rules('register[]', lang('schedule_register'), 'required');
+					$this->form_validation->set_rules('finish[]', lang('schedule_finish'), 'required');
 					if( $this->conf_config['conf_most'] == 1){
-						$this->form_validation->set_rules('most[]', '上傳完稿截止', 'required');
+						$this->form_validation->set_rules('most[]', lang('schedule_most'), 'required');
 					}
 					if ($this->form_validation->run()){
 						$hold       = $this->input->post("hold");
@@ -146,46 +151,46 @@ class Dashboard extends MY_Conference {
 						$success = array();
 						$error = array();
 						if( $this->conf->update_schedule($conf_id,"hold",$int_hold['start'],$int_hold['end']) ){
-							array_push($success,"會議舉行");
+							array_push($success,lang('schedule_hold'));
 						}else{
-							array_push($error,"會議舉行");
+							array_push($error,lang('schedule_hold'));
 						}
 
 						if( $int_submit['end'] < $int_hold['start'] && $int_submit['end'] >= $int_submit['start']){
 							if( $this->conf->update_schedule($conf_id,"submit",$int_submit['start'],$int_submit['end']) ){
-								array_push($success,"論文徵稿");
+								array_push($success,lang('schedule_submit'));
 							}else{
-								array_push($error,"論文徵稿");
+								array_push($error,lang('schedule_submit'));
 							}
 						}else{
-							$this->alert->show("d","更新失敗時間: <u>論文徵稿</u> 無法設置於會議舉行日期後");
+							$this->alert->show("d",lang('update_fail_submit'));
 						}
 						if( $int_early_bird['end'] < $int_hold['start'] && $int_early_bird['end'] >= $int_early_bird['start']){
 							if( $this->conf->update_schedule($conf_id,"early_bird",$int_early_bird['start'],$int_early_bird['end']) ){
-								array_push($success,"早鳥繳費");
+								array_push($success,lang('schedule_early_bird'));
 							}else{
-								array_push($error,"早鳥繳費");
+								array_push($error,lang('schedule_early_bird'));
 							}
 						}else{
-							$this->alert->show("d","更新失敗時間: <u>早鳥繳費</u> 無法設置於會議舉行日期後");
+							$this->alert->show("d",lang('update_fail_early_bird'));
 						}
 						if( $int_register['end'] < $int_hold['start'] && $int_register['end'] >= $int_register['start']){
 							if( $this->conf->update_schedule($conf_id,"register",$int_register['start'],$int_register['end']) ){
-								array_push($success,"線上註冊");
+								array_push($success,lang('schedule_register'));
 							}else{
-								array_push($error,"線上註冊");
+								array_push($error,lang('schedule_register'));
 							}
 						}else{
-							$this->alert->show("d","更新失敗時間: <u>線上註冊</u> 無法設置於會議舉行日期後");
+							$this->alert->show("d",lang('update_fail_register'));
 						}
 						if( $int_finish['end'] < $int_hold['start'] ){
 							if( $this->conf->update_schedule($conf_id,"finish",$int_finish['end'],$int_finish['end']) ){
-								array_push($success,"上傳完稿");
+								array_push($success,lang('schedule_finish'));
 							}else{
-								array_push($error,"上傳完稿");
+								array_push($error,lang('schedule_finish'));
 							}
 						}else{
-							$this->alert->show("d","更新失敗時間: <u>上傳完稿</u> 截止無法設置於會議舉行日期後");
+							$this->alert->show("d",lang('update_fail_finish'));
 						}
 
 						if( $this->conf_config['conf_most'] == 1){
@@ -193,21 +198,21 @@ class Dashboard extends MY_Conference {
 							$int_most = array_map("strtotime", $most);
 							if( $int_most['end'] < $int_hold['start'] ){
 								if( $this->conf->update_schedule($conf_id,"most",$int_most['end'],$int_most['end']) ){
-									array_push($success,"科技部成果發表");
+									array_push($success,lang('schedule_most'));
 								}else{
-									array_push($error,"科技部成果發表");
+									array_push($error,lang('schedule_most'));
 								}
 							}else{
-								$this->alert->show("d","更新失敗時間: <u>科技部成果發表</u> 無法設置於會議舉行日期後");
+								$this->alert->show("d",lang('update_fail_most'));
 							}
 						}
 						$refresh = true;
 						if( count($error) > 0 ){
-							$this->alert->message("更新研討會時間安排失敗:",ul($error, array("class"=>"list")),'d',-1,"check-square-o");
+							$this->alert->message(lang('update_schedule_fail'),ul($error, array("class"=>"list")),'d',-1,"check-square-o");
 							$refresh = false;
 						}
 						if( count($success) > 0 ){
-							$this->alert->message("成功更新研討會時間安排：",ul($success, array("class"=>"list")),'s',-1,"check-square-o");
+							$this->alert->message(lang('update_schedule_success'),ul($success, array("class"=>"list")),'s',-1,"check-square-o");
 						}
 						if( $refresh ){
 							$this->alert->refresh(2);
@@ -870,16 +875,14 @@ class Dashboard extends MY_Conference {
 				case "edit":
 					$data['news']=$this->conf->get_news_info($conf_id,$news_id);
 					if( !empty($data['news']) ){
-						switch ($this->conf_config['default_lang']) {
-							default:
-							case 'zhtw':
-								$this->form_validation->set_rules('news_title', '公告標題', 'required');
-								$this->form_validation->set_rules('news_content', '公告內容', 'required');
-							break;
-							case 'eng':
-								$this->form_validation->set_rules('news_title_eng', '公告標題(英)', 'required');
-								$this->form_validation->set_rules('news_content_eng', '公告內容(英)', 'required');
-							break;
+						$conf_lang = explode(",", $this->conf_config["conf_lang"]);
+						if( in_array("zhtw",$conf_lang) ){
+							$this->form_validation->set_rules('news_title', '公告標題', 'required');
+							$this->form_validation->set_rules('news_content', '公告內容', 'required');
+						}
+						if( in_array("eng",$conf_lang) ){
+							$this->form_validation->set_rules('news_title_eng', '公告標題(英)', 'required');
+							$this->form_validation->set_rules('news_content_eng', '公告內容(英)', 'required');
 						}
 						
 						if ($this->form_validation->run()){
@@ -888,7 +891,7 @@ class Dashboard extends MY_Conference {
 							$news_title_eng   = $this->input->post('news_title_eng');
 							$news_content_eng = $this->input->post('news_content_eng',false);
 							if( $this->conf->update_news($conf_id,$news_id,$news_title,$news_content,$news_title_eng,$news_content_eng) ){
-								$this->alert->show("s","成功更新公告",get_url("dashboard",$conf_id,"news","add"));
+								$this->alert->show("s","成功更新公告",get_url("dashboard",$conf_id,"news","edit")."?id=".$news_id);
 							}else{
 								$this->alert->show("d","無法更新公告");
 							}

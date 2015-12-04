@@ -7,20 +7,22 @@
 			<i class="fa fa-info-circle icon"></i>
 			<div class="content">
 				<div class="header">
-					尚未建立冊帳號？
+					<?php echo lang('regist_hint')?>
 				</div>
-				<p>請在此網站 <a href="<?php echo base_url('user/signup');?>" class="ui red button">建立帳號</a></p>
+				<p><?php echo sprintf(lang('register_here'),'<a href="'.base_url("user/signup").'" class="ui red button">'.lang('register_account').'</a>')?></p>
 			</div>
 		</div>
+		<?php echo validation_errors('<div class="ui message red">', '</div>');?>
+
 		<?php echo form_open('user/login',array('class'=>"form-horizontal")) ?>
 			<div class="form-group">
-				<label for="user_login" class="col-sm-2 control-label">帳號 <span class="text-danger">*</span></label>
+				<label for="user_login" class="col-sm-2 control-label"><?php echo lang('account')?> <span class="text-danger">*</span></label>
 				<div class="col-sm-10">
 					<input type="text" class="form-control" id="user_login" name="user_login">
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="user_pass" class="col-sm-2 control-label">密碼 <span class="text-danger">*</span></label>
+				<label for="user_pass" class="col-sm-2 control-label"><?php echo lang('password')?> <span class="text-danger">*</span></label>
 				<div class="col-sm-10">
 					<input type="password" class="form-control" id="user_pass" name="user_pass">
 				</div>
@@ -28,11 +30,11 @@
 			<div class="form-group">
 				<div class="col-sm-offset-2 col-sm-10">
 					<div class="col-sm-6">
-						<button type="submit" class="ui button blue">登入</button>
-						<a href="<?php echo base_url('user/lostpwd');?>" class="ui button orange">忘記密碼</a>
+						<button type="submit" class="ui button blue"><?php echo lang('login')?></button>
+						<a href="<?php echo base_url('user/lostpwd');?>" class="ui button orange"><?php echo lang('lostpwd')?></a>
 					</div>
 					<div class="col-sm-6 text-right">
-						<a href="<?php echo site_url();?>" class="ui button teal">返回首頁</a>
+						<a href="<?php echo site_url();?>" class="ui button teal"><?php echo lang('back_home')?></a>
 					</div>
 				</div>
 			</div>

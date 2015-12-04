@@ -29,8 +29,8 @@ $(document).ready(function() {
 </script>
 <div class="ui segment">
 	<div class="modal-header">
-		<a href="<?php echo get_url("dashboard",$conf_id,"topic")?>" class="pull-right ui button orange">所有主題列表</a>
-		<h4 class="modal-title">指派主編</h4>
+		<a href="<?php echo get_url("dashboard",$conf_id,"topic")?>" class="pull-right ui button orange"><?php echo lang('topic_all')?></a>
+		<h4 class="modal-title"><?php echo lang('topic_assign_editor')?></h4>
 	</div>
 	<div class="modal-body">
 		<?php echo form_open(get_url("dashboard",$conf_id,"topic","assign")."?id=".$topic['topic_id'],array("class"=>"form-horizontal"))?>
@@ -62,7 +62,7 @@ $(document).ready(function() {
 				<?php }?>
 			</table>
 			<div class="text-center">
-				<button type="submit" name="submit" id="submit" value="add" class="ui button blue">新增主編</button>
+				<button type="submit" name="submit" id="submit" value="add" class="ui button blue"><?php echo lang('add_editor')?></button>
 			</div>
 		<?php echo form_close()?>
 	</div>
@@ -70,7 +70,7 @@ $(document).ready(function() {
 <?php if(!empty($topic_users)){?>
 <div class="ui segment">
 	<div class="modal-header">
-		<a href="<?php echo get_url("dashboard",$conf_id,"topic")?>" class="pull-right ui button orange">所有主題列表</a>
+		<a href="<?php echo get_url("dashboard",$conf_id,"topic")?>" class="pull-right ui button orange"><?php echo lang('topic_all')?></a>
 		<h4 class="modal-title"><strong><?php echo $topic["topic_name"]?>(<?php echo $topic["topic_name_eng"]?>) 主編</strong></h4>
 	</div>
 	<div class="modal-body">
@@ -100,7 +100,7 @@ $(document).ready(function() {
 				<?php }?>
 			</table>
 			<div class="text-center">
-				<button type="submit" name="submit" id="submit" value="del" class="ui button red">刪除主編</button>
+				<button type="submit" name="submit" id="submit" value="del" class="ui button red"><?php echo lang('del_editor')?></button>
 			</div>
 		<?php echo form_close()?>
 	</div>
