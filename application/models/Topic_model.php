@@ -151,11 +151,11 @@ class Topic_model extends CI_Model {
 		$paper_title       = $paper->sub_title;
 		$paper_summary     = $paper->sub_summary;
 		$conf_name         = $paper->conf_name;
-		$conf_link         = base_url($conf_id);
-		$review_accept     = base_url("review_confirm/accept/".$review_token);
-		$review_reject     = base_url("review_confirm/reject/".$review_token);
+		$conf_link         = site_url($conf_id);
+		$review_accept     = site_url("review_confirm/accept/".$review_token);
+		$review_reject     = site_url("review_confirm/reject/".$review_token);
 		$review_deadline   = date("Y-m-d H:i:s",$review_timeout);
-		$password_reseturl = base_url("user/lostpwd");
+		$password_reseturl = site_url("user/lostpwd");
 		$review_url        = get_url("reviewer",$conf_id,"index");
 		$conf_email        = $paper->conf_email;
 

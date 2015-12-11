@@ -75,27 +75,60 @@
 				</table>
 			</div>
 			<div class="tab-pane container-fluid" id="tab_file">
+				<?php if( $paper->sub_status >= 4){?>
+				<h3>完稿檔案</h3>
+				<table class="table table-bordered" id="finish_file">
+					<thead>
+						<tr>
+							<th class="text-center col-md-2">檔案類型</th>
+							<th class="text-center col-md-8">檔案名稱</th>
+							<th class="text-center col-md-2">操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php if(!empty($finishfile)){?>
+						<tr>
+							<td class="text-center"><span class="ui blue basic label">完稿投稿資料</span></td>
+							<td><?php echo $finishfile->file_name?></td>
+							<td class="text-center">
+								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$finishfile->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
+								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$finishfile->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
+							</td>
+						</tr>
+						<?php }?>
+						<?php foreach ($finishother as $key => $finish) {?>
+						<tr>
+							<td class="text-center"><span class="ui teal basic label">完稿補充資料</span></td>
+							<td><?php echo $finish->file_name?></td>
+							<td class="text-center">
+								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$finish->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
+								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$finish->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
+							</td>
+						</tr>
+						<?php }?>
+					</tbody>
+				</table>
+				<?php }?>
+				<?php if( $paper->sub_status <= 4){?>
 				<h3>稿件檔案</h3>
 				<table class="table table-bordered">
 					<thead>
 						<tr>
-							<th style="width:10%">#</th>
-							<th style="width:10%">檔案類型</th>
-							<th style="width:60%">檔案名稱</th>
-							<th style="width:20%">操作</th>
+							<th class="text-center col-md-2">檔案類型</th>
+							<th class="text-center col-md-8">檔案名稱</th>
+							<th class="text-center col-md-2">操作</th>
 						</tr>
 					</thead>
 					<tr>
-						<td><?php if(!empty($otherfile)){echo $otherfile->fid;}?></td>
-						<td>投稿資料</td>
+						<td class="text-center"><span class="ui blue basic label">投稿資料</span></td>
 						<td>
 							<?php if(!empty($otherfile)){?>
-							<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" target="_blank"><?php echo $otherfile->file_name?></a>
+							<?php echo $otherfile->file_name?>
 							<?php }else{?>
 							<span class="ui label red">尚未上傳</span>
 							<?php }?>
 						</td>
-						<td>
+						<td class="text-center">
 							<?php if(!empty($otherfile)){?>
 								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
 								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
@@ -105,12 +138,11 @@
 					<?php if(!empty($otherfiles)){?>
 					<?php foreach ($otherfiles as $key => $otherfile) {?>
 					<tr>
-						<td><?php echo $otherfile->fid;?></td>
-						<td>補充資料</td>
+						<td class="text-center"><span class="ui teal basic label">補充資料</span></td>
 						<td>
-							<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" target="_blank"><?php echo $otherfile->file_name?></a>
+							<?php echo $otherfile->file_name?>
 						</td>
-						<td>
+						<td class="text-center">
 							<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
 							<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
 						</td>
@@ -118,7 +150,9 @@
 					<?php }?>
 					<?php }?>
 				</table>
+				<?php }?>
 			</div>
+
 			<?php if( $paper->sub_status >= 3 || $paper->sub_status == 1){?>
 			<div class="tab-pane container-fluid" id="tab_review">
 				<h3>審查資料</h3>

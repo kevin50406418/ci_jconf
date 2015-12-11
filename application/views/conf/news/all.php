@@ -44,7 +44,7 @@
 			</td>
 			<td>
 				<a href="<?php echo get_url("dashboard",$conf_id,"news","edit")?>?id=<?php echo $new->news_id?>" class="ui button blue">編輯</a>
-				<a href="#" class="ui button red">刪除</a>
+				<a onClick="return confirm('確定是否刪除?');" href="<?php echo get_url("dashboard",$conf_id,"news","del")?>?id=<?php echo $new->news_id?>" class="ui button red">刪除</a>
 			</td>
 		</tr>
 		<?php }?>

@@ -5,7 +5,7 @@
 	<div class="tabbable-line">
 		<ul class="nav nav-tabs nav-tabs-center">
 			<li class="active"> <a href="#tab_info" data-toggle="tab"> 研討會資訊 </a> </li>
-			<li> <a href="<?php echo base_url("sysop/conf/admin/".$conf_config['conf_id'])?>"> 研討管理員 </a> </li>
+			<li> <a href="<?php echo site_url("sysop/conf/admin/".$conf_config['conf_id'])?>"> 研討管理員 </a> </li>
 			<!--<li> <a href="#tab_file" data-toggle="tab"> 研討會ID更換 </a> </li>
 			<li> <a href="#tab_review" data-toggle="tab"> 審查資料 </a> </li>-->
 		</ul>
@@ -13,7 +13,7 @@
 			<div class="tab-pane active container-fluid" id="tab_info">
 				<h2>編輯研討會</h2>
 				<?php echo validation_errors('<div class="ui message red">', '</div>');?>
-				<?php echo form_open(base_url("sysop/conf/edit/".$conf_id),array("class"=>"form-horizontal"))?>
+				<?php echo form_open(site_url("sysop/conf/edit/".$conf_id),array("class"=>"form-horizontal"))?>
 					<div class="form-group">
 						<label for="conf_id" class="col-sm-2 control-label">研討會ID <span class="text-danger">*</span></label>
 						<div class="col-sm-10">

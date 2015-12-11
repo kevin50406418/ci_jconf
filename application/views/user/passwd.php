@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <div class="ui segment pink">
 	<?php echo validation_errors('<div class="ui message red">', '</div>');?>
-	<?php echo form_open(base_url("user/passwd"),array("class"=>"form-horizontal"))?>
+	<?php echo form_open(site_url("user/passwd"),array("class"=>"form-horizontal"))?>
 		<div class="form-group">
 			<label for="user_id" class="col-sm-2 control-label">帳號</label>
 			<div class="col-sm-10">

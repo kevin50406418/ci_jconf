@@ -101,23 +101,21 @@
 				<table class="table table-bordered">
 					<thead>
 						<tr>
-							<th style="width:10%">#</th>
-							<th style="width:10%">檔案類型</th>
-							<th style="width:60%">檔案名稱</th>
-							<th style="width:20%">操作</th>
+							<th class="text-center col-md-2">檔案類型</th>
+							<th class="text-center col-md-8">檔案名稱</th>
+							<th class="text-center col-md-2">操作</th>
 						</tr>
 					</thead>
 					<tr>
-						<td><?php if(!empty($otherfile)){echo $otherfile->fid;}?></td>
-						<td>投稿資料</td>
+						<td class="text-center"><span class="ui blue basic label">投稿資料</span></td>
 						<td>
 							<?php if(!empty($otherfile)){?>
-							<a href="<?php echo get_url("topic",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" target="_blank"><?php echo $otherfile->file_name?></a>
+							<?php echo $otherfile->file_name?>
 							<?php }else{?>
 							<span class="ui label red">尚未上傳</span>
 							<?php }?>
 						</td>
-						<td>
+						<td class="text-center">
 							<?php if(!empty($otherfile)){?>
 								<a href="<?php echo get_url("topic",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
 								<a href="<?php echo get_url("topic",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
@@ -127,12 +125,11 @@
 					<?php if(!empty($otherfiles)){?>
 					<?php foreach ($otherfiles as $key => $otherfile) {?>
 					<tr>
-						<td><?php echo $otherfile->fid;?></td>
-						<td>補充資料</td>
+						<td class="text-center"><span class="ui teal basic label">補充資料</span></td>
 						<td>
-							<a href="<?php echo get_url("topic",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" target="_blank"><?php echo $otherfile->file_name?></a>
+							<?php echo $otherfile->file_name?>
 						</td>
-						<td>
+						<td class="text-center">
 							<a href="<?php echo get_url("topic",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
 							<a href="<?php echo get_url("topic",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
 						</td>

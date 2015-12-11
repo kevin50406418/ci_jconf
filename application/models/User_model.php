@@ -536,7 +536,7 @@ class User_model extends CI_Model {
 	function send_resetpwd_mail($user_login,$user_email,$reset_token){
 		$time = date("Y-m-d H:i:s",time());
 		$site_name = $this->config->item('site_name');
-    	$message = "會員 ".$user_login." 您好,<br><br>您於 ".$time." 送出重置密碼請求，重置訊息如下：<br>".base_url("user/reset/".$user_login."/".$reset_token)."<br>(若非本人所提出的請求，請忽略本信件)<br><br>".$site_name;
+    	$message = "會員 ".$user_login." 您好,<br><br>您於 ".$time." 送出重置密碼請求，重置訊息如下：<br>".site_url("user/reset/".$user_login."/".$reset_token)."<br>(若非本人所提出的請求，請忽略本信件)<br><br>".$site_name;
     	// sp("TO:".$user_email."\n".$message);
     	
     	$this->email->from('ccs@asia.edu.tw', $site_name);

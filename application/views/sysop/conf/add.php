@@ -3,7 +3,7 @@
 <div class="ui segment blue">
 	<h2>新增研討會</h2>
 	<?php echo validation_errors('<div class="ui message red">', '</div>');?>
-	<?php echo form_open(base_url("sysop/conf/add"),array("class"=>"form-horizontal"))?>
+	<?php echo form_open(site_url("sysop/conf/add"),array("class"=>"form-horizontal"))?>
 		<div class="form-group">
 			<label for="conf_id" class="col-sm-2 control-label">研討會ID <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
@@ -87,7 +87,7 @@
 		<div class="form-group">
 			<label for="conf_keywords" class="col-sm-2 control-label">關鍵字 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">
-				<input name="conf_keywords" type="text" class="form-control" id="conf_keywords" value="<?php echo set_value('conf_keywords'); ?">
+				<input name="conf_keywords" type="text" class="form-control" id="conf_keywords" value="<?php echo set_value('conf_keywords'); ?>">
 			</div>
 		</div>
 		<div class="form-group">

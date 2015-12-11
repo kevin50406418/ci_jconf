@@ -253,7 +253,7 @@ class Home extends MY_Controller {
 			$this->session->set_userdata('lang', $lang);
 			$this->alert->js_refresh();
 		}else{
-			$this->alert->js("No direct script access allowed",base_url());
+			$this->alert->js("No direct script access allowed",site_url());
 		}
 	}
 	public function page404($conf_id=''){
@@ -298,7 +298,7 @@ class Home extends MY_Controller {
 	public function _ckeditor(){
 		$data['body_class'] = $this->body_class;
 		$this->cinfo['show_confinfo'] = false;
-		$this->assets->add_js(base_url().'tinymce/tinymce.min.js');
+		$this->assets->add_js(site_url().'tinymce/tinymce.min.js');
 		//print_r($this->input->post(NULL,FALSE));
 		if ($this->form_validation->run() == FALSE){
 			$this->load->view('common/header');

@@ -14,7 +14,7 @@
 		</div>
 		<?php echo validation_errors('<div class="ui message red">', '</div>');?>
 
-		<?php echo form_open('user/login',array('class'=>"form-horizontal")) ?>
+		<?php echo form_open(site_url('user/login'),array('class'=>"form-horizontal")) ?>
 			<div class="form-group">
 				<label for="user_login" class="col-sm-2 control-label"><?php echo lang('account')?> <span class="text-danger">*</span></label>
 				<div class="col-sm-10">

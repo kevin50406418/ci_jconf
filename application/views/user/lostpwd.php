@@ -3,7 +3,7 @@
 	<div class="page-header">
 		<h2><?php echo lang('lostpwd')?></h2>
 	</div>
-	<?php echo form_open(base_url('user/lostpwd'),array("class"=>"form-horizontal"))?>
+	<?php echo form_open(site_url('user/lostpwd'),array("class"=>"form-horizontal"))?>
 		<div class="form-group">
 			<label for="user_login" class="col-sm-2 control-label"><?php echo lang('account')?> <span class="text-danger">*</span></label>
 			<div class="col-sm-10">

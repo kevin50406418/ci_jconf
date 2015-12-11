@@ -9,7 +9,7 @@
 				<li role="presentation" class="active"><a href="#zhtw" aria-controls="home" role="tab" data-toggle="tab">中文</a></li>
 				<li role="presentation"><a href="#eng" aria-controls="profile" role="tab" data-toggle="tab">英文</a></li>
 			</ul>
-			<a class="ui inverted blue button" href="<?php echo base_url("sysop/email/add")?>">新增電子郵件樣版</a>
+			<a class="ui inverted blue button" href="<?php echo site_url("sysop/email/add")?>">新增電子郵件樣版</a>
 		</div>
 		<div class="tab-content">
 			<div role="tabpanel" class="tab-pane active" id="zhtw">
@@ -26,7 +26,7 @@
 							<td><?php echo $zhtw->default_subject?></td>
 							<td><?php echo $zhtw->email_desc?></td>
 							<td>
-								<a href="<?php echo base_url("sysop/email/edit")?>?id=<?php echo $zhtw->email_key?>">編輯</a>
+								<a href="<?php echo site_url("sysop/email/edit")?>?id=<?php echo $zhtw->email_key?>">編輯</a>
 							</td>
 						</tr>
 					<?php }?>

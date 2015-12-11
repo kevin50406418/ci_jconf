@@ -5,7 +5,7 @@
 		<h4 class="modal-title">重設 <?php echo $user_login;?>密碼</h4>
 	</div>
 	<div class="modal-body">
-		<?php echo form_open(base_url("sysop/user/reset/".$user_login),array("class"=>"form-horizontal"))?>
+		<?php echo form_open(site_url("sysop/user/reset/".$user_login),array("class"=>"form-horizontal"))?>
 		<div class="form-group">
 			<label for="user_id" class="col-sm-2 control-label">新密碼 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">

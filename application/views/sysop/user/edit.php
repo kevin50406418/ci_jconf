@@ -2,13 +2,13 @@
 <div class="col-md-<?php echo $col_right;?>">
 <div class="ui segment">
 	<div class="pull-right">
-		<a href="<?php echo base_url("sysop/user/all");?>" class="ui button brown">所有使用者</a>
-		<a href="<?php echo base_url("sysop/user/view/".$user->user_login)?>" class="ui button green">查看使用者</a>
-		<a href="<?php echo base_url("sysop/user/reset/".$user->user_login)?>" class="ui button orange">重設密碼</a>
+		<a href="<?php echo site_url("sysop/user/all");?>" class="ui button brown">所有使用者</a>
+		<a href="<?php echo site_url("sysop/user/view/".$user->user_login)?>" class="ui button green">查看使用者</a>
+		<a href="<?php echo site_url("sysop/user/reset/".$user->user_login)?>" class="ui button orange">重設密碼</a>
 	</div>
 	<h2>編輯使用者</h2>
 	<?php echo validation_errors('<div class="ui message red">', '</div>');?>
-	<?php echo form_open(base_url("sysop/user/edit/".$user_login),array("class"=>"form-horizontal"))?>
+	<?php echo form_open(site_url("sysop/user/edit/".$user_login),array("class"=>"form-horizontal"))?>
 		<div class="form-group">
 			<label for="user_id" class="col-sm-2 control-label">帳號 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">

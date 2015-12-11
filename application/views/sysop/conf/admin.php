@@ -4,14 +4,14 @@
 	<div class="tabbable-panel">
 	<div class="tabbable-line">
 		<ul class="nav nav-tabs nav-tabs-center">
-			<li> <a href="<?php echo base_url("sysop/conf/edit/".$conf_id)?>"> 研討會資訊 </a> </li>
-			<li class="active"> <a href="<?php echo base_url("sysop/conf/admin/".$conf_id)?>"> 研討管理員 </a> </li>
+			<li> <a href="<?php echo site_url("sysop/conf/edit/".$conf_id)?>"> 研討會資訊 </a> </li>
+			<li class="active"> <a href="<?php echo site_url("sysop/conf/admin/".$conf_id)?>"> 研討管理員 </a> </li>
 			<!--<li> <a href="#tab_file" data-toggle="tab"> 研討會ID更換 </a> </li>
 			<li> <a href="#tab_review" data-toggle="tab"> 審查資料 </a> </li>-->
 		</ul>
-		<?php echo form_open(base_url("sysop/conf/add_admin/".$conf_id),array("class"=>"tab-content"))?>
+		<?php echo form_open(site_url("sysop/conf/add_admin/".$conf_id),array("class"=>"tab-content"))?>
 		<div class="ui inverted segment">
-			<a href="<?php echo base_url("sysop/user/add")?>" class="ui blue inverted button">新增使用者</a>
+			<a href="<?php echo site_url("sysop/user/add")?>" class="ui blue inverted button">新增使用者</a>
 			<div class="ui buttons">
 				<button class="ui teal button action" name="type" value="add_admin">設為研討會管理員</button>
 				<button class="ui pink button action" name="type" value="del_admin">取消研討會管理員</button>
@@ -85,7 +85,7 @@ $(document).ready(function() {
 		var table = $('.datatable_users').dataTable();
 		$.ajax({
 			type: "POST",
-			url: "<?php echo base_url("sysop/conf/add_admin/".$conf_id)?>",
+			url: "<?php echo site_url("sysop/conf/add_admin/".$conf_id)?>",
 			data: table.$('input').serialize()+"&type="+$(this).val()+"&<?php echo $this->security->get_csrf_token_name(); ?>=<?php echo $this->security->get_csrf_hash(); ?>" ,
 			success: function(response){$("#alert").html(response);},
 			error:function(xhr){$("#alert").html(data);},

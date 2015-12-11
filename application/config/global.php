@@ -2,6 +2,8 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 //$config['assets_url'] = "http://120.108.113.38/conf/assets/";
+$config['version'] = "0.0.56"; // 系統版本號
+
 $config['site_name'] = "亞大研討會系統";
 $config['spage']=array("index","news","main","dashboard","submit","topic","reviewer");
 $config['test_conf'] = array("test2015","test2013","test2014"); // for developer test conf(will not show for other user)

@@ -1,10 +1,18 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+
+$lang['log_conf'] = "研討會管理";
+$lang['log_submit'] = "投稿者編修";
+$lang['log_topic'] = "主編操作";
+$lang['log_review'] = "審查人操作";
+
 $lang['update_status'] = "更新研討會狀態";
 $lang['add_filter'] = "新增投稿檢核清單";
 $lang['update_filter'] = "更新投稿檢核清單";
+$lang['del_filter'] = "刪投稿檢核清單";
 $lang['add_news'] = "新增研討會公告";
 $lang['update_news'] = "更新研討會公告";
+$lang['del_news'] = "刪投研討會公告";
 $lang['update_confinfo'] = "更新研討會資訊";
 $lang['sysop_updateconf'] = "系統管理員更新研討會狀態";
 $lang['add_topic'] = "新增研討會主題";
@@ -25,10 +33,11 @@ $lang['add_register_meal'] = "新增研討會餐點";
 $lang['update_register_meal'] = "更新研討會餐點";
 $lang['del_register_meal'] = "刪除研討會餐點";
 $lang['update_sort_topic'] = "更新研討會排序";
+$lang['update_mail_template'] = "更新電子郵件樣版";
 
 $lang['assign_reviewer_pedding'] = "指派暫定審查人";
 $lang['update_pedding_timeout'] = "更新暫定審查人審查期限";
-$lang['del_reviewer_pedding'] = "刪除暫定審查人審查期限";
+$lang['del_reviewer_pedding'] = "刪除暫定審查人";
 $lang['assign_reviewer'] = "指派審查人";
 $lang['notice_reviewer'] = "審查提醒";
 $lang['topic_review'] = "稿件審查";
@@ -43,6 +52,7 @@ $lang['update_file'] = "更新投稿論文檔案";
 $lang['del_file'] = "刪除投稿論文檔案";
 $lang['add_file'] = "新增投稿論文檔案";
 $lang['paper_to_review'] = "投稿論文送審";
+$lang['paper_to_reviewing'] = "投稿論文送審";
 
 $lang['add_most'] = "新增科技部成果報名表";
 $lang['add_most_report'] = "新增科技部成果發表者資料";

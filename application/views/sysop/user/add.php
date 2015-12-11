@@ -2,7 +2,7 @@
 <div class="col-md-<?php echo $col_right;?>">
 <?php echo validation_errors('<div class="ui message red">', '</div>');?>
 <div class="ui segment">
-	<?php echo form_open(base_url('sysop/user/add'),array("class"=>"form-horizontal","id"=>"register"))?>
+	<?php echo form_open(site_url('sysop/user/add'),array("class"=>"form-horizontal","id"=>"register"))?>
 		<div class="form-group">
 			<label for="user_id" class="col-sm-2 control-label">帳號 <span class="text-danger">*</span></label>
 			<div class="col-sm-10">

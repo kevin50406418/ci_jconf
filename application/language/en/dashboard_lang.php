@@ -50,6 +50,7 @@ $lang['topic_act_edit'] = "Edit";
 $lang['topic_del_confirm'] = "Do you want to Delete「%2s ( %1s )」?\nNote：Unable to recover after deleted";
 $lang['topic_del'] = "Delete";
 $lang['topic_add'] = "Add Topic";
+$lang['topic_create'] = "Create";
 
 $lang['topic_name_zhtw'] = "Topic Name(Chinese)";
 $lang['topic_name_eng'] = "Topic Name(English)";
@@ -60,3 +61,28 @@ $lang['topic_update'] = "Update";
 
 $lang['add_editor'] = "Add Editors";
 $lang['del_editor'] = "Delete Editors";
+
+/* user */
+$lang['add_user'] = "Add User";
+$lang['assign_admin'] = "Assign Administrator";
+$lang['cancel_admin'] = "Cancel Administrator";
+$lang['assign_reviewer'] = "Assign Reviewer";
+$lang['cancel_reviewer'] = "Cancel Reviewer";
+$lang['add_user'] = "Add User";
+$lang['user_login'] = "Account";
+$lang['user_name'] = "Name";
+$lang['user_email'] = "Email";
+$lang['organization'] = "Organization";
+$lang['operate'] = "Operate";
+$lang['user_edit'] = "Edit";
+
+/* news */
+$lang['add_news'] = "Add News";
+$lang['all_news'] = "All News";
+$lang['news'] = "New";
+$lang['news_title'] = "News Title";
+$lang['news_title_eng'] = "News Title(Eng)";
+$lang['news_content'] = "News Content";
+$lang['news_content_en'] = "News Content(Eng)";
+$lang['news_edit'] = "Edit";
+$lang['news_del'] = "Delete"; //!!

@@ -22,6 +22,7 @@ $lang['dashboard_logs'] = "Logs";
 
 $lang['topic_dashboard'] = "Topic Dashboard";
 $lang['topic_assign'] = "Topic Assign";
+$lang['topic_reviewer_assign'] = "Reviewer Setting";
 
 $lang['reviewer_dashboard'] = "Reviewer Dashboard";
 $lang['reviewer_paper'] = "Paper Reviewer";

@@ -50,6 +50,7 @@ $lang['topic_act_edit'] = "編輯";
 $lang['topic_del_confirm'] = "確定是否刪除主題「%1s ( %2s )」\n注意：刪除後將無法恢復";
 $lang['topic_del'] = "刪除";
 $lang['topic_add'] = "建立研討會主題";
+$lang['topic_create'] = "建立";
 
 $lang['topic_name_zhtw'] = "主題名稱(中)";
 $lang['topic_name_eng'] = "主題名稱(英)";
@@ -60,3 +61,28 @@ $lang['topic_update'] = "更改";
 
 $lang['add_editor'] = "新增主編";
 $lang['del_editor'] = "刪除主編";
+
+/* user */
+$lang['add_user'] = "新增使用者";
+$lang['assign_admin'] = "設為研討會管理員";
+$lang['cancel_admin'] = "取消研討會管理員";
+$lang['assign_reviewer'] = "設為審查人";
+$lang['cancel_reviewer'] = "取消審查人";
+$lang['add_user'] = "新增使用者";
+$lang['user_login'] = "帳號";
+$lang['user_name'] = "姓名";
+$lang['user_email'] = "信箱";
+$lang['organization'] = "所屬機構";
+$lang['operate'] = "操作";
+$lang['user_edit'] = "編輯";
+
+/* news */
+$lang['add_news'] = "新增公告";
+$lang['all_news'] = "所有公告";
+$lang['news'] = "公告";
+$lang['news_title'] = "公告標題";
+$lang['news_title_eng'] = "公告標題(英)";
+$lang['news_content'] = "公告內容";
+$lang['news_content_en'] = "公告內容(英)";
+$lang['news_edit'] = "編輯";
+$lang['news_del'] = "刪除"; //!!

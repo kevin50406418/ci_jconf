@@ -22,6 +22,7 @@ $lang['dashboard_logs'] = "日誌";
 
 $lang['topic_dashboard'] = "主編論文審查";
 $lang['topic_assign'] = "論文審查";
+$lang['topic_reviewer_assign'] = "審查人設置";
 
 $lang['reviewer_dashboard'] = "論文審查";
 $lang['reviewer_paper'] = "論文審查";

@@ -66,7 +66,7 @@ $(function(){
 		<div class="item">您好，<?php echo get_current_user_login()?></div>
         <?php }else{?>
         <div class="item">
-        	<a href="<?php echo base_url("user/login")?>" class="ui teal button">登入</a>
+        	<a href="<?php echo site_url("user/login")?>" class="ui teal button">登入</a>
         </div>
         <?php }?>
     </div>

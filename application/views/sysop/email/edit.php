@@ -5,7 +5,7 @@
 		<h2>編輯電子郵件樣版</h2>
 	</div>
 	<?php echo validation_errors('<div class="ui message red">', '</div>');?>
-	<?php echo form_open(base_url("sysop/email/edit?id=".$id),array("class"=>"form-horizontal"))?>
+	<?php echo form_open(site_url("sysop/email/edit?id=".$id),array("class"=>"form-horizontal"))?>
 	<table class="table table-bordered">
 		<tr>
 			<th class="col-md-2">電子郵件識別碼 <span class="text-danger">*</span></th>

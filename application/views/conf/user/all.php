@@ -11,7 +11,7 @@
 			<button class="ui orange button action" name="type" value="add_review">設為審查人</button>
 			<button class="ui purple button action" name="type" value="del_review">取消審查人</button>
 		</div>
-		<div class="ui buttons col-md-3">
+		<!-- <div class="ui buttons col-md-3">
 			<div class="input-group">
 				<select name="topic" class="form-control">
 					<?php foreach ($topics as $key => $topic) {?>
@@ -22,7 +22,7 @@
 					<button class="btn btn-success action" name="type" value="add_topic">設為主題主編</button>
 				</span>
 			</div>
-		</div>
+		</div> -->
 	</div>
 	<div id="alert"></div>
 	<table class="table table-hover table-bordered datatable_users">

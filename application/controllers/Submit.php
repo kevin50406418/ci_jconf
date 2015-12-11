@@ -101,7 +101,7 @@ class Submit extends MY_Conference {
 					$this->assets->add_js(asset_url().'js/chosen.jquery.js');
 					$country_list = config_item('country_list');
 					$data['user'] =  $this->user->get_user_info($this->user_login);
-					$data['country_list'] = $country_list['zhtw'];
+					$data['country_list'] = $country_list[$this->_lang];
 					$data['topics'] = $this->conf->get_topic($conf_id);
 					$this->load->view('submit/add/step',$data);
 					$this->load->view('submit/add/step2',$data);
@@ -254,7 +254,7 @@ class Submit extends MY_Conference {
 				$country_list = config_item('country_list');
 				$data['paper']              = $this->Submit->get_paperinfo($conf_id,$paper_id, $this->user_login);
 				$data['paper']->sub_summary = str_replace("<br>",PHP_EOL,$data['paper']->sub_summary);
-				$data['country_list']       = $country_list['zhtw'];
+				$data['country_list']       = $country_list[$this->_lang];
 				$data['topics']             = $this->conf->get_topic($conf_id);
 				$data['authors']            = $this->Submit->get_author($paper_id);
 				$this->load->view('submit/edit/step',$data);
@@ -540,6 +540,8 @@ class Submit extends MY_Conference {
 			$data['otherfile'] = $this->Submit->get_otherfile($paper_id);
 			$data['otherfiles'] = $this->Submit->get_otherfiles($paper_id);
 			$data['reviewers'] = $this->topic->get_reviewer($paper_id);
+			$data['finishfile'] = $this->Submit->get_finishfile($paper_id);
+			$data['finishother'] = $this->Submit->get_finishother($paper_id);
 		}
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
@@ -570,7 +572,6 @@ class Submit extends MY_Conference {
 
 		if( !$this->Submit->is_author($paper_id, $this->user_login) ){
 			$this->alert->js("非本篇作者或查無稿件",get_url("submit",$this->conf_id));
-			$this->load->view('common/footer',$data);
 			$this->output->_display();
 			exit;
 		}
@@ -580,17 +581,98 @@ class Submit extends MY_Conference {
 
 		$data['paper'] = $this->Submit->get_paperinfo($this->conf_id,$paper_id,$this->user_login);
 		if(!empty($data['paper'])){
-			$data['authors'] = $this->Submit->get_author($paper_id);
-			$data['otherfile'] = $this->Submit->get_otherfile($paper_id);
+			$data['authors']    = $this->Submit->get_author($paper_id);
+			$data['otherfile']  = $this->Submit->get_otherfile($paper_id);
 			$data['otherfiles'] = $this->Submit->get_otherfiles($paper_id);
-			$data['reviewers'] = $this->topic->get_reviewer($paper_id);
+			$data['reviewers']  = $this->topic->get_reviewer($paper_id);
+			$data['finishfile'] = $this->Submit->get_finishfile($paper_id);
+			$data['finishother'] = $this->Submit->get_finishother($paper_id);
 		}
+		if( $data['paper']->sub_status != 4 ){
+			$this->alert->js("本篇稿件無法上傳完稿",get_url("submit",$this->conf_id));
+			$this->output->_display();
+			exit;
+		}
+		
+		if( !is_null($this->input->post("submit")) ){
+			if( $this->Submit->paper_to_finish($this->conf_id,$paper_id)){
+				$this->alert->js("成功送出完稿",get_url("submit",$conf_id,"detail",$paper_id));
+			}else{
+				$this->alert->js("完稿送出失敗",get_url("submit",$conf_id,"detail",$paper_id));
+			}
+			$this->output->_display();
+			exit;
+		}
+
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
 		$this->load->view('conf/conf_nav',$data);
 		$this->load->view('conf/menu_submit',$data);
-		$this->load->view('submit/detail',$data);
-		$this->load->view('submit/finish',$data);
+		$this->load->view('submit/finish/detail',$data);
+
+		$config['upload_path']= $this->conf->get_paperdir($this->conf_id);
+        $config['allowed_types']= 'pdf';
+        $config['encrypt_name']= true;
+
+        $this->load->library('upload', $config);
+        
+        if ( $this->upload->do_upload('paper_file')){
+            $upload_data = $this->upload->data();
+            $arrayLevel = arrayLevel($upload_data);
+            if( $arrayLevel >1 ){
+            	$this->alert->js("投稿檔案僅限一份",get_url("submit",$this->conf_id));
+            }
+            if(empty($data['finishfile'])){
+           		if( $this->Submit->add_file($conf_id,$paper_id,$upload_data['client_name'],$upload_data['file_name'],"FF") ){
+           			$this->alert->show("s","上傳完稿檔案成功");
+           		}else{
+           			$this->alert->show("d","上傳完稿檔案失敗");
+           		}
+        	}else{
+        		delete_files($this->conf->get_paperdir($this->conf_id).$data['finishfile']->file_system);
+        		if( $this->Submit->update_file($conf_id,$paper_id,$data['finishfile']->fid,$upload_data['client_name'],$upload_data['file_name']) ){
+        			$this->alert->show("s","檔案更新成功");
+        		}else{
+           			$this->alert->show("d","檔案更新失敗");
+           		}
+        	}
+        	$this->alert->refresh(2);
+        }
+
+        if ( $this->upload->do_upload('paper_files')){
+            $upload_datas = $this->upload->data();
+            $arrayLevel = arrayLevel($upload_datas);
+            if( $arrayLevel ==1 ){
+               	if( $this->Submit->add_file($conf_id,$paper_id,$upload_datas['client_name'],$upload_datas['file_name'],"FO") ){
+               		$this->alert->show("s","新增檔案 <strong>".$upload_datas['client_name']."</strong>成功");
+               	}else{
+               		$this->alert->show("d","新增檔案 <strong>".$upload_datas['client_name']."</strong>失敗");
+               	}
+            }else if($arrayLevel == 2){
+            	foreach ($upload_datas as $key => $upload_data) {
+               		if( $this->Submit->add_file($conf_id,$paper_id,$upload_data['client_name'],$upload_data['file_name'],"FO") ){
+               			$this->alert->show("s","新增檔案 <strong>".$upload_data['client_name']."</strong>成功");
+               		}else{
+               			$this->alert->show("d","新增檔案 <strong>".$upload_data['client_name']."</strong>失敗");
+               		}
+                }
+            }
+            $this->alert->refresh(2);
+        }
+
+        if( !is_null($this->input->post("del_file")) ){
+        	$del_file = $this->input->post("del_file");
+        	if( $this->Submit->del_finishfile($conf_id,$paper_id,$del_file) ){
+        		$this->alert->show("s","刪除檔案成功");
+        	}else{
+        		$this->alert->show("d","刪除檔案失敗");
+        	}
+        	$this->alert->refresh(2);
+        }
+        if( !empty($data['finishfile']) ){
+        	$this->load->view('submit/finish/submit',$data);
+        }
+		$this->load->view('submit/finish/finish',$data);
 		$this->load->view('common/footer',$data);
 	}
 	// public function remove($conf_id='',$paper_id=''){

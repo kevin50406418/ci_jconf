@@ -51,15 +51,15 @@ $pg_id = $this->uri->segment(2);
 			<div class="am-dropdown" data-am-dropdown="{boundary: '.am-topbar'}">
 				<a class="am-btn am-btn-primary am-topbar-btn am-btn-sm am-dropdown-toggle" data-am-dropdown-toggle>您好，<?php echo get_current_user_login()?> <i class="fa fa-caret-down"></i></a>
 				<ul class="am-dropdown-content">
-					<li><a href="<?php echo base_url('user/index');?>">編輯個人資料</a></li>
-					<li><a href="<?php echo base_url('user/passwd');?>">更改密碼</a></li>
-					<li><a href="<?php echo base_url('user/log');?>">個人登入紀錄</a></li>
+					<li><a href="<?php echo site_url('user/index');?>">編輯個人資料</a></li>
+					<li><a href="<?php echo site_url('user/passwd');?>">更改密碼</a></li>
+					<li><a href="<?php echo site_url('user/log');?>">個人登入紀錄</a></li>
 					<li class="am-divider"></li>
-					<li><a href="<?php echo base_url('user/logout');?>">登出</a></li>
+					<li><a href="<?php echo site_url('user/logout');?>">登出</a></li>
 				</ul>
 			</div>
 			<?php }else{?>
-			<a href="<?php echo base_url("user/login")?>" class="am-btn am-btn-success am-topbar-btn am-btn-sm">登入</a>
+			<a href="<?php echo site_url("user/login")?>" class="am-btn am-btn-success am-topbar-btn am-btn-sm">登入</a>
 			<?php }?>
 		</div>
 	</div>

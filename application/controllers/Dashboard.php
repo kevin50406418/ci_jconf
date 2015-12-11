@@ -608,6 +608,13 @@ class Dashboard extends MY_Conference {
 						$this->alert->show("d","查無投稿檢核清單",get_url("dashboard",$conf_id,"filter"));
 					}
 				break;
+				case "del":
+					if( $this->conf->del_filter($conf_id,$filter_id) ){
+						$this->alert->js("刪除投稿檢核清單成功",get_url("dashboard",$conf_id,"filter"));
+					}else{
+						$this->alert->js("刪除投稿檢核清單失敗",get_url("dashboard",$conf_id,"filter"));
+					}
+				break;
 			}
 		}
 		//$this->load->view('conf/setting',$data);
@@ -899,7 +906,14 @@ class Dashboard extends MY_Conference {
 
 						$this->load->view('conf/news/edit',$data);
 					}else{
-						$this->alert->show("d","查無公告",get_url("dashboard",$conf_id,"filter"));
+						$this->alert->show("d","查無公告",get_url("dashboard",$conf_id,"news"));
+					}
+				break;
+				case "del":
+					if( $this->conf->del_news($conf_id,$news_id) ){
+						$this->alert->js("刪除公告成功",get_url("dashboard",$conf_id,"news"));
+					}else{
+						$this->alert->js("刪除公告失敗",get_url("dashboard",$conf_id,"news"));
 					}
 				break;
 			}
@@ -1008,7 +1022,8 @@ class Dashboard extends MY_Conference {
 				$data['otherfile']  = $this->Submit->get_otherfile($paper_id);
 				$data['otherfiles'] = $this->Submit->get_otherfiles($paper_id);
 				$data['reviewers']  = $this->topic->get_reviewer($paper_id);
-				
+				$data['finishfile'] = $this->Submit->get_finishfile($paper_id);
+				$data['finishother'] = $this->Submit->get_finishother($paper_id);
 				switch($act){
 					case "detail":
 					default:
@@ -1302,7 +1317,7 @@ class Dashboard extends MY_Conference {
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		$data['conf_logs']    = $this->conf->get_logs($conf_id);
 
-		$this->lang->load("log",$this->_lang);
+		$this->lang->load("conf_log",$this->_lang);
 
 		$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
 		$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);

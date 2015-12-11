@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <div class="col-md-<?php echo $col_right;?>">
 <?php echo validation_errors('<div class="ui message red">', '</div>');?>
-<?php echo form_open(base_url("sysop/user/all"),array("class"=>"ui segment","id"=>"users"))?>
+<?php echo form_open(site_url("sysop/user/all"),array("class"=>"ui segment","id"=>"users"))?>
 	<p>
 		<button value="sysop" name="type" class="ui button blue basic" id="sysop">設為系統管理員</button>
 		<button value="unsysop" name="type" class="ui button red basic" id="unsysop">取消系統管理員</button>
@@ -41,10 +41,10 @@
 				<?php echo $user->user_org?>
 			</td>
 			<td>
-				<a href="<?php echo base_url("sysop/user/edit/".$user->user_login)?>" class="ui button blue tiny basic"><i class="fa fa-pencil-square-o"></i> 編輯</a>
-				<a href="<?php echo base_url("sysop/user/view/".$user->user_login)?>" class="ui button teal tiny basic">查看</a>
-				<?php if($user->user_staus == 1){?><a href="#" class="ui button green tiny basic">啟用</a><?php }?>
-				<a href="<?php echo base_url("sysop/user/reset/".$user->user_login)?>" class="ui button orange tiny basic">重設密碼</a>
+				<a href="<?php echo site_url("sysop/user/edit/".$user->user_login)?>" class="ui button blue tiny basic"><i class="fa fa-pencil-square-o"></i> 編輯</a>
+				<a href="<?php echo site_url("sysop/user/view/".$user->user_login)?>" class="ui button teal tiny basic">查看</a>
+				<!-- <?php if($user->user_staus == 1){?><a href="#" class="ui button green tiny basic">啟用</a><?php }?>-->
+				<a href="<?php echo site_url("sysop/user/reset/".$user->user_login)?>" class="ui button orange tiny basic">重設密碼</a>
 			</td>
 		</tr>
 		<?php }?>
@@ -81,7 +81,7 @@ $(document).ready(function() {
 		var table = $('.datatable_users').dataTable();
 		$.ajax({
 			type: "POST",
-			url: "<?php echo base_url("sysop/user/manage")?>",
+			url: "<?php echo site_url("sysop/user/manage")?>",
 			data: table.$('input').serialize()+"&type=sysop&<?php echo $this->security->get_csrf_token_name(); ?>=<?php echo $this->security->get_csrf_hash(); ?>" ,
 			success: function(response){$("#alert").html(response);},
 			error:function(xhr){$("#alert").html(data);},
@@ -92,7 +92,7 @@ $(document).ready(function() {
 		var table = $('.datatable_users').dataTable();
 		$.ajax({
 			type: "POST",
-			url: "<?php echo base_url("sysop/user/manage")?>",
+			url: "<?php echo site_url("sysop/user/manage")?>",
 			data: table.$('input').serialize()+"&type=unsysop&<?php echo $this->security->get_csrf_token_name(); ?>=<?php echo $this->security->get_csrf_hash(); ?>" ,
 			success: function(response){$("#alert").html(response);},
 			error:function(xhr){$("#alert").html(data);},

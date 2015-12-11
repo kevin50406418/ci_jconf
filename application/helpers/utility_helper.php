@@ -47,7 +47,7 @@ function get_url($page='',$conf_id='',$act='',$id='',$step=''){
 		$return.=$v;
 		$i++;
 	}
-	return base_url($return);
+	return site_url($return);
 }
 
 function js_alert($text,$refresh=-1) {

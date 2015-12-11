@@ -15,7 +15,10 @@
 			<td><?php echo date("Y-m-d H:i:s",$log->log_time)?></td>
 			<td><?php echo $log->login_user?></td>
 			<td><?php echo lang('log_'.$log->log_type)?></td>
-			<td><?php echo $log->log_act?></td>
+			<td>
+				<?php echo lang($log->log_act)?>
+				<!-- <?php echo $log->log_act?> -->
+			</td>
 			<td>
 				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal<?php echo $log->log_id?>">
 					更多資訊

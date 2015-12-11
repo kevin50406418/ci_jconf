@@ -5,7 +5,7 @@
 		<h4 class="modal-title">系統設定</h4>
 	</div>
 	<div class="modal-body">
-		<?php echo form_open(base_url("sysop/setting"),array("class"=>"form-horizontal"))?>
+		<?php echo form_open(site_url("sysop/setting"),array("class"=>"form-horizontal"))?>
 		<div class="form-group">
 			<label for="user_id" class="col-sm-2 control-label">網站名稱</label>
 			<div class="col-sm-10">

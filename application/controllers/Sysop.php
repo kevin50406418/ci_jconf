@@ -17,7 +17,7 @@ class Sysop extends MY_Sysop {
 		if( !in_array($fetch_method,$no_redirect) ){
 			if( !$this->sysop->is_sysop_login() ){
 				$this->session->set_tempdata('user_back', current_url(), 300);
-				redirect(base_url("sysop/login"), 'location', 301);
+				redirect(site_url("sysop/login"), 'location', 301);
 			}else{
 				$this->sysop->add_sysop_time();
 			}
@@ -26,6 +26,7 @@ class Sysop extends MY_Sysop {
 
 	public function index(){
 		//$data['col_nav'] = $this->col_nav;
+		
 		$data['col_right'] = 12;
 		$data['active'] = $this->active;
 		$data['body_class'] = "container";
@@ -95,7 +96,7 @@ class Sysop extends MY_Sysop {
 						$add = $this->conf->add_conf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$conf_lang,$conf_host,$conf_place,$conf_fax,$conf_keywords="",$conf_desc);
 						if( !is_null($next) ){
 							if($add['status']){
-								$this->alert->js($add['error'],base_url("sysop/conf/edit/".$conf_id));
+								$this->alert->js($add['error'],site_url("sysop/conf/edit/".$conf_id));
 							}else{
 								$this->alert->js($add['error']);
 							}
@@ -121,12 +122,12 @@ class Sysop extends MY_Sysop {
 							$valid_status = array(0,1);
 							if( in_array($conf_staus,$valid_status) ){
 								if( $this->conf->update_status($conf_id,$conf_staus) ){
-									$this->alert->js("更新成功",base_url("sysop/conf/"));
+									$this->alert->js("更新成功",site_url("sysop/conf/"));
 								}else{
-									$this->alert->js("更新失敗",base_url("sysop/conf/"));
+									$this->alert->js("更新失敗",site_url("sysop/conf/"));
 								}
 							}else{
-								$this->alert->js("無效設定，無法更改研討會顯示狀態",base_url("sysop/conf/"));
+								$this->alert->js("無效設定，無法更改研討會顯示狀態",site_url("sysop/conf/"));
 							}
 						}
 					}
@@ -165,9 +166,9 @@ class Sysop extends MY_Sysop {
 
 							$update = $this->conf->sysop_updateconf($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_staus,$conf_lang,$conf_host,$conf_place,$conf_fax,$conf_keywords,$conf_desc);
 							if( $update ){
-								$this->alert->js("更新成功",base_url("sysop/conf/edit/".$conf_id));
+								$this->alert->js("更新成功",site_url("sysop/conf/edit/".$conf_id));
 							}else{
-								$this->alert->js("更新失敗",base_url("sysop/conf/edit/".$conf_id));
+								$this->alert->js("更新失敗",site_url("sysop/conf/edit/".$conf_id));
 							}
 						}
 						
@@ -176,7 +177,7 @@ class Sysop extends MY_Sysop {
 						$data['conf_lang'] = explode(",", $data['conf_config']['conf_lang']);
 						$this->load->view('sysop/conf/edit',$data);
 					}else{
-						$this->alert->js("研討會不存在",base_url("sysop/conf"));
+						$this->alert->js("研討會不存在",site_url("sysop/conf"));
 					}
 					$this->load->view('common/footer',$data);
 				break;
@@ -191,7 +192,7 @@ class Sysop extends MY_Sysop {
 
 						$this->load->view('sysop/conf/admin',$data);
 					}else{
-						$this->alert->js("研討會不存在",base_url("sysop/conf"));
+						$this->alert->js("研討會不存在",site_url("sysop/conf"));
 					}
 					$this->load->view('common/footer',$data);
 				break;
@@ -301,7 +302,7 @@ class Sysop extends MY_Sysop {
 				    	$user_postaddr = $user_addcounty."|".$user_area."|".$user_postaddr;
 				    	$res = $this->user->adduser($user_login,$user_pass,$user_title,$user_email,$user_firstname,$user_lastname,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research);
 				    	if( $res['status'] ){
-				    		$this->alert->js("Add User Success",base_url("sysop/user/add"));
+				    		$this->alert->js("Add User Success",site_url("sysop/user/add"));
 				    		$this->form_validation->set_message('signup_success', 'Signup Success');
 				    		//redirect($redirect, 'refresh');
 				    	}else{
@@ -427,7 +428,7 @@ class Sysop extends MY_Sysop {
 
 							$res = $this->user->updateuser($user_login,$user_title,$user_email,$user_firstname,$user_lastname,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research);
 					    	if( $res['status'] ){
-					    		$this->alert->js("Edit Success",base_url("sysop/user/edit/".$user_login));
+					    		$this->alert->js("Edit Success",site_url("sysop/user/edit/".$user_login));
 					    		//redirect($redirect, 'refresh');
 					    	}else{
 					    		$this->alert->js($res['error']);
@@ -466,7 +467,7 @@ class Sysop extends MY_Sysop {
 					break;
 				}
 			}else{
-				$this->alert->js("The username is not exist.",base_url("sysop/user/all"));
+				$this->alert->js("The username is not exist.",site_url("sysop/user/all"));
 			}
 		}
 		if( empty($user_login) && $do != "manage" ){
@@ -549,7 +550,7 @@ class Sysop extends MY_Sysop {
 				
 				$id = $this->input->get("id");
 				if( empty($id) ){
-					$this->alert->js("找不到電子郵件樣版",base_url("sysop/email"));
+					$this->alert->js("找不到電子郵件樣版",site_url("sysop/email"));
 				}else{
 					$mail_template = $this->sysop->get_mail_template($id);
 					if( !empty($mail_template) ){
@@ -573,7 +574,7 @@ class Sysop extends MY_Sysop {
 						$this->load->view('common/tinymce',$data);
 						$this->load->view('sysop/email/edit',$data);
 					}else{
-						$this->alert->js("找不到電子郵件樣版",base_url("sysop/email"));
+						$this->alert->js("找不到電子郵件樣版",site_url("sysop/email"));
 					}
 				}
 			break;
@@ -583,7 +584,7 @@ class Sysop extends MY_Sysop {
 	}
 	public function login(){
 		if( $this->sysop->is_sysop_login() ){
-			redirect(base_url("sysop"), 'location', 301);
+			redirect(site_url("sysop"), 'location', 301);
 		}
 		$this->assets->add_css(asset_url().'style/sysop_login.css');
 		$data['body_class'] = $this->body_class;
@@ -593,7 +594,7 @@ class Sysop extends MY_Sysop {
 		if ($this->form_validation->run() == TRUE){
 			$user_pwd = $this->input->post('user_pass', TRUE);
 			if( $this->sysop->sysop_login($user_pwd) ){
-				$redirect = $this->session->has_userdata('user_back')?$this->session->user_back:base_url("sysop");
+				$redirect = $this->session->has_userdata('user_back')?$this->session->user_back:site_url("sysop");
 				$this->alert->show("i","Login Success",$redirect);
 			}else{
 				$this->alert->show("d","Login Error");
@@ -608,7 +609,23 @@ class Sysop extends MY_Sysop {
 		$this->sysop->logout();
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
-		$this->alert->show("i","Logout Success",base_url("sysop/login"));
+		$this->alert->show("i","Logout Success",site_url("sysop/login"));
 		$this->load->view('common/footer',$data);
+	}
+
+	public function version(){
+		$out = array();
+		$json = file_get_contents("https://raw.githubusercontent.com/kevin50406418/conf/version/version_conf");
+		$get = json_decode($json);
+		$version = $this->config->item('version');
+		if( $version < $get->version ){
+			$out['upgrade'] = false;
+			$out["desc"] = "需要更新為".$get->version;
+		}else if( $version == $get->version ){
+			$out['upgrade'] = true;
+			$out["desc"] = "已是最新版本";
+		}
+
+		echo json_encode($out);
 	}
 }

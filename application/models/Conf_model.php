@@ -157,6 +157,16 @@ class Conf_model extends CI_Model {
         return false;
 	}
 
+	function del_filter($conf_id,$filter_id){
+		$this->db->where('conf_id', $conf_id);
+		$this->db->where('filter_id', $filter_id);
+		if( $this->db->delete('filter') ){
+			$this->add_log("conf","del_filter",$conf_id,array("filter_id"=>$filter_id));
+			return true;
+		}
+		return false;
+	}
+	
 	function get_filter_info($conf_id,$filter_id){
 		$this->db->from('filter');
 		$this->db->where('conf_id', $conf_id);
@@ -215,6 +225,16 @@ class Conf_model extends CI_Model {
         return false;
 	}
 	
+	function del_news($conf_id,$news_id){
+		$this->db->where('conf_id', $conf_id);
+		$this->db->where('news_id', $news_id);
+		if( $this->db->delete('news') ){
+			$this->add_log("conf","del_news",$conf_id,array("news_id"=>$news_id));
+			return true;
+		}
+		return false;
+	}
+
 	function update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_host,$conf_place,$conf_keywords="",$conf_desc=''){
 		$conf = array(
 			"conf_name"    =>$conf_name,

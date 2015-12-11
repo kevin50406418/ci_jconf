@@ -7,10 +7,10 @@
 			<div class="header">
 				<?php echo lang('login_hint')?>
 			</div>
-			<p><?php echo sprintf(lang('login_please'),'<a href="'.base_url("user/login").'" class="ui red button">'.lang('signup').'</a>')?></p>
+			<p><?php echo sprintf(lang('login_please'),'<a href="'.site_url("user/login").'" class="ui red button">'.lang('signup').'</a>')?></p>
 		</div>
 	</div>
-	<?php echo form_open(base_url('user/signup'),array("class"=>"form-horizontal","id"=>"register"))?>
+	<?php echo form_open(site_url('user/signup'),array("class"=>"form-horizontal","id"=>"register"))?>
 		<div class="form-group">
 			<label for="user_id" class="col-sm-2 control-label"><?php echo lang('account')?> <span class="text-danger">*</span></label>
 			<div class="col-sm-10">

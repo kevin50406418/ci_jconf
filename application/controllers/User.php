@@ -55,7 +55,7 @@ class User extends MY_Controller {
 
 				$res = $this->user->updateuser($user_login,$user_title,$user_email,$user_firstname,$user_lastname,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research);
 		    	if( $res['status'] ){
-		    		$this->alert->js("Edit Success",base_url("user/index"));
+		    		$this->alert->js("Edit Success",site_url("user/index"));
 		    		redirect($redirect, 'refresh');
 		    	}else{
 		    		$this->alert->js($res['error']);
@@ -86,7 +86,7 @@ class User extends MY_Controller {
 		    		if( preg_match('/(favicon|clang)/i',$redirect) ){
 						$redirect = "";
 					}
-					redirect(base_url($redirect), 'location', 301);
+					redirect(site_url($redirect), 'location', 301);
 		    	}else{
 		    		$this->alert->js(lang('login_fail'));
 		    	}
@@ -222,7 +222,7 @@ class User extends MY_Controller {
 		    	$user_postaddr = $user_addcounty."|".$user_area."|".$user_postaddr;
 		    	$res = $this->user->adduser($user_login,$user_pass,$user_title,$user_email,$user_firstname,$user_lastname,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research);
 		    	if( $res['status'] ){
-		    		$this->alert->js("Signup Success",base_url("user/login"));
+		    		$this->alert->js("Signup Success",site_url("user/login"));
 		    		$this->form_validation->set_message('signup_success', 'Signup Success');
 		    		
 		    	}else{
@@ -323,7 +323,7 @@ class User extends MY_Controller {
 				$data['reset_token'] = $reset_token;
 
 				if( empty($reset_token) ){
-					$this->alert->js("密碼重製金鑰無效",base_url('/user/lostpwd'));
+					$this->alert->js("密碼重製金鑰無效",site_url('/user/lostpwd'));
 				}else{
 					if( $reset_token->reset_staus == 0 && time() < $reset_token->reset_failtime ){
 					    $this->form_validation->set_rules('user_pass', '新密碼', 'required|min_length[6]');
@@ -332,15 +332,15 @@ class User extends MY_Controller {
 							$user_pass  = $this->input->post('user_pass', TRUE);
 							if( $this->user->change_passwd($user_login,$user_pass,3) ){
 								$this->user->set_reset_token($user_login,$reset_token->reset_token);
-								$this->alert->js("更改密碼成功",base_url('/user/login'));
+								$this->alert->js("更改密碼成功",site_url('/user/login'));
 							}else{
-								$this->alert->js("更改密碼失敗",base_url('/user/login'));
+								$this->alert->js("更改密碼失敗",site_url('/user/login'));
 							}
 						}
 
 						$this->load->view('user/reset',$data);
 					}else{
-						$this->alert->js("密碼重製金鑰無效",base_url('/user/lostpwd'));
+						$this->alert->js("密碼重製金鑰無效",site_url('/user/lostpwd'));
 					}
 				}	
 				$this->load->view('common/footer',$data);
@@ -355,23 +355,23 @@ class User extends MY_Controller {
 		$this->load->view('common/nav',$data);
 		// sp($check_review);
 		if( !in_array($type,array("accept","reject") ) ){
-			$this->alert->js("連結無效",base_url());
+			$this->alert->js("連結無效",site_url());
 		}else{
 			if( !empty($check_review) ){
 				switch( $type ){
 					case "accept":
 						if( $this->topic->review_confirm($review_token,1) ){
-							$this->alert->show("s","感謝協助審查",base_url());
+							$this->alert->show("s","感謝協助審查",site_url());
 						}
 					break;
 					case "reject":
 						if( $this->topic->review_confirm($review_token,0) ){
-							$this->alert->show("s","非常感謝你答覆審查意願",base_url());
+							$this->alert->show("s","非常感謝你答覆審查意願",site_url());
 						}
 					break;
 				}
 			}else{
-				$this->alert->js("連結無效",base_url());
+				$this->alert->js("連結無效",site_url());
 			}
 		}
 		$this->load->view('common/footer',$data);

@@ -16,7 +16,7 @@
 </footer>
 <?php echo $this->assets->show_js(true);?>
 <script>
-$(function(){$("#chlang_zh").click(function(){$.get("<?php echo base_url("clang/zh")?>",function(result){$("#chlang").html(result);});});$("#chlang_en").click(function(){$.get("<?php echo base_url("clang/en")?>",function(result){$("#chlang").html(result);});});});
+$(function(){$("#chlang_zh").click(function(){$.get("<?php echo site_url("clang/zh")?>",function(result){$("#chlang").html(result);});});$("#chlang_en").click(function(){$.get("<?php echo site_url("clang/en")?>",function(result){$("#chlang").html(result);});});});
 </script>
 </body>
 </html>
