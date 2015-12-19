@@ -63,7 +63,7 @@ $route['(:any)/index'] = function ($conf_id){
 };
 $route['(:any)/news'] = 'home/news/$1';
 $route['(:any)/main'] = 'home/main/$1';
-$route['debug'] = 'home/debug';
+// $route['debug'] = 'home/debug';
 $route['(:any)/dashboard'] = 'dashboard/index/$1';
 $route['(:any)/dashboard/(:any)'] = 'dashboard/$2/$1';
 $route['(:any)/dashboard/(:any)/(:any)'] = 'dashboard/$2/$1/$3';

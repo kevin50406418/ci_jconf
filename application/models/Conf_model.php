@@ -25,6 +25,7 @@ class Conf_model extends CI_Model {
 		if($this->conf->confid_exists( $conf_id , $user_sysop)){
 			$this->db->from('conf');
 			$this->db->where('conf_id', $conf_id);
+			$this->db->join('style','conf.conf_template = style.style_template');
 			$query = $this->db->get();
 			if ($query->num_rows() > 0){
 				return $query->row_array();
@@ -308,37 +309,34 @@ class Conf_model extends CI_Model {
 			"status" => false,
 			"error" => ""
 		);
-		$data = "<!DOCTYPE html><html><head><title>403 Forbidden</title></head><body><p>Directory access is forbidden.</p></body></html>";
 
-		if( !file_exists ( $this->get_paperdir($conf_id) ) ){
-			mkdir($this->get_paperdir($conf_id), 0755);
-			write_file($this->get_paperdir($conf_id)."index.html", $data);
-		}else{
+		if( file_exists($this->get_paperdir($conf_id)) ){
 			$return = array(
-				"status" => false,
 				"error" => "Directory '".$this->get_paperdir($conf_id)."' exists."
 			);
+			return $return;
 		}
-		
-		if( !file_exists ( $this->get_regdir($conf_id) ) ){
-			mkdir($this->get_regdir($conf_id), 0755);
-			write_file($this->get_regdir($conf_id)."index.html", $data);
-		}else{
+		if( file_exists($this->get_regdir($conf_id)) ){
 			$return = array(
-				"status" => false,
 				"error" => "Directory '".$this->get_regdir($conf_id)."' exists."
 			);
+			return $return;
 		}
-
-		if( !file_exists ( $this->get_mostdir($conf_id) ) ){
-			mkdir($this->get_mostdir($conf_id), 0755);
-			write_file($this->get_mostdir($conf_id)."index.html", $data);
-		}else{
+		if( file_exists($this->get_mostdir($conf_id)) ){
 			$return = array(
-				"status" => false,
 				"error" => "Directory '".$this->get_mostdir($conf_id)."' exists."
 			);
+			return $return;
 		}
+
+		$data = "<!DOCTYPE html><html><head><title>403 Forbidden</title></head><body><p>Directory access is forbidden.</p></body></html>";
+		mkdir($this->get_paperdir($conf_id), 0755);
+		mkdir($this->get_regdir($conf_id), 0755);
+		mkdir($this->get_mostdir($conf_id), 0755);
+		write_file($this->get_paperdir($conf_id)."index.html", $data);
+		write_file($this->get_regdir($conf_id)."index.html", $data);
+		write_file($this->get_mostdir($conf_id)."index.html", $data);
+		
 		$return['status'] = true;
 		return $return;
 	}
@@ -419,7 +417,9 @@ class Conf_model extends CI_Model {
 		        }
 			}
 		}
-
+		if( $return['status'] ){
+			$return["error"] = "Success Add Conference";
+		}
 		return $return;
 	}
 
@@ -596,37 +596,56 @@ class Conf_model extends CI_Model {
 		return $this->db->insert_batch('conf_content',$conf_content);
 	}
 
-	public function change_dir($new_id,$old_id){
+	function change_confid($new_id,$old_id){
 		$return = array(
 			"status" => false,
 			"error" => ""
 		);
-		$new_paperdir = $this->get_paperdir($new_id);
-		$old_paperdir = $this->get_paperdir($old_id);
-		if( file_exists($new_paperdir) ){
-			$return["status"] = false;
-			$return["error"] = "Directory: '".$old_id."' is exists";
-		}else{
-			if( rename($old_paperdir, $new_paperdir) ){
-				$return["status"] = true;
+		$return = $this->change_dir($new_id,$old_id);
+		if( $return["status"] ){
+			if( !$this->db->update('conf', array("conf_id"=>$new_id), array("conf_id"=>$old_id)) ){
+				$return["error"] = "Change id Fail!!(DB)";
 			}else{
-				$return["status"] = false;
-				$return["error"] = "change paper directory error.";
+				$return["status"] = true;
+				$return["error"] = "Change id Success!!";
 			}
 		}
-		$new_regdir = $this->get_regdir($new_id);
-		$old_regdir = $this->get_regdir($old_id);
-		if( file_exists($new_regdir) ){
-			$return["status"] = false;
-			$return["error"] = "Directory: '".$old_id."' is exists";
-		}else{
-			if( rename($old_paperdir, $new_paperdir) ){
-				$return["status"] = true;
-			}else{
-				$return["status"] = false;
-				$return["error"] = "change registration directory error.";
-			}
+		return $return;
+	}
+
+	function change_dir($new_id,$old_id){
+		$return = array(
+			"status" => false,
+			"error" => ""
+		);
+		if( $this->confid_exists( $new_id , 1) ){
+			$return["error"] = "研討會ID: '".$new_id."' 已存在";
+			return $return;
 		}
+
+		if( file_exists($this->get_paperdir($new_id)) ){
+			$return = array(
+				"error" => "Directory '".$this->get_paperdir($new_id)."' exists."
+			);
+			return $return;
+		}
+		if( file_exists($this->get_regdir($new_id)) ){
+			$return = array(
+				"error" => "Directory '".$this->get_regdir($new_id)."' exists."
+			);
+			return $return;
+		}
+		if( file_exists($this->get_mostdir($new_id)) ){
+			$return = array(
+				"error" => "Directory '".$this->get_mostdir($new_id)."' exists."
+			);
+			return $return;
+		}
+
+		rename($this->get_paperdir($old_id), $this->get_paperdir($new_id));
+		rename($this->get_regdir($old_id), $this->get_regdir($new_id));
+		rename($this->get_mostdir($old_id), $this->get_mostdir($new_id));
+		$return["status"] = true;
 		return $return;
 	}
 
@@ -849,12 +868,24 @@ class Conf_model extends CI_Model {
 	}
 
 	function update_confmost($conf_id,$conf_most){
-		$conf_col = array(
+		$conf_most = array(
 			"conf_most" => $conf_most
 		);
 		$this->db->where('conf_id', $conf_id);
-		if( $this->db->update('conf', $conf_col) ){
-			$this->add_log("conf","update_confmost",$conf_id,$conf_col);
+		if( $this->db->update('conf', $conf_most) ){
+			$this->add_log("conf","update_confmost",$conf_id,$conf_most);
+			return true;
+		}
+		return false;
+	}
+
+	function update_topic_assign($conf_id,$topic_assign){
+		$topic_assign = array(
+			"topic_assign" => $topic_assign
+		);
+		$this->db->where('conf_id', $conf_id);
+		if( $this->db->update('conf', $topic_assign) ){
+			$this->add_log("conf","conf_topic_assign",$conf_id,$topic_assign);
 			return true;
 		}
 		return false;
@@ -1107,8 +1138,11 @@ class Conf_model extends CI_Model {
 			$body_zhtw    = $v["zhtw"]['default_body'];
 			$subject_eng  = $v["eng"]['default_subject'];
 			$body_eng     = $v["eng"]['default_body'];
-			$this->conf->add_mail_template($email_key,$conf_id,$subject_zhtw,$body_zhtw,$subject_eng,$body_eng);
+			if( !$this->conf->add_mail_template($email_key,$conf_id,$subject_zhtw,$body_zhtw,$subject_eng,$body_eng) ){
+				log_message('error','Add Mail error: email_key='.$email_key.", conf_id=".$conf_id);
+			}
 		}
+		return true;
 	}
 
 	function get_mail_templates($conf_id){
@@ -1177,4 +1211,6 @@ class Conf_model extends CI_Model {
     	$query = $this->db->get();
 		return $query->result();
 	}
+
+	
 }

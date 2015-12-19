@@ -69,6 +69,9 @@ class User_model extends CI_Model {
 		}else{
 			if(!$this->is_sysop()){
 				$priv_topic = $this->session->priv_topic;
+				if( !is_array($priv_topic) ){
+					return false;
+				}
 				return in_array($conf_id,$priv_topic);
 			}else{
 				return true;
@@ -82,6 +85,9 @@ class User_model extends CI_Model {
 		}else{
 			if(!$this->is_sysop()){
 				$priv_reviewer = $this->session->priv_reviewer;
+				if( !is_array($priv_reviewer) ){
+					return false;
+				}
 				return in_array($conf_id,$this->session->priv_reviewer);
 			}else{
 				return true;

@@ -12,6 +12,10 @@
 		</div>
 		<div class="collapse navbar-collapse" id="user_nav">
 			<?php if($this->cinfo['show_confinfo']){?>
+			<ul class="nav navbar-nav">
+				<?php if(isset($topic_pedding)){?><li><a href="<?php echo get_url("topic",$conf_config['conf_id'],"index")?>">主編論文審查 <span class="ui label<?php if($topic_pedding>0){?> yellow<?php }else{?> grey<?php }?> circular"><?php echo $topic_pedding?></span></a></li><?php }?>
+				<?php if(isset($reviewer_pedding)){?><li><a href="<?php echo get_url("reviewer",$conf_config['conf_id'],"index")?>">論文審查 <span class="ui label <?php if($reviewer_pedding>0){?> yellow<?php }else{?> grey<?php }?> circular"><?php echo $reviewer_pedding?></span></a></li><?php }?>
+			</ul>
 			<a class="btn btn-danger navbar-btn" data-toggle="modal" data-target="#conf_schedule">重要日期</a>
 			<?php }?>
 			<?php if($this->user->is_login()){?>
@@ -31,6 +35,7 @@
 			<ul class="nav navbar-nav navbar-right">
 			<?php if($this->cinfo['show_confinfo']){?>
 				<li><a href="<?php echo site_url();?>"><i class="fa fa-home fa-lg"></i> 所有研討會</a></li>
+
 			<?php }?>
 			<?php if($this->user->is_sysop()){?>
 				<li><a href="<?php echo site_url("sysop");?>"><?php echo lang('nav_sysop')?></a></li>

@@ -34,6 +34,7 @@ $lang['update_register_meal'] = "更新研討會餐點";
 $lang['del_register_meal'] = "刪除研討會餐點";
 $lang['update_sort_topic'] = "更新研討會排序";
 $lang['update_mail_template'] = "更新電子郵件樣版";
+$lang['conf_topic_assign'] = "更新主編設置審查人設置";
 
 $lang['assign_reviewer_pedding'] = "指派暫定審查人";
 $lang['update_pedding_timeout'] = "更新暫定審查人審查期限";

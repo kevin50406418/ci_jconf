@@ -103,17 +103,18 @@ class Submit_model extends CI_Model {
     	}
     }
     
-    function add_paper($sub_title,$sub_summary,$sub_keyword,$sub_topic,$sub_lang,$sub_sponsor,$conf_id){
+    function add_paper($sub_title,$sub_summary,$sub_keyword,$sub_topic,$sub_lang,$sub_sponsor,$conf_id,$sub_user){
         $paper = array(
-            "sub_title"   =>$sub_title,
-            "sub_summary" =>$sub_summary,
-            "sub_keyword" =>$sub_keyword,
-            "sub_topic"   =>$sub_topic,
-            "sub_lang"    =>$sub_lang,
-            "sub_sponsor" =>$sub_sponsor,
-            "sub_status"  =>-1,
-            "sub_time"    =>time(),
-            "conf_id"     =>$conf_id
+            "sub_title"   => $sub_title,
+            "sub_summary" => $sub_summary,
+            "sub_keyword" => $sub_keyword,
+            "sub_topic"   => $sub_topic,
+            "sub_lang"    => $sub_lang,
+            "sub_sponsor" => $sub_sponsor,
+            "sub_status"  => -1,
+            "sub_time"    => time(),
+            "conf_id"     => $conf_id,
+            "sub_user"    => $sub_user
         );
         // $this->conf->add_log("submit","add_paper",$conf_id,$paper);
         if( $this->db->insert('paper', $paper) ){
@@ -896,5 +897,26 @@ class Submit_model extends CI_Model {
         }else{
             return false;
         }
+    }
+
+    function count_pages($pdfname) {
+        
+        $output   = shell_exec("pdfinfo ".$pdfname);
+        preg_match("/Title:\s*(.+)/i", $output, $pagetitlematches);
+        preg_match('/Pages:\s+([0-9]+)/', $output, $pagecountmatches);
+        preg_match('/Page size:\s+([0-9]{0,5}\.?[0-9]{0,3}) x ([0-9]{0,5}\.?[0-9]{0,3})/', $output, $pagesizematches);
+        // $num      = preg_match_all("/\/Page\W/", $pdftext, $dummy);
+        // $pagesize = preg_match('~ Page size: ([0-9\.]+) x ([0-9\.]+) pts ~', $pdftext, $matches);
+        
+        $pdfinfo = array();
+        $pdfinfo['pages'] = $pagecountmatches[1];
+        $pdfinfo['width'] = round($pagesizematches[1]/2.83)/10;
+        $pdfinfo['height'] = round($pagesizematches[2]/2.83)/10;
+        return $pdfinfo;
+    }
+
+    function pdf_pages($pdfname) {
+        $pdftext = file_get_contents($pdfname);
+        return $pdftext;
     }
 }

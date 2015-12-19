@@ -19,6 +19,7 @@ $lang['dashboard_submit'] = "Paper List";
 $lang['dashboard_signup'] = "Registration";
 $lang['dashboard_report'] = "Report";
 $lang['dashboard_logs'] = "Logs";
+$lang['dashboard_most'] = "MOST Results";
 
 $lang['topic_dashboard'] = "Topic Dashboard";
 $lang['topic_assign'] = "Topic Assign";
