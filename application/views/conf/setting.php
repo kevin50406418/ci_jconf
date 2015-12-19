@@ -22,8 +22,8 @@ $(function() {
 		<ul class="nav nav-tabs nav-tabs-center">
 			<li class="active"> <a href="#tab_config" data-toggle="tab"> <i class="fa fa-info-circle fa-lg"></i> <?php echo lang('conf_info')?> </a> </li>
 			<li> <a href="#tab_style" data-toggle="tab"> <i class="fa fa-magic fa-lg"></i> <?php echo lang('conf_style')?> </a> </li>
-			<li> <a href="#tab_function" data-toggle="tab"> <i class="fa fa-cog fa-lg"></i> <?php echo lang('conf_function')?> </a> </li>
-			<li> <a href="#tab_schedule" data-toggle="tab"> <i class="fa fa-calendar fa-lg"></i> <?php echo lang('schedule')?> </a> </li>
+			<li> <a href="#tab_function" data-toggle="tab"> <i class="fa fa-cog fa-lg"></i> <?php echo lang('conf_style_name')?> </a> </li>
+			<li> <a href="#tab_schedule" data-toggle="tab"> <i class="fa fa-calendar fa-lg"></i> <?php echo lang('conf_function')?> </a> </li>
 			<!--<li> <a href="#tab_org" data-toggle="tab"> <i class="fa fa-users fa-lg"></i> 大會組織 </a> </li>-->
 			<?php echo form_open(get_url("dashboard",$conf_id,"setting"),array("class"=>"pull-right"))?>
 			<?php echo form_hidden('do', 'status');?>
@@ -172,41 +172,16 @@ $(function() {
 					</div>
 				</div>
 				<div class="form-group">
-					<div class="col-sm-2 control-label"><?php echo lang('conf_function')?></div>
+					<label for="conf_most" class="col-sm-2 control-label">科技部成果發表</label>
 					<div class="col-sm-10">
-						<table class="table table-bordered">
-							<thead>
-								<tr>
-									<th></th>
-									<th class="text-center"><?php echo lang('most_on')?></th>
-									<th class="text-center"><?php echo lang('most_off')?></th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<th>
-										<label for="conf_most" class="control-label">科技部成果發表</label>
-									</th>
-									<td class="text-center<?php if($conf_config['conf_most'] == 1 ){?> success<?php }?>">
-										<input type="radio" name="conf_most" id="conf_most1" autocomplete="off" value="1"<?php if($conf_config['conf_most'] == 1 ){?> checked<?php }?>> 
-									</td>
-									<td class="text-center<?php if($conf_config['conf_most'] == 0 ){?> danger<?php }?>">
-										<input type="radio" name="conf_most" id="conf_most2" autocomplete="off" value="0"<?php if($conf_config['conf_most'] == 0 ){?> checked<?php }?>>
-									</td>
-								</tr>
-								<tr>
-									<th>
-										<label for="topic_assign" class="control-label"><?php echo lang('conf_topic_assign')?></label>
-									</th>
-									<td class="text-center<?php if($conf_config['topic_assign'] == 1 ){?> success<?php }?>">
-										<input type="radio" name="topic_assign" id="topic_assign1" autocomplete="off" value="1"<?php if($conf_config['topic_assign'] == 1 ){?> checked<?php }?>> 
-									</td>
-									<td class="text-center<?php if($conf_config['topic_assign'] == 0 ){?> danger<?php }?>">
-										<input type="radio" name="topic_assign" id="topic_assign2" autocomplete="off" value="0"<?php if($conf_config['topic_assign'] == 0 ){?> checked<?php }?>>
-									</td>
-								</tr>
-							</tbody>
-						</table>
+						<div class="btn-group" data-toggle="buttons">
+							<label class="btn btn-success<?php if($conf_config['conf_most'] == 1 ){?> active<?php }?>">
+								<input type="radio" name="conf_most" id="conf_most1" autocomplete="off" value="1"<?php if($conf_config['conf_most'] == 1 ){?> checked<?php }?>> <?php echo lang('most_on')?>
+							</label>
+							<label class="btn btn-danger<?php if($conf_config['conf_most'] == 0 ){?> active<?php }?>">
+								<input type="radio" name="conf_most" id="conf_most2" autocomplete="off" value="0"<?php if($conf_config['conf_most'] == 0 ){?> checked<?php }?>> <?php echo lang('most_off')?>
+							</label>
+						</div>
 					</div>
 				</div>
 				<div class="form-group">

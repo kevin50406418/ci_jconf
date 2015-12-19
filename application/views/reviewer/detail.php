@@ -88,15 +88,15 @@
 						<td class="text-center"><span class="ui blue basic label">投稿資料</span></td>
 						<td>
 							<?php if(!empty($otherfile)){?>
-							<a href="<?php echo get_url("reviewer",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" target="_blank"><?php echo $otherfile->file_name?></a>
+							<a href="<?php echo get_url("topic",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" target="_blank"><?php echo $otherfile->file_name?></a>
 							<?php }else{?>
 							<span class="ui label red">尚未上傳</span>
 							<?php }?>
 						</td>
 						<td>
 							<?php if(!empty($otherfile)){?>
-								<a href="<?php echo get_url("reviewer",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
-								<a href="<?php echo get_url("reviewer",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
+								<a href="<?php echo get_url("topic",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
+								<a href="<?php echo get_url("topic",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
 							<?php }?>
 						</td>
 					</tr>
@@ -105,11 +105,11 @@
 					<tr>
 						<td class="text-center"><span class="ui teal basic label">補充資料</span></td>
 						<td>
-							<a href="<?php echo get_url("reviewer",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" target="_blank"><?php echo $otherfile->file_name?></a>
+							<a href="<?php echo get_url("topic",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" target="_blank"><?php echo $otherfile->file_name?></a>
 						</td>
 						<td>
-							<a href="<?php echo get_url("reviewer",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
-							<a href="<?php echo get_url("reviewer",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
+							<a href="<?php echo get_url("topic",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
+							<a href="<?php echo get_url("topic",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
 						</td>
 					</tr>
 					<?php }?>

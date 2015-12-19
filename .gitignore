@@ -45,4 +45,3 @@ Temporary Items
 application/config/database.php
 sftp-config.json
 .remote-sync.json
-debug*

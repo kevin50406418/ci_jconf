@@ -25,7 +25,7 @@ $lang['update_contents'] = "Update Website Contents";
 $lang['update_content'] = "Update Website Content";
 $lang['del_contents'] = "Delete Website Content";
 $lang['update_confcol'] = "Update Home Layout";
-$lang['update_confmost'] = "Update MOST results published status";
+$lang['update_confmost'] = "更新科技部成果發表狀態";
 $lang['update_schedule'] = "Update Conference Schedule";
 $lang['most_review'] = "更新科技部成果報名表狀態";
 $lang['update_most'] = "更新科技部成果報名表";
@@ -34,7 +34,6 @@ $lang['update_register_meal'] = "Update Register Meal";
 $lang['del_register_meal'] = "Delete Register Meal";
 $lang['update_sort_topic'] = "Update Topic Sort";
 $lang['update_mail_template'] = "Update Mail Template";
-$lang['conf_topic_assign'] = "Update Topic Assign Reviewer";
 
 $lang['assign_reviewer_pedding'] = "Assign Pedding Reviewer";
 $lang['update_pedding_timeout'] = "Update Pedding Reviewer Review Timeout";

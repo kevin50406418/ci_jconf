@@ -1,4 +1,5 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');?>
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
+?>
 <div class="row">
 	<div class="col-md-2"></div>
 	<div class="ui segment col-md-8">
@@ -17,7 +18,7 @@
 			<div class="form-group">
 				<label for="user_login" class="col-sm-2 control-label"><?php echo lang('account')?> <span class="text-danger">*</span></label>
 				<div class="col-sm-10">
-					<input type="text" class="form-control" id="user_login" name="user_login" value="<?php echo set_value('user_login'); ?>">
+					<input type="text" class="form-control" id="user_login" name="user_login">
 				</div>
 			</div>
 			<div class="form-group">

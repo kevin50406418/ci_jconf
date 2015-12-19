@@ -39,13 +39,6 @@ class Dashboard extends MY_Conference {
 		$data['schedule'] = $schedule;
 		$data['styles'] = $this->conf->get_style();
 		
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
-
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
 
@@ -117,25 +110,18 @@ class Dashboard extends MY_Conference {
 				case "func":
 					$this->form_validation->set_rules('conf_col', lang('home_layout'), 'required');
 					$this->form_validation->set_rules('conf_most', lang('conf_most'), 'required');
-					$this->form_validation->set_rules('topic_assign', "主編設置審查人", 'required');
 					if ($this->form_validation->run()){
-						$conf_col     = $this->input->post('conf_col');
+						$conf_col    = $this->input->post('conf_col');
 						$conf_most    = $this->input->post('conf_most');
-						$topic_assign = $this->input->post('topic_assign');
 						if( $this->conf->update_confcol($conf_id,$conf_col) ){
 							$this->alert->show("s",lang('home_layout').lang('update_success'));
 						}else{
-							$this->alert->show("d",lang('home_layout').lang('update_fail'));
+							$this->alert->show("s",lang('home_layout').lang('update_fail'));
 						}
 						if( $this->conf->update_confmost($conf_id,$conf_most) ){
 							$this->alert->show("s",lang('conf_most').lang('update_success'));
 						}else{
-							$this->alert->show("d",lang('conf_most').lang('update_fail'));
-						}
-						if( $this->conf->update_topic_assign($conf_id,$topic_assign) ){
-							$this->alert->show("s",lang('conf_topic_assign').lang('update_success'));
-						}else{
-							$this->alert->show("d",lang('conf_topic_assign').lang('update_fail'));
+							$this->alert->show("s",lang('conf_most').lang('update_fail'));
 						}
 						$this->alert->refresh(1);
 					}
@@ -266,13 +252,6 @@ class Dashboard extends MY_Conference {
 			$this->assets->add_js(asset_url().'js/repeatable.js',true);
 		}
 
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
-
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
 		$this->load->view('conf/conf_nav',$data);
@@ -310,7 +289,6 @@ class Dashboard extends MY_Conference {
 						$topic_info     = $this->input->post('topic_info');
 						if( $this->conf->add_topic($conf_id,$topic_name,$topic_abbr,$topic_info,$topic_name_eng) ){
 							$this->alert->show("s","成功加入研討會主題: '".$topic_name."(".$topic_name_eng.")'");
-							$this->alert->refresh(2);
 						}else{
 							$this->alert->show("d","無法加入研討會主題: '".$topic_name."(".$topic_name_eng.")'");
 						}
@@ -422,13 +400,7 @@ class Dashboard extends MY_Conference {
 		$data['conf_lang']    = explode(",", $this->conf_config['conf_lang']);
 		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
-
+		
 		if( $do=="all"){
 			$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
 			$this->assets->add_js(asset_url().'js/repeatable.js',true);
@@ -582,13 +554,6 @@ class Dashboard extends MY_Conference {
 		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
 
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
-
 		$this->assets->add_js(base_url('ckeditor/ckeditor.js'));
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
@@ -668,13 +633,6 @@ class Dashboard extends MY_Conference {
 		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		$data['topics']       = $this->conf->get_topic($conf_id);
-
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
 
 		if( ( empty($user_login) && $do=="add" ) || ( !empty($user_login) && $do=="edit" ) ){
 			$country_list = config_item('country_list');
@@ -879,13 +837,6 @@ class Dashboard extends MY_Conference {
 		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
 
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
-
 		$this->assets->add_js(base_url('ckeditor/ckeditor.js'));
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
@@ -979,14 +930,6 @@ class Dashboard extends MY_Conference {
 		$data['conf_config']    = $this->conf_config;
 		$data['schedule']       = $this->conf->get_schedules($this->conf_id);
 		$data['conf_content']   = $this->conf->conf_content($conf_id);
-
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
-
 		$this->assets->add_js(base_url().'tinymce/tinymce.min.js');
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
@@ -1039,13 +982,6 @@ class Dashboard extends MY_Conference {
 		$data['conf_config']  = $this->conf_config;
 		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
-
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
 
 		$this->assets->add_css(asset_url().'style/chosen.css');
 		$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
@@ -1265,13 +1201,6 @@ class Dashboard extends MY_Conference {
 		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
-
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
 
@@ -1366,13 +1295,6 @@ class Dashboard extends MY_Conference {
 		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
-
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
 
@@ -1395,13 +1317,6 @@ class Dashboard extends MY_Conference {
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		$data['conf_logs']    = $this->conf->get_logs($conf_id);
 
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
-
 		$this->lang->load("conf_log",$this->_lang);
 
 		$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
@@ -1417,148 +1332,141 @@ class Dashboard extends MY_Conference {
 		
 	}
 
-	// public function modules($conf_id='',$do="all",$module_id=''){
-	// 	$data['conf_id']      = $conf_id;
-	// 	$data['body_class']   = $this->body_class;
+	public function modules($conf_id='',$do="all",$module_id=''){
+		$data['conf_id']      = $conf_id;
+		$data['body_class']   = $this->body_class;
 		
-	// 	$data['spage']        = $this->config->item('spage');
-	// 	$data['conf_config']  = $this->conf_config;
-	// 	$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-	// 	$data['conf_content'] = $this->conf->conf_content($conf_id);
+		$data['spage']        = $this->config->item('spage');
+		$data['conf_config']  = $this->conf_config;
+		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
+		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		
-	// 	if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-	// 		$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-	// 	}
-	// 	if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-	// 		$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-	// 	}
+		if( empty($module_id) && $do=="all"){
+			$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
+			$this->assets->add_js(asset_url().'js/repeatable.js',true);
+		}
+		$this->assets->add_js(base_url().'tinymce/tinymce.min.js');
+		$this->load->view('common/header');
+		$this->load->view('common/nav',$data);
 
-	// 	if( empty($module_id) && $do=="all"){
-	// 		$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
-	// 		$this->assets->add_js(asset_url().'js/repeatable.js',true);
-	// 	}
-	// 	$this->assets->add_js(base_url().'tinymce/tinymce.min.js');
-	// 	$this->load->view('common/header');
-	// 	$this->load->view('common/nav',$data);
-
-	// 	$this->load->view('conf/conf_nav',$data);
-	// 	//$this->load->view('conf/conf_schedule',$data);
+		$this->load->view('conf/conf_nav',$data);
+		//$this->load->view('conf/conf_schedule',$data);
 		
-	// 	$this->load->view('conf/menu_conf',$data);
+		$this->load->view('conf/menu_conf',$data);
 		
-	// 	if( empty($module_id) ){
-	// 		switch($do){
-	// 			case "all":
-	// 				$data['module_zhtw'] = $this->conf->get_modules($conf_id,"zhtw");
-	// 				$data['module_eng'] = $this->conf->get_modules($conf_id,"eng");
-	// 				$this->load->view('conf/module/all',$data);
-	// 			break;
-	// 			case "add":
-	// 				$module = $this->input->get('module');
-	// 				switch ($module) {
-	// 					case "news":
-	// 						$this->conf->module_form_valid("news");
-	// 						if($this->form_validation->run()){
-	// 							$module_title = $this->input->post("module_title");
-	// 							$module_position = $this->input->post("module_position");
-	// 							$module_showtitle = $this->input->post("module_showtitle");
-	// 							$module_lang = $this->input->post("module_lang");
-	// 							if( $this->module->add_news($conf_id,$module_title,$module_position,$module_showtitle,$module_lang) ){
-	// 								$this->alert->show("s","成功新增文字模組");
-	// 							}else{
-	// 								$this->alert->show("d","新增文字模組失敗");
-	// 							}
-	// 							$this->alert->refresh(2);
-	// 						}
-	// 						$this->load->view('conf/module/add_news',$data);
-	// 					break;
-	// 					case "text":
-	// 					default:
-	// 						$this->conf->module_form_valid("text");
-	// 						if($this->form_validation->run()){
-	// 							$module_title = $this->input->post("module_title");
-	// 							$module_position = $this->input->post("module_position");
-	// 							$module_showtitle = $this->input->post("module_showtitle");
-	// 							$module_lang = $this->input->post("module_lang");
-	// 							$module_content = $this->input->post("module_content",false);
-	// 							if( $this->module->add_text($conf_id,$module_title,$module_position,$module_showtitle,$module_lang,$module_content) ){
-	// 								$this->alert->show("s","成功新增文字模組");
-	// 							}else{
-	// 								$this->alert->show("d","新增文字模組失敗");
-	// 							}
-	// 							$this->alert->refresh(2);
-	// 						}
-	// 						$this->load->view('common/tinymce',$data);
-	// 						$this->load->view('conf/module/add_text',$data);
-	// 					break;
-	// 				}
-	// 			break;
-	// 		}
-	// 	}else{
-	// 		switch($do){
-	// 			case "edit":
-	// 				$module = $this->conf->get_module($conf_id,$module_id);
-	// 				if( !empty($module) ){
-	// 					$data['module'] = $module;
-	// 					switch($module->module_type){
-	// 						case "news":
-	// 							$this->conf->module_form_valid("news");
-	// 							if($this->form_validation->run()){
-	// 								$module_title = $this->input->post("module_title");
-	// 								$module_position = $this->input->post("module_position");
-	// 								$module_showtitle = $this->input->post("module_showtitle");
-	// 								$module_lang = $this->input->post("module_lang");
-	// 								if( $this->module->update_news($conf_id,$module_id,$module_title,$module_position,$module_showtitle,$module_lang) ){
-	// 									$this->alert->show("s","成功更新文字模組");
-	// 								}else{
-	// 									$this->alert->show("d","更新文字模組失敗");
-	// 								}
-	// 								$this->alert->refresh(2);
-	// 							}
-	// 							$this->load->view('conf/module/edit_news',$data);
-	// 						break;
-	// 						case "text":
-	// 							$this->conf->module_form_valid("text");
-	// 							if($this->form_validation->run()){
-	// 								$module_title     = $this->input->post("module_title");
-	// 								$module_position  = $this->input->post("module_position");
-	// 								$module_showtitle = $this->input->post("module_showtitle");
-	// 								$module_lang      = $this->input->post("module_lang");
-	// 								$module_content   = $this->input->post("module_content",false);
-	// 								if( $this->module->update_text($conf_id,$module_id,$module_title,$module_position,$module_showtitle,$module_lang,$module_content) ){
-	// 									$this->alert->show("s","成功更新文字模組");
-	// 								}else{
-	// 									$this->alert->show("d","更新文字模組失敗");
-	// 								}
-	// 								$this->alert->refresh(2);
-	// 							}
-	// 							$this->load->view('conf/module/edit_text',$data);
-	// 							$this->load->view('common/tinymce',$data);
-	// 						break;
-	// 					}
+		if( empty($module_id) ){
+			switch($do){
+				case "all":
+					$data['module_zhtw'] = $this->conf->get_modules($conf_id,"zhtw");
+					$data['module_eng'] = $this->conf->get_modules($conf_id,"eng");
+					$this->load->view('conf/module/all',$data);
+				break;
+				case "add":
+					$module = $this->input->get('module');
+					switch ($module) {
+						case "news":
+							$this->conf->module_form_valid("news");
+							if($this->form_validation->run()){
+								$module_title = $this->input->post("module_title");
+								$module_position = $this->input->post("module_position");
+								$module_showtitle = $this->input->post("module_showtitle");
+								$module_lang = $this->input->post("module_lang");
+								if( $this->module->add_news($conf_id,$module_title,$module_position,$module_showtitle,$module_lang) ){
+									$this->alert->show("s","成功新增文字模組");
+								}else{
+									$this->alert->show("d","新增文字模組失敗");
+								}
+								$this->alert->refresh(2);
+							}
+							$this->load->view('conf/module/add_news',$data);
+						break;
+						case "text":
+						default:
+							$this->conf->module_form_valid("text");
+							if($this->form_validation->run()){
+								$module_title = $this->input->post("module_title");
+								$module_position = $this->input->post("module_position");
+								$module_showtitle = $this->input->post("module_showtitle");
+								$module_lang = $this->input->post("module_lang");
+								$module_content = $this->input->post("module_content",false);
+								if( $this->module->add_text($conf_id,$module_title,$module_position,$module_showtitle,$module_lang,$module_content) ){
+									$this->alert->show("s","成功新增文字模組");
+								}else{
+									$this->alert->show("d","新增文字模組失敗");
+								}
+								$this->alert->refresh(2);
+							}
+							$this->load->view('common/tinymce',$data);
+							$this->load->view('conf/module/add_text',$data);
+						break;
+					}
+				break;
+			}
+		}else{
+			switch($do){
+				case "edit":
+					$module = $this->conf->get_module($conf_id,$module_id);
+					if( !empty($module) ){
+						$data['module'] = $module;
+						switch($module->module_type){
+							case "news":
+								$this->conf->module_form_valid("news");
+								if($this->form_validation->run()){
+									$module_title = $this->input->post("module_title");
+									$module_position = $this->input->post("module_position");
+									$module_showtitle = $this->input->post("module_showtitle");
+									$module_lang = $this->input->post("module_lang");
+									if( $this->module->update_news($conf_id,$module_id,$module_title,$module_position,$module_showtitle,$module_lang) ){
+										$this->alert->show("s","成功更新文字模組");
+									}else{
+										$this->alert->show("d","更新文字模組失敗");
+									}
+									$this->alert->refresh(2);
+								}
+								$this->load->view('conf/module/edit_news',$data);
+							break;
+							case "text":
+								$this->conf->module_form_valid("text");
+								if($this->form_validation->run()){
+									$module_title     = $this->input->post("module_title");
+									$module_position  = $this->input->post("module_position");
+									$module_showtitle = $this->input->post("module_showtitle");
+									$module_lang      = $this->input->post("module_lang");
+									$module_content   = $this->input->post("module_content",false);
+									if( $this->module->update_text($conf_id,$module_id,$module_title,$module_position,$module_showtitle,$module_lang,$module_content) ){
+										$this->alert->show("s","成功更新文字模組");
+									}else{
+										$this->alert->show("d","更新文字模組失敗");
+									}
+									$this->alert->refresh(2);
+								}
+								$this->load->view('conf/module/edit_text',$data);
+								$this->load->view('common/tinymce',$data);
+							break;
+						}
 						
-	// 				}else{
-	// 					$this->alert->js("找不到模組",get_url("dashboard",$conf_id,"modules"));
-	// 				}
-	// 			break;
-	// 			case "del":
-	// 				$module = $this->conf->get_module($conf_id,$module_id);
-	// 				if( !empty($module) ){
-	// 					$data['module'] = $module;
-	// 					if( $this->module->del_module($conf_id,$module_id) ){
-	// 						$this->alert->show("s","成功刪除模組",get_url("dashboard",$conf_id,"modules"));
-	// 					}else{
-	// 						$this->alert->show("d","刪除模組失敗",get_url("dashboard",$conf_id,"modules"));
-	// 					}
-	// 				}else{
-	// 					$this->alert->js("找不到模組",get_url("dashboard",$conf_id,"modules"));
-	// 				}
-	// 			break;
-	// 		}
-	// 	}
-	// 	$this->load->view('common/footer',$data);
+					}else{
+						$this->alert->js("找不到模組",get_url("dashboard",$conf_id,"modules"));
+					}
+				break;
+				case "del":
+					$module = $this->conf->get_module($conf_id,$module_id);
+					if( !empty($module) ){
+						$data['module'] = $module;
+						if( $this->module->del_module($conf_id,$module_id) ){
+							$this->alert->show("s","成功刪除模組",get_url("dashboard",$conf_id,"modules"));
+						}else{
+							$this->alert->show("d","刪除模組失敗",get_url("dashboard",$conf_id,"modules"));
+						}
+					}else{
+						$this->alert->js("找不到模組",get_url("dashboard",$conf_id,"modules"));
+					}
+				break;
+			}
+		}
+		$this->load->view('common/footer',$data);
 		
-	// }
+	}
 
 	public function most($conf_id='',$act=''){
 		$data['conf_id']      = $conf_id;
@@ -1569,13 +1477,6 @@ class Dashboard extends MY_Conference {
 		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
-
 		$hold = $this->conf->get_schedule($conf_id,"hold");
 		$day = ($hold->end_value - $hold->start_value)/86400;
 		$hold_day = array();
@@ -1777,13 +1678,6 @@ class Dashboard extends MY_Conference {
 		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
-
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);
 		$this->load->view('conf/conf_nav',$data);
@@ -1803,13 +1697,6 @@ class Dashboard extends MY_Conference {
 		$data['conf_config']  = $this->conf_config;
 		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
-		
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
 		
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);

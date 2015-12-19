@@ -30,11 +30,6 @@ class Topic extends MY_Topic {
 		$data['conf_config']  = $this->conf_config;
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-		$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
 
 		if( !$this->conf->conf_hastopic($conf_id) ){
 			$this->alert->js("尚未建立研討會主題，請洽研討會會議管理人員",get_url("main",$conf_id));
@@ -104,11 +99,6 @@ class Topic extends MY_Topic {
 		$data['conf_config']  = $this->conf_config;
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-		$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
 
 		if( empty($paper_id) ){
 			$this->alert->js("稿件不存在",get_url("topic",$conf_id,"index"));
@@ -318,11 +308,6 @@ class Topic extends MY_Topic {
 		$data['conf_config']  = $this->conf_config;
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-		$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
 
 		if( empty($paper_id) ){
 			$this->alert->js("稿件不存在",get_url("topic",$conf_id,"index"));
@@ -385,18 +370,25 @@ class Topic extends MY_Topic {
 
 	public function files($conf_id='',$paper_id=''){
 		if( empty($conf_id) || empty($paper_id) ){
-			$this->alert->file_notfound(get_url("topic",$conf_id));
+			$this->alert->js("查無稿件檔案",get_url("submit",$conf_id));
 		}
 		$data['conf_id'] = $conf_id;
+
+		$user_login = $this->session->userdata('user_login');
 		
 		if( is_null($this->input->get("fid") ) ){
-			$this->alert->file_notfound(get_url("topic",$conf_id));
+			$this->alert->js("查無稿件檔案",get_url("submit",$conf_id));
+			$this->load->view('common/footer',$data);
+			$this->output->_display();
+			exit;
 		}else{
 			$fid = $this->input->get("fid");
-			$file=$this->topic->get_file($fid,$paper_id,$this->user_login);
-
+			$file=$this->topic->get_file($fid,$paper_id,$user_login);
 			if(empty($file)){
-				$this->alert->file_notfound(get_url("topic",$conf_id));
+				$this->alert->js("查無稿件檔案",get_url("submit",$conf_id));
+				$this->load->view('common/footer',$data);
+				$this->output->_display();
+				exit;
 			}
 			$this->load->helper('download');
 			$do = $this->input->get("do");
@@ -428,68 +420,54 @@ class Topic extends MY_Topic {
 		$data['users']     = $this->user->get_all_users(10);
 		$data['confs']     = $this->user->get_conf_array($conf_id);
 		$data['reviewers'] = $this->user->get_reviewer_array($conf_id);
-		$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
+		
+		$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
+		$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
+		$this->assets->add_js(asset_url().'js/dataTables.bootstrap.js',true);
 
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
-		if( $this->conf_config["topic_assign"] ){
-			$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
-			$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
-			$this->assets->add_js(asset_url().'js/dataTables.bootstrap.js',true);
-
-			if( $this->input->is_ajax_request() ){
-				$this->form_validation->set_rules('type', '操作', 'required');
-				$this->form_validation->set_rules('user_login[]', '帳號', 'required');
-			    if ($this->form_validation->run()){
-			    	$type = $this->input->post('type');
-			    	$user_logins = $this->input->post('user_login');
-			    	if(is_array($user_logins)){
-			    		switch($type){
-				    		case "add_review":
-				    			foreach ($user_logins as $key => $user_login) {
-				    				if( $this->user->add_reviewer($conf_id,$user_login) ){
-				    					$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 設為審查人");
-				    				}else{
-				    					$this->alert->show("d","將使用者 <strong>".$user_login."</strong> 設為審查人失敗");
-				    				}
-				    			}
-				    		break;
-				    		case "del_review":
-				    			foreach ($user_logins as $key => $user_login) {
-				    				if( $this->user->del_reviewer($conf_id,$user_login) ){
-				    					$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 取消設為審查人");
-				    				}else{
-				    					$this->alert->show("d","將使用者 <strong>".$user_login."</strong> 取消審查人失敗");
-				    				}
-				    			}
-				    		break;
-				    	}
-				    	$this->alert->refresh(2);
-			    	}else{
-			    		$this->alert->js("請選擇使用者帳號");
+		if( $this->input->is_ajax_request() ){
+			$this->form_validation->set_rules('type', '操作', 'required');
+			$this->form_validation->set_rules('user_login[]', '帳號', 'required');
+		    if ($this->form_validation->run()){
+		    	$type = $this->input->post('type');
+		    	$user_logins = $this->input->post('user_login');
+		    	if(is_array($user_logins)){
+		    		switch($type){
+			    		case "add_review":
+			    			foreach ($user_logins as $key => $user_login) {
+			    				if( $this->user->add_reviewer($conf_id,$user_login) ){
+			    					$this->alert->show("s","成功將使用者 <strong>".$user_login."<strong> 設為審查人");
+			    				}else{
+			    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 設為審查人失敗");
+			    				}
+			    			}
+			    		break;
+			    		case "del_review":
+			    			foreach ($user_logins as $key => $user_login) {
+			    				if( $this->user->del_reviewer($conf_id,$user_login) ){
+			    					$this->alert->show("s","成功將使用者 <strong>".$user_login."<strong> 取消設為審查人");
+			    				}else{
+			    					$this->alert->show("d","將使用者 <strong>".$user_login."<strong> 取消審查人失敗");
+			    				}
+			    			}
+			    		break;
 			    	}
-			    }
-			    
-			}else{
-				$this->load->view('common/header');
-				$this->load->view('common/nav',$data);
-
-				$this->load->view('conf/conf_nav',$data);
-				//$this->load->view('conf/conf_schedule',$data);
-				$this->load->view('conf/menu_topic',$data);
-				$this->load->view('topic/all_user',$data);
-				$this->load->view('common/footer',$data);
-			}
+			    	$this->alert->refresh(2);
+		    	}else{
+		    		$this->alert->js("請選擇使用者帳號");
+		    	}
+		    }
+		    
 		}else{
 			$this->load->view('common/header');
 			$this->load->view('common/nav',$data);
+
 			$this->load->view('conf/conf_nav',$data);
+			//$this->load->view('conf/conf_schedule',$data);
 			$this->load->view('conf/menu_topic',$data);
-			$this->alert->show("d","研討會為開啟主編審查人設置功能");
+			$this->load->view('topic/all_user',$data);
 			$this->load->view('common/footer',$data);
 		}
-		
 	}
 
 	public function _tmp($conf_id=''){
@@ -500,11 +478,6 @@ class Topic extends MY_Topic {
 		$data['conf_config']  = $this->conf_config;
 		$data['conf_content'] = $this->conf->conf_content($conf_id);
 		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-		$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
 
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$data);

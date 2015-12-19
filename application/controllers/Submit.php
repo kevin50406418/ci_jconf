@@ -111,7 +111,8 @@ class Submit extends MY_Conference {
 			break;
 			case 3:
 				$data['step_class']=array(1=>"completed",2=>"completed",3=>"active",4=>"disabled",5=>"disabled",6=>"disabled");
-				echo validation_errors('<div class="ui message red">', '</div>');
+				$data['show_file'] = false;
+				
 				//author
 				$this->form_validation->set_rules('user_fname[]', '名字', 'required');
 				$this->form_validation->set_rules('user_lname[]', '姓氏', 'required');
@@ -134,12 +135,12 @@ class Submit extends MY_Conference {
 				$this->form_validation->set_rules('sub_lang', '語言', 'required');
 				
 				if ($this->form_validation->run()){
-					$sub_title    = $this->input->post('sub_title');
-					$sub_summary  = str_replace(PHP_EOL,"<br>",$this->input->post('sub_summary'));
-					$sub_keyword  = empty($this->input->post('sub_keywords'))?"":$this->input->post('sub_keywords');
-					$sub_topic    = $this->input->post('sub_topic');
-					$sub_lang     = $this->input->post('sub_lang');
-					$sub_sponsor  = $this->input->post('sub_sponsor');
+					$sub_title    =$this->input->post('sub_title');
+					$sub_summary  =str_replace(PHP_EOL,"<br>",$this->input->post('sub_summary'));
+					$sub_keyword  =empty($this->input->post('sub_keywords'))?"":$this->input->post('sub_keywords');
+					$sub_topic    =$this->input->post('sub_topic');
+					$sub_lang     =$this->input->post('sub_lang');
+					$sub_sponsor  =$this->input->post('sub_sponsor');
 					
 					$main_contact = $this->input->post('main_contact');
 					$user_fname   = $this->input->post('user_fname');
@@ -148,7 +149,7 @@ class Submit extends MY_Conference {
 					$user_org     = $this->input->post('user_org');
 					$user_country = $this->input->post('user_country');
 
-					$insert_id = $this->Submit->add_paper($sub_title,$sub_summary,$sub_keyword,$sub_topic,$sub_lang,$sub_sponsor,$conf_id,$this->user_login);
+					$insert_id = $this->Submit->add_paper($sub_title,$sub_summary,$sub_keyword,$sub_topic,$sub_lang,$sub_sponsor,$conf_id);
         			$data['paper_id'] = $insert_id;
         			foreach ($user_fname as $key => $value) {
         				$contact_author = 0;
@@ -162,6 +163,7 @@ class Submit extends MY_Conference {
         				}
         				$this->Submit->add_author($insert_id,$user_login,$user_fname[$key],$user_lname[$key],$user_email[$key],$user_org[$key],$user_country[$key],$contact_author,$key+1);
         			}
+        			$show_upload = true;
         			redirect(get_url("submit",$conf_id,"edit",$insert_id)."?step=3", 'location', 301);
         		}
 			break;

@@ -19,7 +19,6 @@ $lang['dashboard_submit'] = "所有稿件";
 $lang['dashboard_signup'] = "註冊管理";
 $lang['dashboard_report'] = "統計報告";
 $lang['dashboard_logs'] = "日誌";
-$lang['dashboard_most'] = "科技部成果發表";
 
 $lang['topic_dashboard'] = "主編論文審查";
 $lang['topic_assign'] = "論文審查";

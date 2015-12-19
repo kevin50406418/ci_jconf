@@ -15,17 +15,15 @@ $lang['conf_fax'] = "傳真";
 $lang['conf_keywords'] = "關鍵字";
 $lang['conf_desc'] = "簡介";
 $lang['conf_edit'] = "修改";
+
 $lang['conf_style'] = "研討會樣式";
 $lang['conf_style_name'] = "樣式名稱";
 $lang['conf_function'] = "功能設定";
 $lang['home_layout'] = "首頁排版";
-$lang['conf_most'] = "科技部成果發表";
-$lang['conf_topic_assign'] = "主編設置審查人";
+$lang['conf_most'] = "首頁排版";
 $lang['most_on'] = "啟動";
 $lang['most_off'] = "關閉";
 $lang['schedule'] = "時間安排";
-$lang['conf_close'] = "關閉研討會";
-$lang['conf_open'] = "開啟研討會";
 
 $lang['update_success'] = "更新成功";
 $lang['update_fail'] = "更新失敗";

@@ -6,8 +6,8 @@
 		<ul class="nav nav-tabs nav-tabs-center">
 			<li> <a href="<?php echo site_url("sysop/conf/edit/".$conf_id)?>"> 研討會資訊 </a> </li>
 			<li class="active"> <a href="<?php echo site_url("sysop/conf/admin/".$conf_id)?>"> 研討管理員 </a> </li>
-			<li> <a href="<?php echo site_url("sysop/conf/change/".$conf_id)?>"> 研討會ID更換 </a> </li>
-			<!--<li> <a href="#tab_review" data-toggle="tab"> 審查資料 </a> </li>-->
+			<!--<li> <a href="#tab_file" data-toggle="tab"> 研討會ID更換 </a> </li>
+			<li> <a href="#tab_review" data-toggle="tab"> 審查資料 </a> </li>-->
 		</ul>
 		<?php echo form_open(site_url("sysop/conf/add_admin/".$conf_id),array("class"=>"tab-content"))?>
 		<div class="ui inverted segment">
