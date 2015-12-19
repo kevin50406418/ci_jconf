@@ -40,6 +40,13 @@ class Home extends MY_Controller {
 				$schedule = $this->conf->get_schedules($this->conf_id);
 				$data['schedule'] = $schedule;
 				
+				if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
+					$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
+				}
+				if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
+					$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
+				}
+
 				if( $conf_template == "default"){
 					$this->load->view('common/header');
 					$this->load->view('common/nav',$data);
@@ -94,7 +101,12 @@ class Home extends MY_Controller {
 				
 				$schedule = $this->conf->get_schedules($this->conf_id);
 				$data['schedule'] = $schedule;
-				
+				if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
+					$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
+				}
+				if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
+					$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
+				}
 				if( $conf_template == "default"){
 					$this->load->view('common/header');
 					$this->load->view('common/nav',$data);
@@ -149,23 +161,30 @@ class Home extends MY_Controller {
 				$this->assets->add_css(asset_url().'style/statistic.min.css');
 				$data['schedule'] = $this->conf->get_schedules($this->conf_id);
 				
+				if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
+					$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
+				}
+				if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
+					$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
+				}
+		
 				$this->load->view('common/header');
 				$this->load->view('common/nav',$data);
 				$this->load->view('conf/index');
 				$this->load->view('conf/conf_nav',$data);
 				//$this->load->view('conf/conf_schedule',$data);
-				if($this->user->is_login()){
-					$this->load->view('conf/menu_submit',$data);
-					if($this->user->is_conf($conf_id) || $this->user->is_sysop()){
-						$this->load->view('conf/menu_conf',$data);
-					}
-					if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-						$this->load->view('conf/menu_topic',$data);
-					}
-					if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-						$this->load->view('conf/menu_reviewer',$data);
-					}
+				
+				$this->load->view('conf/menu_submit',$data);
+				if($this->user->is_conf($conf_id) || $this->user->is_sysop()){
+					$this->load->view('conf/menu_conf',$data);
 				}
+				if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
+					$this->load->view('conf/menu_topic',$data);
+				}
+				if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
+					$this->load->view('conf/menu_reviewer',$data);
+				}
+				
 				$this->load->view('common/footer',$data);
 			}else{
 				$this->cinfo['show_confinfo'] = false;
@@ -203,6 +222,13 @@ class Home extends MY_Controller {
 				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
 				$this->assets->add_meta_tag("keywords", $data['conf_config']['conf_keywords'], "name");
 				$this->assets->add_css(asset_url().'style/statistic.min.css');
+
+				if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
+					$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
+				}
+				if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
+					$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
+				}
 
 				if( $conf_template == "default"){
 					$this->load->view('common/header');
@@ -271,42 +297,5 @@ class Home extends MY_Controller {
 			$this->conf->show_404conf();
 		}
 	}
-	public function debug(){
-		$data['body_class'] = $this->body_class;
-		$this->cinfo['show_confinfo'] = false;
-		if(!$this->user->is_sysop()){
-			redirect('/', 'location', 301);
-		}
-		// $conf = array();
-		// $confs = $this->conf->all_conf_config(true);
-		// foreach ($confs as $key => $value) {
-		// 	array_push($conf,$value->conf_id);
-		// }
-		// foreach ($conf as $key => $value) {
-		// 	$this->conf->init_conf_content($value);
-		// }
-		//
-		// $this->load->view('common/header');
-		// $this->load->view('common/nav',$data);
-		// $this->load->view('common/footer',$data);
-		// sp($this->Submit->sendmail_submit_success(54,"test2015"));
-		// sp($this->Submit->sendmail_submit_success(60,"test2015"));
-		// sp($this->topic->notice_editor("test2015",60));
-		//phpinfo();
-	}
-
-	public function _ckeditor(){
-		$data['body_class'] = $this->body_class;
-		$this->cinfo['show_confinfo'] = false;
-		$this->assets->add_js(site_url().'tinymce/tinymce.min.js');
-		//print_r($this->input->post(NULL,FALSE));
-		if ($this->form_validation->run() == FALSE){
-			$this->load->view('common/header');
-			$this->load->view('common/nav',$data);
-			$this->load->view('ckeditor');
-			$this->load->view('common/footer',$data);
-        }else{
-           // $ckeditor1 = $this->input->post('ckeditor1', TRUE);
-        }
-	}
+	
 }

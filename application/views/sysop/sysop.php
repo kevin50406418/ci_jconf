@@ -7,7 +7,7 @@
 		</a>
 		<a href="<?php echo site_url("sysop/conf/add");?>" class="btn btn-lg btn-hover btn-primary col-md-3 ui header">
 			<i class="fa fa-university fa-5x"></i><sup><i class="fa fa-plus-square-o fa-5x"></i></sup>
-			<br>研討會管理
+			<br>新增研討會
 		</a>
 		<a href="<?php echo site_url("sysop/user/all");?>" class="btn btn-lg btn-hover btn-primary col-md-3 ui header">
 			<i class="fa fa-users fa-5x"></i>

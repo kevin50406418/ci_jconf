@@ -58,6 +58,7 @@ class Topic_model extends CI_Model {
 		$this->db->join('paper_file', 'paper.sub_id = paper_file.paper_id');
 		$this->db->where('auth_topic.user_login', $user_login);
 		$this->db->where("paper.sub_id",$paper_id);
+		// $this->db->where("topic.topic_id",$topic_id);
 		$this->db->where("fid",$fid);
 		$query = $this->db->get();
 		return $query->row();
@@ -326,5 +327,23 @@ class Topic_model extends CI_Model {
 		);
 		$this->db->where('review_token', $review_token);
 		return $this->db->update('paper_review', $review);
+	}
+
+	function count_pedding_paper($conf_id,$user_login){
+		$papers=$this->topic->get_paper($conf_id,$user_login,null,1); // need to review paper
+		$paper_author_array=$this->Submit->show_mypaper($user_login,$conf_id); // user submit paper
+		$paper_author = array();
+		if(is_array($paper_author_array)){
+			foreach ($paper_author_array as $key => $pa) {
+				array_push($paper_author,$pa->sub_id);
+			}
+		}
+		$pedding_review = array();
+		foreach ($papers as $key => $paper) {
+			if(!in_array($paper->sub_id,$paper_author)){
+				array_push($pedding_review,$paper->sub_id);
+			}
+		}
+		return count($pedding_review);
 	}
 }

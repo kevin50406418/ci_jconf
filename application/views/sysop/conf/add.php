@@ -99,7 +99,7 @@
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-10">
 				<button type="submit" class="ui button orange">新增研討會</button>
-				<label><input type="checkbox" value="1" name="next" checked> 建立後設定研討會</label>
+				<!-- <label><input type="checkbox" value="1" name="next" checked> 建立後設定研討會</label> -->
 			</div>
 		</div>
 	<?php echo form_close();?>

@@ -133,6 +133,30 @@ class Sysop extends MY_Sysop {
 					}
 					$this->load->view('common/footer',$data);
 				break;
+				case "change":
+					$this->load->view('common/header');
+					$this->load->view('common/nav',$data);
+					$this->load->view('sysop/nav',$data);
+					if( $this->conf->confid_exists( $conf_id , 1) ){
+						$conf_config = $this->conf->conf_config($conf_id,true);
+						$data['conf_config'] = $conf_config;
+
+						$this->form_validation->set_rules('new_id', '新研討會ID', 'required');
+						if ($this->form_validation->run()){
+							$new_id = $this->input->post('new_id');
+							$return = $this->conf->change_confid($new_id,$conf_id);
+							if( $return["status"] ){
+								$this->alert->js($return["error"],site_url("sysop/conf/change/".$new_id));
+							}else{
+								$this->alert->js($return["error"],site_url("sysop/conf/change/".$conf_id));
+							}
+						}
+						$this->load->view('sysop/conf/change',$data);
+					}else{
+						$this->alert->js("研討會不存在",site_url("sysop/conf"));
+					}
+					$this->load->view('common/footer',$data);
+				break;
 				case "edit": // Edit Conference information
 					$this->load->view('common/header');
 					$this->load->view('common/nav',$data);
@@ -615,7 +639,7 @@ class Sysop extends MY_Sysop {
 
 	public function version(){
 		$out = array();
-		$json = file_get_contents("https://raw.githubusercontent.com/kevin50406418/conf/version/version_conf");
+		$json = file_get_contents("https://raw.githubusercontent.com/kevin50406418/conf/version/version_conf?t=".time());
 		$get = json_decode($json);
 		$version = $this->config->item('version');
 		if( $version < $get->version ){
@@ -624,8 +648,11 @@ class Sysop extends MY_Sysop {
 		}else if( $version == $get->version ){
 			$out['upgrade'] = true;
 			$out["desc"] = "已是最新版本";
+		}else{
+			$out['upgrade'] = false;
+			$out["desc"] = "ERROR:最新版本為".$get->version;
 		}
-
 		echo json_encode($out);
+
 	}
 }

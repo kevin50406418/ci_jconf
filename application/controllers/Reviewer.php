@@ -31,10 +31,15 @@ class Reviewer extends MY_Conference {
 		$data['conf_config']=$this->conf_config;
 		$data['conf_content']=$this->conf->conf_content($conf_id);
 		$data['schedule'] = $this->conf->get_schedules($this->conf_id);
-
-		$user_login = $this->session->userdata('user_login');
-		$data['papers']=$this->reviewer->get_paper($conf_id,$user_login);
-		$paper_author=$this->Submit->show_mypaper($user_login,$conf_id);
+		$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
+		
+		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
+			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
+		}
+		
+		$data['papers']=$this->reviewer->get_paper($conf_id,$this->user_login);
+		$data['time']=time();
+		$paper_author=$this->Submit->show_mypaper($this->user_login,$conf_id);
 		$data['paper_author'] = array();
 		if(is_array($paper_author)){
 			foreach ($paper_author as $key => $pa) {
@@ -61,7 +66,12 @@ class Reviewer extends MY_Conference {
 		$data['conf_config']=$this->conf_config;
 		$data['conf_content']=$this->conf->conf_content($conf_id);
 		$data['schedule'] = $this->conf->get_schedules($this->conf_id);
-		
+		$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
+
+		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
+			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
+		}
+
 		if( empty($paper_id) ){
 			$this->alert->js("稿件不存在",get_url("topic",$conf_id,"index"));
 			$this->load->view('common/footer',$data);
@@ -88,11 +98,14 @@ class Reviewer extends MY_Conference {
 				$data['otherfile']  = $this->Submit->get_otherfile($paper_id);
 				$data['otherfiles'] = $this->Submit->get_otherfiles($paper_id);
 				$data['reviewers']  = $this->reviewer->get_reviewer($paper_id);
+				$user_reviewer=$this->reviewer->get_paper_reviewer($paper_id,$this->user_login);
 			}
-			$this->load->view('reviewer/detail',$data);
+			
 			$paper_is_review = $this->reviewer->is_review($paper_id,$this->user_login);
-			if( !empty($paper_is_review) ){
-				if( $paper_is_review->review_status == 3 ){
+			if( !is_null($paper_is_review) ){
+				$this->load->view('reviewer/detail',$data);
+
+				if( $data['paper']->sub_status == 3 ){
 					$data['review']  = $paper_is_review;
 					$this->form_validation->set_rules('review_status', '審查狀態', 'required');
 				    $this->form_validation->set_rules('review_comment', '審查建議', 'required');
@@ -120,12 +133,45 @@ class Reviewer extends MY_Conference {
 				    }
 					$this->load->view('reviewer/reviewer',$data);
 				}
+			}else{
+				$this->alert->js("您無法審查本篇稿件",get_url("reviewer",$conf_id,"index"));
 			}
-			
 		}else{
 			$this->alert->js("由於您為本篇稿件作者之一，無法審查本篇稿件",get_url("reviewer",$conf_id,"index"));
 		}
 		$this->load->view('common/footer',$data);
+	}
+
+	public function files($conf_id='',$paper_id=''){
+		if( empty($conf_id) || empty($paper_id) ){
+			$this->alert->file_notfound(get_url("reviewer",$conf_id));
+		}
+		$data['conf_id'] = $conf_id;
+		
+		if( is_null($this->input->get("fid") ) ){
+			$this->alert->file_notfound(get_url("reviewer",$conf_id));
+		}else{
+			$fid = $this->input->get("fid");
+			$file=$this->reviewer->get_file($fid,$paper_id,$this->user_login);
+			if(empty($file)){
+				$this->alert->file_notfound(get_url("reviewer",$conf_id));
+			}
+			$this->load->helper('download');
+			$do = $this->input->get("do");
+			switch($do){
+				case "download":
+					force_download($file->file_name,file_get_contents($this->conf->get_paperdir($conf_id).$file->file_system));
+				break;
+				default:
+				case "view":
+					$this->output
+						->set_content_type('pdf')
+						->set_header("Content-Disposition: inline; filename=\"".$paper_id."-".$file->fid."-".$file->file_name."\"")
+						->set_output(file_get_contents($this->conf->get_paperdir($conf_id).$file->file_system));
+				break;
+			}
+		}
+		
 	}
 }
 ?>
