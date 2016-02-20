@@ -4,6 +4,6 @@
 	<p>找不到研討會</p>
 	<p>
 		<a class="btn btn-mint btn-lg" href="javascript:history.back();" role="button"><i class="fa fa-arrow-circle-left"></i> 返回上一頁</a>
-		<a class="btn btn-primary btn-lg" href="<?php echo site_url();?>" role="button"><i class="fa fa-home"></i> 返回首頁</a>
+		<a class="btn btn-primary btn-lg" href="/" role="button"><i class="fa fa-home"></i> 返回首頁</a>
 	</p>
 </div>

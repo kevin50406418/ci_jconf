@@ -1,8 +1,5 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
-<div class="col-md-<?php echo $col_right;?>">
 <div class="ui segment blue">
-	
-		
 	<div role="tabpanel">
 		<div class="ui inverted segment">
 			<ul class="nav nav-pills pull-right" role="tablist">

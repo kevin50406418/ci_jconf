@@ -52,6 +52,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['default_controller'] = 'home';
 $route['404_override'] = 'home/page404';//home/page404
 $route['translate_uri_dashes'] = FALSE;
+$route['help'] = 'help/index';
+$route['help/(:any)'] = 'help/$1';
 $route['review_confirm/(:any)/(:any)'] = 'user/review_confirm/$1/$2';
 $route['clang/(:any)'] = 'home/change_lang/$1';
 $route['(:any)/index'] = function ($conf_id){
@@ -62,6 +64,7 @@ $route['(:any)/index'] = function ($conf_id){
 	}
 };
 $route['(:any)/news'] = 'home/news/$1';
+$route['(:any)/rss'] = 'home/rss/$1';
 $route['(:any)/main'] = 'home/main/$1';
 // $route['debug'] = 'home/debug';
 $route['(:any)/dashboard'] = 'dashboard/index/$1';

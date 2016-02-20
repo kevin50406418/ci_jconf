@@ -29,7 +29,7 @@ class User_model extends CI_Model {
 	}
 
 
-    function is_login(){
+    function is_login(){ //wil bug
 		if($this->session->has_userdata('user_login')){
 			return true;
 		}else{
@@ -51,6 +51,7 @@ class User_model extends CI_Model {
 	}
 
 	function is_conf($conf_id=''){
+		if( !$this->is_login() )return false;
 		if(empty($conf_id)){
 			return false;
 		}else{
@@ -129,45 +130,42 @@ class User_model extends CI_Model {
 	function adduser($user_login,$user_pass,$user_title,$user_email,$user_first_name,$user_last_name,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research){
 		$return = array(
 			"status" => false,
-			"error" => ""
+			"error"  => ""
 		);
 		$user = array(
-			"user_login" => $user_login,
-			"user_pass" => hash('sha256',$user_pass),
-			"user_title" => $user_title,
-			"user_email" => $user_email,
-			"user_register" => time(),
-			"user_staus" => 0,
+			"user_login"      => $user_login,
+			"user_pass"       => hash('sha256',$user_pass),
+			"user_title"      => $user_title,
+			"user_email"      => $user_email,
+			"user_register"   => time(),
+			"user_staus"      => 0,
 			"user_first_name" => $user_first_name,
-			"user_last_name" => $user_last_name,
-			"user_gender" => $user_gender,
-			"user_org" => $user_org,
-			"user_phone_o" => $user_phone_o,
-			"user_cellphone" => $user_cellphone,
-			"user_fax" => $user_fax,
-			"user_postcode" => $user_postcode,
-			"user_postaddr" => $user_postaddr,
-			"user_country" => $user_country,
-			"user_lang" => $user_lang,
-			"user_research" => $user_research,
-			"user_sysop" => 0		
+			"user_last_name"  => $user_last_name,
+			"user_gender"     => $user_gender,
+			"user_org"        => $user_org,
+			"user_phone_o"    => $user_phone_o,
+			"user_cellphone"  => $user_cellphone,
+			"user_fax"        => $user_fax,
+			"user_postcode"   => $user_postcode,
+			"user_postaddr"   => $user_postaddr,
+			"user_country"    => $user_country,
+			"user_lang"       => $user_lang,
+			"user_research"   => $user_research,
+			"user_sysop"      => 0		
 		);
 		
 		if( $this->username_exists($user_login) ){
-			$return["error"] = "The account '".$user_login."' is exist.";
+			$return["error"] = sprintf(lang('alert_username_exists'),$user_login);
 			return $return;
 		}
 
 		if( $this->email_exists($user_email) ){
-			$return["error"] = "Email is exist. If you are not signup this email,please contact system administrator.";
+			$return["error"] = sprintf(lang('alert_email_exists'),$user_email);
 			return $return;
 		}
 
 		if( $this->db->insert('users', $user) ){
-			$return = array(
-				"status" => true,
-				"error" => ""
-			);
+			$return = array("status" => true,"error" => "");
         }else{
            $return = array(
 				"status" => false,
@@ -180,24 +178,24 @@ class User_model extends CI_Model {
 	function updateuser($user_login,$user_title,$user_email,$user_first_name,$user_last_name,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research){
 		$return = array(
 			"status" => false,
-			"error" => ""
+			"error"  => ""
 		);
 		$user = array(
-			"user_login" => $user_login,
-			"user_title" => $user_title,
-			"user_email" => $user_email,
+			"user_login"      => $user_login,
+			"user_title"      => $user_title,
+			"user_email"      => $user_email,
 			"user_first_name" => $user_first_name,
-			"user_last_name" => $user_last_name,
-			"user_gender" => $user_gender,
-			"user_org" => $user_org,
-			"user_phone_o" => $user_phone_o,
-			"user_cellphone" => $user_cellphone,
-			"user_fax" => $user_fax,
-			"user_postcode" => $user_postcode,
-			"user_postaddr" => $user_postaddr,
-			"user_country" => $user_country,
-			"user_lang" => $user_lang,
-			"user_research" => $user_research,	
+			"user_last_name"  => $user_last_name,
+			"user_gender"     => $user_gender,
+			"user_org"        => $user_org,
+			"user_phone_o"    => $user_phone_o,
+			"user_cellphone"  => $user_cellphone,
+			"user_fax"        => $user_fax,
+			"user_postcode"   => $user_postcode,
+			"user_postaddr"   => $user_postaddr,
+			"user_country"    => $user_country,
+			"user_lang"       => $user_lang,
+			"user_research"   => $user_research,	
 		);
 
 		if( !$this->email_exists_userlogin($user_email,$user_login) ){
@@ -408,21 +406,38 @@ class User_model extends CI_Model {
 	}
 
 	function user_valid(){
-		$this->form_validation->set_rules('user_email', '電子信箱', 'required|valid_email');
-	    $this->form_validation->set_rules('user_title', '稱謂', 'required');
-	    $this->form_validation->set_rules('user_firstname', '名字', 'required');
-	    $this->form_validation->set_rules('user_lastname', '姓氏', 'required');
-	    $this->form_validation->set_rules('user_gender', '性別', 'required');
-	    $this->form_validation->set_rules('user_org', '所屬機構', 'required');
-	    $this->form_validation->set_rules('user_phoneO_1', '電話(公)', 'required');
-	    $this->form_validation->set_rules('user_phoneO_2', '電話(公)', 'required');
-	    $this->form_validation->set_rules('user_postcode', '郵遞區號', 'required');
-	    $this->form_validation->set_rules('user_postadd', '聯絡地址', 'required');
-	    $this->form_validation->set_rules('user_country', '國別', 'required');
-	    $this->form_validation->set_rules('user_lang', '語言', 'required');
-	    $this->form_validation->set_rules('user_title', '研究領域', 'required|min_length[1]');
+		$this->form_validation->set_rules('user_id', lang('account'), 'required');
+		$this->form_validation->set_rules('user_pw', lang('password'), 'required|min_length[6]');
+		$this->form_validation->set_rules('user_pw2', lang('confirm_password'), 'required|matches[user_pw]|min_length[6]');
+		$this->form_validation->set_rules('user_email', lang('user_email'), 'required|valid_email');
+		$this->form_validation->set_rules('user_title', lang('user_title'), 'required');
+		$this->form_validation->set_rules('user_firstname', lang('user_firstname'), 'required');
+		$this->form_validation->set_rules('user_lastname', lang('user_lastname'), 'required');
+		$this->form_validation->set_rules('user_gender', lang('user_gender'), 'required');
+		$this->form_validation->set_rules('user_org', lang('user_org'), 'required');
+		$this->form_validation->set_rules('user_phoneO_1', lang('user_phoneO'), 'required|is_natural');
+		$this->form_validation->set_rules('user_phoneO_2', lang('user_phoneO'), 'required|is_natural');
+		$this->form_validation->set_rules('user_postcode', lang('user_postcode'), 'required|is_natural');
+		$this->form_validation->set_rules('user_postadd', lang('user_poststreetadd'), 'required');
+		$this->form_validation->set_rules('user_country', lang('user_country'), 'required');
+		$this->form_validation->set_rules('user_research', lang('user_research'), 'required|min_length[1]');
 	}
 
+	function users_valid(){
+		$this->form_validation->set_rules('user_id[]', lang('account'), 'required');
+		$this->form_validation->set_rules('user_email[]', lang('user_email'), 'required|valid_email');
+		$this->form_validation->set_rules('user_title[]', lang('user_title'), 'required');
+		$this->form_validation->set_rules('user_firstname[]', lang('user_firstname'), 'required');
+		$this->form_validation->set_rules('user_lastname[]', lang('user_lastname'), 'required');
+		$this->form_validation->set_rules('user_gender[]', lang('user_gender'), 'required');
+		$this->form_validation->set_rules('user_org[]', lang('user_org'), 'required');
+		$this->form_validation->set_rules('user_phoneO_1[]', lang('user_phoneO'), 'required|is_natural');
+		$this->form_validation->set_rules('user_phoneO_2[]', lang('user_phoneO'), 'required|is_natural');
+		$this->form_validation->set_rules('user_postcode[]', lang('user_postcode'), 'required|is_natural');
+		$this->form_validation->set_rules('user_postadd[]', lang('user_poststreetadd'), 'required');
+		$this->form_validation->set_rules('user_country[]', lang('user_country'), 'required');
+		$this->form_validation->set_rules('user_research[]', lang('user_research'), 'required|min_length[1]');
+	}
 	function change_passwd($user_login,$user_pass,$login_staus=2){
 		$user = array(
 			"user_pass" => hash('sha256',$user_pass)
@@ -550,6 +565,62 @@ class User_model extends CI_Model {
 		$this->email->subject('[重設密碼]'.$site_name.'重設密碼');
 		$this->email->message($message);
 
+		return $this->email->send();
+	}
+
+	function send_pwd_mail($user_firstname,$user_lastname,$user_login,$user_email,$user_pass){
+		$time = date("Y-m-d H:i:s",time());
+		$site_name = $this->config->item('site_name');
+		$login_link = site_url("user/login");
+    	$message = $user_lastname.' '.$user_firstname.'，您好<br><br>
+    	您在“'.$site_name.'”的帳號已經建立，系統產生一個密碼給您。<br><br>
+    	您目前的登入資訊如下：<br>
+    	帳號：'.$user_login.'<br>
+    	密碼：'.$user_pass.'<br><br>
+    	要開始使用“'.$site_name.'”請透過連結登入：<br><a href="'.$login_link.'">'.$login_link.'</a><br><br>
+    	在大部分的郵件軟體中，上面的網址應該會自動以連結格式呈現，您可以直接點選；如果沒有，您可以將上面網址直接貼到瀏覽器的網址列中。<br><br>
+    	'.$site_name.'管理員<br><br><hr>
+    	Hi '.$user_firstname.' '.$user_lastname.',<br><br>
+		A new account has been created for you at "'.$site_name.'" and you have been issued with a new password.<br><br>
+		Your current login information is now:<br>
+		username: '.$user_login.'<br>
+		password: '.$user_pass.'<br><br>
+		Please go to this page to change your password:<br><a href="'.$login_link.'">'.$login_link.'</a><br><br>
+		In most mail programs, this should appear as a blue link which you can just click on. If that doesn\'t work, then cut and paste the address into the address line at the top of your web browser window.<br><br>
+		Cheers from the "'.$site_name.'" administrator';
+
+    	$this->email->from('ccs@asia.edu.tw', $site_name);
+		$this->email->to($user_email);
+		$this->email->subject('新用戶帳號 New user account');
+		$this->email->message($message);
+		return $this->email->send();
+	}
+
+	function send_sigup_mail($user_firstname,$user_lastname,$user_login,$user_email,$user_pass){
+		$time = date("Y-m-d H:i:s",time());
+		$site_name = $this->config->item('site_name');
+		$login_link = site_url("user/login");
+    	$message = $user_lastname.' '.$user_firstname.'，您好<br><br>
+    	您在“'.$site_name.'”的帳號已經建立。<br><br>
+    	您目前的登入資訊如下：<br>
+    	帳號：'.$user_login.'<br>
+    	密碼：'.$user_pass.'<br><br>
+    	要開始使用“'.$site_name.'”請透過連結登入：<br><a href="'.$login_link.'">'.$login_link.'</a><br><br>
+    	在大部分的郵件軟體中，上面的網址應該會自動以連結格式呈現，您可以直接點選；如果沒有，您可以將上面網址直接貼到瀏覽器的網址列中。<br><br>
+    	'.$site_name.'管理員<br><br><hr>
+    	Hi '.$user_firstname.' '.$user_lastname.',<br><br>
+		A new account has been created for you at "'.$site_name.'".<br><br>
+		Your current login information is now:<br>
+		username: '.$user_login.'<br>
+		password: '.$user_pass.'<br><br>
+		Please go to this page to change your password:<br><a href="'.$login_link.'">'.$login_link.'</a><br><br>
+		In most mail programs, this should appear as a blue link which you can just click on. If that doesn\'t work, then cut and paste the address into the address line at the top of your web browser window.<br><br>
+		Cheers from the "'.$site_name.'" administrator';
+
+    	$this->email->from('ccs@asia.edu.tw', $site_name);
+		$this->email->to($user_email);
+		$this->email->subject('新用戶帳號 New user account');
+		$this->email->message($message);
 		return $this->email->send();
 	}
 

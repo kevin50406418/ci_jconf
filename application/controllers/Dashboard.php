@@ -1,57 +1,69 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+/*
+ * @package	Jconf
+ * @author	Jingxun Lai
+ * @copyright	Copyright (c) 2015 - 2016, Jingxun Lai, Inc. (https://jconf.tw/)
+ * @license	http://opensource.org/licenses/MIT	MIT License
+ * @link	https://jconf.tw
+ * @since	Version 1.0.0
+ * @date	2016/2/20 
+ */
+
 class Dashboard extends MY_Conference {
 	public function __construct(){
 		parent::__construct();
 		$this->lang->load("dashboard",$this->_lang);
 		$this->cinfo['show_confinfo'] = true;
-		$this->user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
-		if( !$this->conf->confid_exists($this->conf_id,$this->user_sysop) ){
+		$this->user_sysop = $this->is_sysop?$this->session->userdata('user_sysop'):0;
+		if( !$this->conf->confid_exists($this->conf_id,$this->user->is_conf($this->conf_id)) ){
 			$this->cinfo['show_confinfo'] = false;
 			$this->conf->show_404conf();
 		}
-		$this->conf_config = $this->conf->conf_config($this->conf_id,$this->user_sysop);
-		
-		if( $this->user->is_conf($this->conf_id) || $this->user_sysop ){
-			
-		}else{
-			$data['conf_id'] = $this->conf_id;
-			$data['body_class'] = $this->body_class;
-			$data['conf_config']=$this->conf_config;
-			$this->conf->show_permission_deny($data);
+		$this->is_sysop    = $this->user_sysop;
+		$this->is_conf     = $this->user->is_conf($this->conf_id);
+		$this->is_topic    = $this->user->is_topic($this->conf_id);
+		$this->is_reviewer = $this->user->is_reviewer($this->conf_id);
+		$this->conf_config = $this->conf->conf_config($this->conf_id,$this->is_conf);
+		$this->data['conf_id']     = $this->conf_id;
+		$this->data['body_class']  = $this->body_class;
+		$this->data['conf_config'] = $this->conf_config;
+
+		if( !$this->is_conf && !$this->user_sysop ){
+			$this->conf->show_permission_deny($this->data);
 		}
-		
+		$this->assets->set_title_separator(" | ");
+
+		$this->data['spage']        = $this->config->item('spage');
+		$this->data['schedule']     = $this->conf->get_schedules($this->conf_id);
+		$this->data['schedules']    = $this->conf->get_schedules($this->conf_id);
+		$this->data['conf_content'] = $this->conf->conf_content($this->conf_id);
+
+		if( $this->is_topic || $this->is_sysop ){
+			$this->data['topic_pedding'] = $this->topic->count_pedding_paper($this->conf_id,$this->user_login);
+		}
+		if( $this->is_reviewer || $this->is_sysop ){
+			$this->data['reviewer_pedding'] = $this->reviewer->count_review($this->conf_id,$this->user_login);
+		}
 	}
 
 	public function index($conf_id=''){
-		$data['conf_id']      = $conf_id;
-		$data['body_class']   = $this->body_class;
-		
-		$data['spage']        = $this->config->item('spage');
-		$data['conf_config']  = $this->conf_config;
-		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-		$data['conf_content'] = $this->conf->conf_content($conf_id);
-
+		$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js');
 		$this->assets->add_css(asset_url().'style/datepicker.css');
 		$this->assets->add_js(asset_url().'js/bootstrap-datepicker.js');
 		$this->assets->add_js(asset_url().'js/locales/bootstrap-datepicker.zh-TW.js');
-		$schedule = $this->conf->get_schedules($conf_id);
-		$data['schedule'] = $schedule;
-		$data['styles'] = $this->conf->get_style();
-		
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
+		$this->assets->add_js(asset_url().'js/repeatable.js');
+		$this->assets->set_title(lang('dashboard_setting'));
+		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
+
+		$schedule = $this->conf->get_schedules($this->conf_id);
+		$this->data['schedule'] = $schedule;
+		$this->data['styles'] = $this->conf->get_style();
 
 		$this->load->view('common/header');
-		$this->load->view('common/nav',$data);
-
-		$this->load->view('conf/conf_nav',$data);
-		//$this->load->view('conf/conf_schedule',$data);
-		$this->load->view('conf/menu_conf',$data);
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_conf',$this->data);
 
 		if( !is_null($this->input->post("do")) ){
 			$do = $this->input->post("do");
@@ -62,7 +74,7 @@ class Dashboard extends MY_Conference {
 						$conf_staus = $this->input->post('conf_staus');
 						$valid_status = array(0,1);
 						if( in_array($conf_staus,$valid_status) ){
-							if( $this->conf->update_status($conf_id,$conf_staus) ){
+							if( $this->conf->update_status($this->conf_id,$conf_staus) ){
 								$this->alert->js(lang('update_success'));
 							}else{
 								$this->alert->js(lang('update_fail'));
@@ -77,7 +89,7 @@ class Dashboard extends MY_Conference {
 					$this->form_validation->set_rules('style', lang('conf_style'), 'required');
 					if ($this->form_validation->run()){
 						$style = $this->input->post('style');
-						if( $this->conf->update_confstyle($conf_id,$style) ){
+						if( $this->conf->update_confstyle($this->conf_id,$style) ){
 							$this->alert->js(lang('conf_style').lang('update_success'));
 						}else{
 							$this->alert->js(lang('conf_style').lang('update_fail'));
@@ -106,7 +118,7 @@ class Dashboard extends MY_Conference {
 						$conf_place   = $this->input->post('conf_place');
 						$conf_desc    = $this->input->post('conf_desc');
 						$conf_keywords= $this->input->post('conf_keywords');
-						if( $this->conf->update_confinfo($conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_host,$conf_place,$conf_keywords,$conf_desc) ){
+						if( $this->conf->update_confinfo($this->conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_fax,$conf_address,$conf_host,$conf_place,$conf_keywords,$conf_desc) ){
 							$this->alert->js(lang('update_success'));
 						}else{
 							$this->alert->js(lang('update_fail'));
@@ -122,17 +134,17 @@ class Dashboard extends MY_Conference {
 						$conf_col     = $this->input->post('conf_col');
 						$conf_most    = $this->input->post('conf_most');
 						$topic_assign = $this->input->post('topic_assign');
-						if( $this->conf->update_confcol($conf_id,$conf_col) ){
+						if( $this->conf->update_confcol($this->conf_id,$conf_col) ){
 							$this->alert->show("s",lang('home_layout').lang('update_success'));
 						}else{
 							$this->alert->show("d",lang('home_layout').lang('update_fail'));
 						}
-						if( $this->conf->update_confmost($conf_id,$conf_most) ){
+						if( $this->conf->update_confmost($this->conf_id,$conf_most) ){
 							$this->alert->show("s",lang('conf_most').lang('update_success'));
 						}else{
 							$this->alert->show("d",lang('conf_most').lang('update_fail'));
 						}
-						if( $this->conf->update_topic_assign($conf_id,$topic_assign) ){
+						if( $this->conf->update_topic_assign($this->conf_id,$topic_assign) ){
 							$this->alert->show("s",lang('conf_topic_assign').lang('update_success'));
 						}else{
 							$this->alert->show("d",lang('conf_topic_assign').lang('update_fail'));
@@ -141,119 +153,29 @@ class Dashboard extends MY_Conference {
 					}
 				break;
 				case "schedule":
-					$this->form_validation->set_rules('hold[]', lang('schedule_hold'), 'required');
-					$this->form_validation->set_rules('submit[]', lang('schedule_submit'), 'required');
-					$this->form_validation->set_rules('early_bird[]', lang('schedule_early_bird'), 'required');
-					$this->form_validation->set_rules('register[]', lang('schedule_register'), 'required');
-					$this->form_validation->set_rules('finish[]', lang('schedule_finish'), 'required');
-					if( $this->conf_config['conf_most'] == 1){
-						$this->form_validation->set_rules('most[]', lang('schedule_most'), 'required');
-					}
+					$this->form_validation->set_rules('do', "do", 'required');
 					if ($this->form_validation->run()){
-						$hold       = $this->input->post("hold");
-						$submit     = $this->input->post("submit");
-						$early_bird = $this->input->post("early_bird");
-						$register   = $this->input->post("register");
-						$finish     = $this->input->post("finish");
-						
-						$int_hold = array_map("strtotime", $hold);
-						$int_submit = array_map("strtotime", $submit);
-						$int_early_bird = array_map("strtotime", $early_bird);
-						$int_register = array_map("strtotime", $register);
-						$int_finish = array_map("strtotime", $finish);
-
-						$success = array();
-						$error = array();
-						if( $this->conf->update_schedule($conf_id,"hold",$int_hold['start'],$int_hold['end']) ){
-							array_push($success,lang('schedule_hold'));
+						$sc = $this->input->post("sc");
+						if( $this->conf->update_schedules($this->conf_id,$sc) ){
+							$this->alert->js("更新成功");
 						}else{
-							array_push($error,lang('schedule_hold'));
+							$this->alert->js("更新失敗");
 						}
-
-						if( $int_submit['end'] < $int_hold['start'] && $int_submit['end'] >= $int_submit['start']){
-							if( $this->conf->update_schedule($conf_id,"submit",$int_submit['start'],$int_submit['end']) ){
-								array_push($success,lang('schedule_submit'));
-							}else{
-								array_push($error,lang('schedule_submit'));
-							}
-						}else{
-							$this->alert->show("d",lang('update_fail_submit'));
-						}
-						if( $int_early_bird['end'] < $int_hold['start'] && $int_early_bird['end'] >= $int_early_bird['start']){
-							if( $this->conf->update_schedule($conf_id,"early_bird",$int_early_bird['start'],$int_early_bird['end']) ){
-								array_push($success,lang('schedule_early_bird'));
-							}else{
-								array_push($error,lang('schedule_early_bird'));
-							}
-						}else{
-							$this->alert->show("d",lang('update_fail_early_bird'));
-						}
-						if( $int_register['end'] < $int_hold['start'] && $int_register['end'] >= $int_register['start']){
-							if( $this->conf->update_schedule($conf_id,"register",$int_register['start'],$int_register['end']) ){
-								array_push($success,lang('schedule_register'));
-							}else{
-								array_push($error,lang('schedule_register'));
-							}
-						}else{
-							$this->alert->show("d",lang('update_fail_register'));
-						}
-						if( $int_finish['end'] < $int_hold['start'] ){
-							if( $this->conf->update_schedule($conf_id,"finish",$int_finish['end'],$int_finish['end']) ){
-								array_push($success,lang('schedule_finish'));
-							}else{
-								array_push($error,lang('schedule_finish'));
-							}
-						}else{
-							$this->alert->show("d",lang('update_fail_finish'));
-						}
-
-						if( $this->conf_config['conf_most'] == 1){
-							$most     = $this->input->post("most");
-							$int_most = array_map("strtotime", $most);
-							if( $int_most['end'] < $int_hold['start'] ){
-								if( $this->conf->update_schedule($conf_id,"most",$int_most['end'],$int_most['end']) ){
-									array_push($success,lang('schedule_most'));
-								}else{
-									array_push($error,lang('schedule_most'));
-								}
-							}else{
-								$this->alert->show("d",lang('update_fail_most'));
-							}
-						}
-						$refresh = true;
-						if( count($error) > 0 ){
-							$this->alert->message(lang('update_schedule_fail'),ul($error, array("class"=>"list")),'d',-1,"check-square-o");
-							$refresh = false;
-						}
-						if( count($success) > 0 ){
-							$this->alert->message(lang('update_schedule_success'),ul($success, array("class"=>"list")),'s',-1,"check-square-o");
-						}
-						if( $refresh ){
-							$this->alert->refresh(2);
-						}
+						$this->alert->refresh(2);
 					}
 				break;
 			}
 		}
-		$this->load->view('conf/setting',$data);
-		$this->load->view('common/footer',$data);
+		$this->load->view('conf/setting',$this->data);
+		$this->load->view('common/footer',$this->data);
 	}
 
-	
-
 	public function setting($conf_id=''){
-		$this->index($conf_id);
+		$this->index($this->conf_id);
 	}
 
 	public function topic($conf_id='',$type=''){
-		$data['conf_id']      = $conf_id;
-		$data['body_class']   = $this->body_class;
-		
-		$data['spage']        = $this->config->item('spage');
-		$data['conf_config']  = $this->conf_config;
-		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-		$data['conf_content'] = $this->conf->conf_content($conf_id);
-		$data['count_editor'] = $this->conf->count_editor($conf_id);
+		$this->data['count_editor'] = $this->conf->count_editor($this->conf_id);
 
 		if( !is_null( $this->input->get('id', TRUE)) && $type =="assign" ){
 			$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
@@ -266,19 +188,13 @@ class Dashboard extends MY_Conference {
 			$this->assets->add_js(asset_url().'js/repeatable.js',true);
 		}
 
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
+		$this->assets->set_title(lang('dashboard_topic'));
+		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 
 		$this->load->view('common/header');
-		$this->load->view('common/nav',$data);
-		$this->load->view('conf/conf_nav',$data);
-		//$this->load->view('conf/conf_schedule',$data);
-		$this->load->view('conf/menu_conf',$data);
-		//$this->load->view('conf/setting',$data);
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_conf',$this->data);
 		
 		if( is_null( $this->input->get('id', TRUE)) ){
 			switch($type){
@@ -287,15 +203,15 @@ class Dashboard extends MY_Conference {
 					$this->form_validation->set_rules('topic_id[]', '研討會主題', 'required');
 					if ($this->form_validation->run()){
 						$topic_array = $this->input->post("topic_id");
-						if( $this->conf->sort_topic($conf_id,$topic_array) ){
+						if( $this->conf->sort_topic($this->conf_id,$topic_array) ){
 							$this->alert->show("s","研討會主題順序調整成功");
 						}else{
 							$this->alert->show("d","研討會主題順序調整失敗");
 						}
 						$this->alert->refresh(2);
 					}
-					$data['topics'] = $this->conf->get_topic($conf_id);
-					$this->load->view('conf/topic/all',$data);
+					$this->data['topics'] = $this->conf->get_topic($this->conf_id);
+					$this->load->view('conf/topic/all',$this->data);
 				break;
 				case "add":
 					$this->form_validation->set_rules('topic_name', '主題名稱(中)', 'required');
@@ -308,14 +224,14 @@ class Dashboard extends MY_Conference {
 						$topic_name_eng = $this->input->post('topic_ename');
 						$topic_abbr     = $this->input->post('topic_abbr');
 						$topic_info     = $this->input->post('topic_info');
-						if( $this->conf->add_topic($conf_id,$topic_name,$topic_abbr,$topic_info,$topic_name_eng) ){
+						if( $this->conf->add_topic($this->conf_id,$topic_name,$topic_abbr,$topic_info,$topic_name_eng) ){
 							$this->alert->show("s","成功加入研討會主題: '".$topic_name."(".$topic_name_eng.")'");
 							$this->alert->refresh(2);
 						}else{
 							$this->alert->show("d","無法加入研討會主題: '".$topic_name."(".$topic_name_eng.")'");
 						}
 					}
-					$this->load->view('conf/topic/add',$data);
+					$this->load->view('conf/topic/add',$this->data);
 				break;
 			}
 		}else{
@@ -338,7 +254,7 @@ class Dashboard extends MY_Conference {
 					}else{
 						$this->alert->js("查無此主題");
 					}
-					$this->alert->refresh(1,get_url("dashboard",$conf_id,"topic"));
+					$this->alert->refresh(1,get_url("dashboard",$this->conf_id,"topic"));
 				break;
 				case "edit":
 					$this->form_validation->set_rules('topic_name', '主題名稱(中)', 'required');
@@ -351,25 +267,26 @@ class Dashboard extends MY_Conference {
 						$topic_name_eng = $this->input->post('topic_ename');
 						$topic_abbr     = $this->input->post('topic_abbr');
 						$topic_info     = $this->input->post('topic_info');
-						if( $this->conf->update_topic($topic_id,$conf_id,$topic_name,$topic_abbr,$topic_info,$topic_name_eng) ){
+						if( $this->conf->update_topic($topic_id,$this->conf_id,$topic_name,$topic_abbr,$topic_info,$topic_name_eng) ){
 							$this->alert->show("s","成功更改研討會主題: '".$topic_name."(".$topic_name_eng.")'");
 						}else{
 							$this->alert->show("d","無法更改研討會主題: '".$topic_name."(".$topic_name_eng.")'");
 						}
+						$this->alert->refresh(2);
 					}
-					$data["topic"] = $this->conf->get_topic_info($conf_id,$topic_id);
-					$this->load->view('conf/topic/edit',$data);
+					$this->data["topic"] = $this->conf->get_topic_info($this->conf_id,$topic_id);
+					$this->load->view('conf/topic/edit',$this->data);
 				break;
 				case "assign":
-					$data['users']=$this->user->get_all_users(0);
-					$data["topic"] = $this->conf->get_topic_info($conf_id,$topic_id);
-					if( !empty($data["topic"]) ){
-						$data["topic_users"] = $this->conf->get_editor($topic_id,$conf_id);
+					$this->data['users']=$this->user->get_all_users(0);
+					$this->data["topic"] = $this->conf->get_topic_info($this->conf_id,$topic_id);
+					if( !empty($this->data["topic"]) ){
+						$this->data["topic_users"] = $this->conf->get_editor($topic_id,$this->conf_id);
 						$auth_users = array();
-						foreach ($data["topic_users"] as $key => $user) {
+						foreach ($this->data["topic_users"] as $key => $user) {
 							array_push($auth_users, $user->user_login);
 						}
-						$data['auth_users'] = $auth_users;
+						$this->data['auth_users'] = $auth_users;
 						$this->form_validation->set_rules(
 					        'submit', '送出',
 					        'required',
@@ -384,50 +301,38 @@ class Dashboard extends MY_Conference {
 								switch($submit){
 									case "add":
 										foreach ($user_logins as $key => $user_login) {
-											if( $this->conf->add_assign_topic($topic_id,$conf_id,$user_login) ){
-												$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 設為 <strong>".$data["topic"]["topic_name"]."(".$data["topic"]["topic_name_eng"].")</strong> 主編");
+											if( $this->conf->add_assign_topic($topic_id,$this->conf_id,$user_login) ){
+												$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 設為 <strong>".$this->data["topic"]["topic_name"]."(".$this->data["topic"]["topic_name_eng"].")</strong> 主編");
 											}else{
-												$this->alert->show("d","無法將使用者 <strong>".$user_login."</strong> 設為 <strong>".$data["topic"]["topic_name"]."(".$data["topic"]["topic_name_eng"].")</strong> 主編");
+												$this->alert->show("d","無法將使用者 <strong>".$user_login."</strong> 設為 <strong>".$this->data["topic"]["topic_name"]."(".$this->data["topic"]["topic_name_eng"].")</strong> 主編");
 											}
 										}
 									break;
 									case "del":
 										foreach ($user_logins as $key => $user_login) {
-											if( $this->conf->del_assign_topic($topic_id,$conf_id,$user_login) ){
-												$this->alert->show("s","已將使用者 <strong>".$user_login."</strong> 取消 <strong>".$data["topic"]["topic_name"]."(".$data["topic"]["topic_name_eng"].")</strong> 主編");
+											if( $this->conf->del_assign_topic($topic_id,$this->conf_id,$user_login) ){
+												$this->alert->show("s","已將使用者 <strong>".$user_login."</strong> 取消 <strong>".$this->data["topic"]["topic_name"]."(".$this->data["topic"]["topic_name_eng"].")</strong> 主編");
 											}else{
-												$this->alert->show("d","無法將使用者 <strong>".$user_login."</strong> 取消 <strong>".$data["topic"]["topic_name"]."(".$data["topic"]["topic_name_eng"].")</strong> 主編");
+												$this->alert->show("d","無法將使用者 <strong>".$user_login."</strong> 取消 <strong>".$this->data["topic"]["topic_name"]."(".$this->data["topic"]["topic_name_eng"].")</strong> 主編");
 											}
 										}
 									break;
 								}
+								$this->alert->refresh(2);
 							}
 						}
-						$this->load->view('conf/topic/assign',$data);
+						$this->load->view('conf/topic/assign',$this->data);
 					}else{
-						$this->alert->show("d","研討會主題不存在",get_url("dashboard",$conf_id,"topic"));
+						$this->alert->show("d","研討會主題不存在",get_url("dashboard",$this->conf_id,"topic"));
 					}
 				break;
 			}
 		}
-		$this->load->view('common/footer',$data);
+		$this->load->view('common/footer',$this->data);
 	}
 
 	public function website($conf_id='',$do='all'){
-		$data['conf_id']      = $conf_id;
-		$data['body_class']   = $this->body_class;
-		
-		$data['spage']        = $this->config->item('spage');
-		$data['conf_config']  = $this->conf_config;
-		$data['conf_lang']    = explode(",", $this->conf_config['conf_lang']);
-		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-		$data['conf_content'] = $this->conf->conf_content($conf_id);
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
+		$this->data['conf_lang']    = explode(",", $this->conf_config['conf_lang']);
 
 		if( $do=="all"){
 			$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
@@ -438,21 +343,21 @@ class Dashboard extends MY_Conference {
 			$this->assets->add_js(base_url().'tinymce/tinymce.min.js');
 		}
 
+		$this->assets->set_title(lang('dashboard_website'));
+		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
+
 		$this->load->view('common/header');
-		$this->load->view('common/nav',$data);
-
-		$this->load->view('conf/conf_nav',$data);
-		//$this->load->view('conf/conf_schedule',$data);
-
-		$this->load->view('conf/menu_conf',$data);
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_conf',$this->data);
 		if( is_null( $this->input->get('id', TRUE)) ){
 			switch($do){
 				default:
 				case "all":
 					$show_alert = true;
-					if(in_array("zhtw",$data['conf_lang'])){
+					if(in_array("zhtw",$this->data['conf_lang'])){
 						$this->form_validation->set_rules('zhtw[]', '', 'required');
-						$data['contents']['zhtw'] = $this->conf->get_contents($conf_id,"zhtw");
+						$this->data['contents']['zhtw'] = $this->conf->get_contents($this->conf_id,"zhtw");
 						
 						if($this->form_validation->run()){
 							$zhtw=$this->input->post('zhtw');
@@ -465,7 +370,7 @@ class Dashboard extends MY_Conference {
 									$page_show  = 0;
 									$text = "隱藏";
 								}
-								if( !$this->conf->update_contents($conf_id,$page_id,'zhtw',$page_order,$page_show) ){
+								if( !$this->conf->update_contents($this->conf_id,$page_id,'zhtw',$page_order,$page_show) ){
 									$this->alert->show("d","更新".$page_id."順序及狀態失敗(".$text.")");
 								}
 							}
@@ -474,13 +379,11 @@ class Dashboard extends MY_Conference {
 								$show_alert = false;
 								$this->alert->refresh(2);
 							}
-							
-							
 						}
 					}
-					if(in_array("eng",$data['conf_lang'])){
+					if(in_array("eng",$this->data['conf_lang'])){
 						$this->form_validation->set_rules('eng[]', '', 'required');
-						$data['contents']['eng'] = $this->conf->get_contents($conf_id,"en");
+						$this->data['contents']['eng'] = $this->conf->get_contents($this->conf_id,"en");
 						
 						if($this->form_validation->run()){
 							$eng=$this->input->post('eng');
@@ -493,7 +396,7 @@ class Dashboard extends MY_Conference {
 									$page_show  = 0;
 									$text = "隱藏";
 								}
-								if( !$this->conf->update_contents($conf_id,$page_id,'eng',$page_order,$page_show) ){
+								if( !$this->conf->update_contents($this->conf_id,$page_id,'eng',$page_order,$page_show) ){
 									$this->alert->show("d","更新".$page_id."順序及狀態失敗(".$text.")");
 								}
 							}
@@ -504,8 +407,7 @@ class Dashboard extends MY_Conference {
 							}
 						}
 					}
-					
-					$this->load->view('conf/content/all',$data);
+					$this->load->view('conf/content/all',$this->data);
 				break;
 				case "add":
 					$this->form_validation->set_rules('page_title[]', '標題', 'required');
@@ -516,16 +418,16 @@ class Dashboard extends MY_Conference {
 						$page_id      =$this->input->post('page_id');
 						$page_content =$this->input->post('page_content',false);
 
-						if(in_array("zhtw",$data['conf_lang'])){
-							if( $this->conf->add_content($conf_id,$page_id,$page_title['zhtw'],$page_content['zhtw'],'zhtw') ){
+						if(in_array("zhtw",$this->data['conf_lang'])){
+							if( $this->conf->add_content($this->conf_id,$page_id,$page_title['zhtw'],$page_content['zhtw'],'zhtw') ){
 								$this->alert->show("s","成功新增".$page_id."[中文]網頁內容");
 							}else{
 								$this->alert->show("d","新增".$page_id."[中文]網頁內容失敗");
 							}
 						}
 
-						if(in_array("eng",$data['conf_lang'])){
-							if( $this->conf->add_content($conf_id,$page_id,$page_title['en'],$page_content['en'],'en') ){
+						if(in_array("eng",$this->data['conf_lang'])){
+							if( $this->conf->add_content($this->conf_id,$page_id,$page_title['en'],$page_content['en'],'en') ){
 								$this->alert->show("s","成功新增".$page_id."[英文]網頁內容");
 							}else{
 								$this->alert->show("d","新增".$page_id."[英文]網頁內容失敗");
@@ -533,8 +435,8 @@ class Dashboard extends MY_Conference {
 						}
 						$this->alert->refresh(2);
 					}
-					$this->load->view('common/tinymce',$data);
-					$this->load->view('conf/content/add',$data);
+					$this->load->view('common/tinymce',$this->data);
+					$this->load->view('conf/content/add',$this->data);
 				break;
 			}
 		}else{
@@ -542,15 +444,16 @@ class Dashboard extends MY_Conference {
 			$page_lang = $this->input->get('lang', TRUE);
 			switch($do){
 				case "edit":
-					$data['page_id']=$page_id;
-					$data['content']=$this->conf->get_content($conf_id,$page_id,$page_lang);
-					if( !empty($data['content']) ){
+					$spage=$this->config->item('spage');
+					$this->data['spage']=$spage;
+					$this->data['page_id']=$page_id;
+					$this->data['content']=$this->conf->get_content($this->conf_id,$page_id,$page_lang);
+					if( !empty($this->data['content']) ){
 						$this->form_validation->set_rules('page_title', '標題', 'required');
-						$this->form_validation->set_rules('page_content', '網頁內容', 'required');
 						if($this->form_validation->run()){
-							$page_title   =$this->input->post('page_title');
-							$page_content =$this->input->post('page_content',false);
-							if( $this->conf->update_content($conf_id,$page_id,$page_lang,$page_title,$page_content) ){
+							$page_title   = $this->input->post('page_title');
+							$page_content = $this->input->post('page_content',false);
+							if( $this->conf->update_content($this->conf_id,$page_id,$page_lang,$page_title,$page_content) ){
 								$this->alert->show("s","成功更新".$page_id."網頁內容");
 							}else{
 								$this->alert->show("d","更新".$page_id."網頁內容失敗");
@@ -558,51 +461,36 @@ class Dashboard extends MY_Conference {
 							$this->alert->refresh(2);
 						}
 					}
-					$this->load->view('common/tinymce',$data);
-					$this->load->view('conf/content/edit',$data);
+					$this->load->view('common/tinymce',$this->data);
+					$this->load->view('conf/content/edit',$this->data);
 				break;
 				case "del":
-					if( $this->conf->del_contents($conf_id,$page_id) ){
-						$this->alert->js("成功刪除".$page_id."網頁內容",get_url("dashboard",$conf_id,"website"));
+					if( $this->conf->del_contents($this->conf_id,$page_id) ){
+						$this->alert->js("成功刪除".$page_id."網頁內容",get_url("dashboard",$this->conf_id,"website"));
 					}else{
-						$this->alert->js("刪除".$page_id."網頁內容失敗",get_url("dashboard",$conf_id,"website"));
+						$this->alert->js("刪除".$page_id."網頁內容失敗",get_url("dashboard",$this->conf_id,"website"));
 					}
 				break;
 			}			
 		}
-		$this->load->view('common/footer',$data);
+		$this->load->view('common/footer',$this->data);
 	}
 
 	public function filter($conf_id='',$type=''){
-		$data['conf_id']      = $conf_id;
-		$data['body_class']   = $this->body_class;
-		
-		$data['spage']        = $this->config->item('spage');
-		$data['conf_config']  = $this->conf_config;
-		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-		$data['conf_content'] = $this->conf->conf_content($conf_id);
-
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
-
+		$this->assets->set_title(lang('dashboard_filter'));
+		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 		$this->assets->add_js(base_url('ckeditor/ckeditor.js'));
+
 		$this->load->view('common/header');
-		$this->load->view('common/nav',$data);
-
-		$this->load->view('conf/conf_nav',$data);
-		//$this->load->view('conf/conf_schedule',$data);
-
-		$this->load->view('conf/menu_conf',$data);
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_conf',$this->data);
 		if( is_null( $this->input->get('id', TRUE)) ){
 			switch($type){
 				default:
 				case "all":
-					$data['filters']=$this->conf->get_filter($conf_id);
-					$this->load->view('conf/filter/all',$data);
+					$this->data['filters']=$this->conf->get_filter($this->conf_id);
+					$this->load->view('conf/filter/all',$this->data);
 				break;
 				case "add":
 					$this->form_validation->set_rules('content', '檢核清單內容', 'required');
@@ -611,74 +499,61 @@ class Dashboard extends MY_Conference {
 					if ($this->form_validation->run()){
 						$filter_content     = $this->input->post('content',false);
 						$filter_content_eng = $this->input->post('econtent',false);
-						if( $this->conf->add_filter($conf_id,$filter_content,$filter_content_eng) ){
-							$this->alert->show("s","成功建立投稿檢核清單",get_url("dashboard",$conf_id,"filter","add"));
+						if( $this->conf->add_filter($this->conf_id,$filter_content,$filter_content_eng) ){
+							$this->alert->show("s","成功建立投稿檢核清單",get_url("dashboard",$this->conf_id,"filter","add"));
 						}else{
 							$this->alert->show("d","無法建立投稿檢核清單");
 						}
 					}
-					$this->load->view('conf/filter/add',$data);
+					$this->load->view('conf/filter/add',$this->data);
 				break;
 			}
 		}else{
 			$filter_id = $this->input->get('id', TRUE);
 			switch($type){
 				case "edit":
-					$data['filter']=$this->conf->get_filter_info($conf_id,$filter_id);
-					if( !empty($data['filter']) ){
+					$this->data['filter']=$this->conf->get_filter_info($this->conf_id,$filter_id);
+					if( !empty($this->data['filter']) ){
 						$this->form_validation->set_rules('content', '檢核清單內容', 'required');
 						$this->form_validation->set_rules('econtent', '檢核清單內容(英)', 'required');
 						if ($this->form_validation->run()){
 							$filter_content     = $this->input->post('content',false);
 							$filter_content_eng = $this->input->post('econtent',false);
-							if( $this->conf->update_filter($conf_id,$filter_id,$filter_content,$filter_content_eng) ){
-								$this->alert->show("s","成功更新投稿檢核清單",get_url("dashboard",$conf_id,"filter","edit")."?id=".$filter_id);
+							if( $this->conf->update_filter($this->conf_id,$filter_id,$filter_content,$filter_content_eng) ){
+								$this->alert->show("s","成功更新投稿檢核清單",get_url("dashboard",$this->conf_id,"filter","edit")."?id=".$filter_id);
 							}else{
 								$this->alert->show("d","無法更新投稿檢核清單");
 							}
 						}
 
-						$this->load->view('conf/filter/edit',$data);
+						$this->load->view('conf/filter/edit',$this->data);
 					}else{
-						$this->alert->show("d","查無投稿檢核清單",get_url("dashboard",$conf_id,"filter"));
+						$this->alert->show("d","查無投稿檢核清單",get_url("dashboard",$this->conf_id,"filter"));
 					}
 				break;
 				case "del":
-					if( $this->conf->del_filter($conf_id,$filter_id) ){
-						$this->alert->js("刪除投稿檢核清單成功",get_url("dashboard",$conf_id,"filter"));
+					if( $this->conf->del_filter($this->conf_id,$filter_id) ){
+						$this->alert->js("刪除投稿檢核清單成功",get_url("dashboard",$this->conf_id,"filter"));
 					}else{
-						$this->alert->js("刪除投稿檢核清單失敗",get_url("dashboard",$conf_id,"filter"));
+						$this->alert->js("刪除投稿檢核清單失敗",get_url("dashboard",$this->conf_id,"filter"));
 					}
 				break;
 			}
 		}
-		//$this->load->view('conf/setting',$data);
-		$this->load->view('common/footer',$data);
-		
+		$this->load->view('common/footer',$this->data);
 	}
 
 
 	public function user($conf_id='',$do="all",$user_login=""){
-		$data['conf_id']      = $conf_id;
-		$data['body_class']   = $this->body_class;
-		$data['do']           = $do;
-		
-		$data['spage']        = $this->config->item('spage');
-		$data['conf_config']  = $this->conf_config;
-		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-		$data['conf_content'] = $this->conf->conf_content($conf_id);
-		$data['topics']       = $this->conf->get_topic($conf_id);
+		$this->data['do']           = $do;
+		$this->data['topics']       = $this->conf->get_topic($this->conf_id);
 
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
+		$this->assets->set_title(lang('dashboard_user'));
+		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 
-		if( ( empty($user_login) && $do=="add" ) || ( !empty($user_login) && $do=="edit" ) ){
+		if(  !empty($user_login) && $do== "edit"  ){
 			$country_list = config_item('country_list');
-			$data['country_list'] = $country_list['zhtw'];
+			$this->data['country_list'] = $country_list[$this->_lang];
 
 			$this->assets->add_css(asset_url().'style/chosen.css');
 
@@ -688,6 +563,12 @@ class Dashboard extends MY_Conference {
 			$this->assets->add_js(asset_url().'js/jquery.twzipcode.min.js');
 			$this->assets->add_js(asset_url().'js/chosen.jquery.js');
 		}
+		if( $do== "add" ){
+			$country_list = config_item('country_list');
+			$this->data['country_list'] = $country_list[$this->_lang];
+			$this->assets->add_js(asset_url().'js/repeatable-addusers.js');
+			$this->assets->add_js(asset_url().'js/jquery.twzipcode.min.js');
+		}
 		if( ( empty($user_login) && $do=="all" ) ){
 			$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
 			$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
@@ -695,59 +576,56 @@ class Dashboard extends MY_Conference {
 		}
 		if( !$this->input->is_ajax_request() ){
 			$this->load->view('common/header');
-			$this->load->view('common/nav',$data);
-
-			$this->load->view('conf/conf_nav',$data);
-			//$this->load->view('conf/conf_schedule',$data);
-			$this->load->view('conf/menu_conf',$data);
+			$this->load->view('common/nav',$this->data);
+			$this->load->view('conf/conf_nav',$this->data);
+			$this->load->view('conf/menu_conf',$this->data);
 		}
 		if( empty($user_login) ){
 			switch($do){
 				case "add":
-					$this->load->view('js/signup');
-					$this->user->user_valid();
+					$this->user->users_valid();
 				    if ($this->form_validation->run()){
-				    	$user_login = $this->input->post('user_id', TRUE);
-				    	$user_pass = $this->input->post('user_pw', TRUE);
-				    	$user_email = $this->input->post('user_email', TRUE);
-				    	$user_title = $this->input->post('user_title', TRUE);
-				    	$user_firstname = $this->input->post('user_firstname', TRUE);
-				    	$user_lastname = $this->input->post('user_lastname', TRUE);
-				    	$user_gender = $this->input->post('user_gender', TRUE);
-				    	$user_org = $this->input->post('user_org', TRUE);
-				    	$user_phoneO_1 = $this->input->post('user_phoneO_1', TRUE);
-				    	$user_phoneO_2 = $this->input->post('user_phoneO_2', TRUE);
-				    	$user_phoneO_3 = $this->input->post('user_phoneO_3', TRUE);
-				    	$user_phoneO_3 = $this->input->post('user_phoneO_3', TRUE);
-				    	$user_cellphone = $this->input->post('user_cellphone', TRUE);
-				    	$user_fax = $this->input->post('user_fax', TRUE);
-				    	$user_postcode = $this->input->post('user_postcode', TRUE);
-				    	$user_addcounty = $this->input->post('user_addcounty', TRUE);
-				    	$user_area = $this->input->post('user_area', TRUE);
-				    	$user_postaddr = $this->input->post('user_postadd', TRUE);
-				    	$user_country = $this->input->post('user_country', TRUE);
-				    	$user_lang = $this->input->post('user_lang', TRUE);
-				    	$user_research = $this->input->post('user_research', TRUE);
-
-				    	$user_phone_o = $user_phoneO_1.",".$user_phoneO_2.",".$user_phoneO_3;
-				    	$user_postaddr = $user_addcounty."|".$user_area."|".$user_postaddr;
-				    	$res = $this->user->adduser($user_login,$user_pass,$user_title,$user_email,$user_firstname,$user_lastname,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research);
-				    	if( $res['status'] ){
-				    		$this->alert->js("Add User Success");
-				    		$this->form_validation->set_message('signup_success', 'Signup Success');
-				    		//redirect($redirect, 'refresh');
-				    	}else{
-				    		$this->alert->js($res['error']);
-				    		$this->form_validation->set_message('signup_error', $res['error']);
-				    	}
+				    	$user_login = $this->input->post('user_id');
+				    	$user_email = $this->input->post('user_email');
+				    	$user_title = $this->input->post('user_title');
+				    	$user_firstname = $this->input->post('user_firstname');
+				    	$user_lastname = $this->input->post('user_lastname');
+				    	$user_gender = $this->input->post('user_gender');
+				    	$user_org = $this->input->post('user_org');
+				    	$user_phoneO_1 = $this->input->post('user_phoneO_1');
+				    	$user_phoneO_2 = $this->input->post('user_phoneO_2');
+				    	$user_phoneO_3 = $this->input->post('user_phoneO_3');
+				    	$user_phoneO_3 = $this->input->post('user_phoneO_3');
+				    	$user_postcode = $this->input->post('user_postcode');
+				    	$user_addcounty = $this->input->post('user_addcounty');
+				    	$user_area = $this->input->post('user_area');
+				    	$user_postaddr = $this->input->post('user_postadd');
+				    	$user_country = $this->input->post('user_country');
+				    	$user_research = $this->input->post('user_research');
+						foreach ($user_login as $key => $login) {
+							$user_phone_o = $user_phoneO_1[$key].",".$user_phoneO_2[$key].",".$user_phoneO_3[$key];
+				    		$user_postaddr = $user_addcounty[$key]."|".$user_area[$key]."|".$user_postaddr[$key];
+				    		$user_pass = $this->user->generator_password(8);
+				    		$res = $this->user->adduser($user_login[$key],$user_pass,$user_title[$key],$user_email[$key],$user_firstname[$key],$user_lastname[$key],$user_gender[$key],$user_org[$key],$user_phone_o,"","",$user_postcode[$key],$user_postaddr,$user_country[$key],"zhtw",$user_research[$key]);
+				    		if( $res['status'] ){
+					    		$this->alert->show("s","成功建立帳號:".$login."密碼為:".$user_pass);
+					    		if( $this->user->send_pwd_mail($user_firstname[$key],$user_lastname[$key],$user_login[$key],$user_email[$key],$user_pass) ){
+					    			$this->alert->show("s","已將登入資訊發送至".$user_email[$key]);
+					    		}else{
+					    			$this->alert->show("d","將登入資訊發送失敗，發送目標信箱：".$user_email[$key]);
+					    		}
+					    	}else{
+					    		$this->alert->show("d","建立帳號:".$login."失敗，原因:".$res['error']);
+					    	}
+						}				    	
 				    }
-				    $this->load->view('conf/user/add',$data);
+				    $this->load->view('conf/user/add',$this->data);
 				break;
 				default:
 				case "all": // view all users
-					$data['users']=$this->user->get_all_users(10);
-					$data['confs']=$this->user->get_conf_array($conf_id);
-					$data['reviewers']=$this->user->get_reviewer_array($conf_id);
+					$this->data['users']=$this->user->get_all_users(10);
+					$this->data['confs']=$this->user->get_conf_array($this->conf_id);
+					$this->data['reviewers']=$this->user->get_reviewer_array($this->conf_id);
 					
 					if( $this->input->is_ajax_request() ){
 						$this->form_validation->set_rules('type', '操作', 'required');
@@ -758,7 +636,7 @@ class Dashboard extends MY_Conference {
 					    	switch($type){
 					    		case "add_admin":
 					    			foreach ($user_logins as $key => $user_login) {
-					    				if( $this->user->add_conf($conf_id,$user_login) ){
+					    				if( $this->user->add_conf($this->conf_id,$user_login) ){
 					    					$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 設為研討會管理員");
 					    				}else{
 					    					$this->alert->show("d","將使用者 <strong>".$user_login."</strong> 設為研討會管理員失敗");
@@ -767,7 +645,7 @@ class Dashboard extends MY_Conference {
 					    		break;
 					    		case "del_admin":
 					    			foreach ($user_logins as $key => $user_login) {
-					    				if( $this->user->del_conf($conf_id,$user_login) ){
+					    				if( $this->user->del_conf($this->conf_id,$user_login) ){
 					    					$this->alert->show("s","將使用者 <strong>".$user_login."</strong> 取消設為研討會管理員");
 					    				}else{
 					    					$this->alert->show("d","將使用者 <strong>".$user_login."</strong> 取消研討會管理員失敗");
@@ -776,7 +654,7 @@ class Dashboard extends MY_Conference {
 					    		break;
 					    		case "add_review":
 					    			foreach ($user_logins as $key => $user_login) {
-					    				if( $this->user->add_reviewer($conf_id,$user_login) ){
+					    				if( $this->user->add_reviewer($this->conf_id,$user_login) ){
 					    					$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 設為審查人");
 					    				}else{
 					    					$this->alert->show("d","將使用者 <strong>".$user_login."</strong> 設為審查人失敗");
@@ -785,7 +663,7 @@ class Dashboard extends MY_Conference {
 					    		break;
 					    		case "del_review":
 					    			foreach ($user_logins as $key => $user_login) {
-					    				if( $this->user->del_reviewer($conf_id,$user_login) ){
+					    				if( $this->user->del_reviewer($this->conf_id,$user_login) ){
 					    					$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 取消設為審查人");
 					    				}else{
 					    					$this->alert->show("d","將使用者 <strong>".$user_login."</strong> 取消審查人失敗");
@@ -795,57 +673,54 @@ class Dashboard extends MY_Conference {
 					    		case "add_topic":
 					    			$topic = $this->input->post('topic');
 					    			// foreach ($user_logins as $key => $user_login) {
-					    			// 	if( $this->user->del_reviewer($conf_id,$user_login) ){
+					    			// 	if( $this->user->del_reviewer($this->conf_id,$user_login) ){
 					    			// 		$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 取消設為審查人");
 					    			// 	}else{
 					    			// 		$this->alert->show("d","將使用者 <strong>".$user_login."</strong> 取消審查人失敗");
 					    			// 	}
 					    			// }
-					    			sp($user_logins);
 					    		break;
 					    	}
-					    	// $this->alert->refresh(2);
+					    	$this->alert->refresh(2);
 					    }
 					}else{
-						$this->load->view('conf/user/all',$data);
+						$this->load->view('conf/user/all',$this->data);
 					}
 				break;
 				case "import":
-					
-					
 				break;
 			}
 		}else{
 			if($this->user->username_exists($user_login)){
-				$data['user']=$this->user->get_user_info($user_login);
-				$data['user']->user_phone_o=explode(",", $data['user']->user_phone_o);
-				$data['user']->user_postaddr=explode("|", $data['user']->user_postaddr);
+				$this->data['user'] = $this->user->get_user_info($user_login);
+				$this->data['user']->user_phone_o=explode(",", $this->data['user']->user_phone_o);
+				$this->data['user']->user_postaddr=explode("|", $this->data['user']->user_postaddr);
 				$country_list = config_item('country_list');
-				$data['country_list'] = $country_list['zhtw'];
+				$this->data['country_list'] = $country_list[$this->_lang];
 
 				switch($do){
 					case "edit":
 						$this->user->user_valid();
 						if ($this->form_validation->run()){
-					    	$user_email = $this->input->post('user_email', TRUE);
-					    	$user_title = $this->input->post('user_title', TRUE);
-					    	$user_firstname = $this->input->post('user_firstname', TRUE);
-					    	$user_lastname = $this->input->post('user_lastname', TRUE);
-					    	$user_gender = $this->input->post('user_gender', TRUE);
-					    	$user_org = $this->input->post('user_org', TRUE);
-					    	$user_phoneO_1 = $this->input->post('user_phoneO_1', TRUE);
-					    	$user_phoneO_2 = $this->input->post('user_phoneO_2', TRUE);
-					    	$user_phoneO_3 = $this->input->post('user_phoneO_3', TRUE);
-					    	$user_phoneO_3 = $this->input->post('user_phoneO_3', TRUE);
-					    	$user_cellphone = $this->input->post('user_cellphone', TRUE);
-					    	$user_fax = $this->input->post('user_fax', TRUE);
-					    	$user_postcode = $this->input->post('user_postcode', TRUE);
-					    	$user_addcounty = $this->input->post('user_addcounty', TRUE);
-					    	$user_area = $this->input->post('user_area', TRUE);
-					    	$user_postaddr = $this->input->post('user_postadd', TRUE);
-					    	$user_country = $this->input->post('user_country', TRUE);
-					    	$user_lang = $this->input->post('user_lang', TRUE);
-					    	$user_research = $this->input->post('user_research', TRUE);
+					    	$user_email = $this->input->post('user_email');
+					    	$user_title = $this->input->post('user_title');
+					    	$user_firstname = $this->input->post('user_firstname');
+					    	$user_lastname = $this->input->post('user_lastname');
+					    	$user_gender = $this->input->post('user_gender');
+					    	$user_org = $this->input->post('user_org');
+					    	$user_phoneO_1 = $this->input->post('user_phoneO_1');
+					    	$user_phoneO_2 = $this->input->post('user_phoneO_2');
+					    	$user_phoneO_3 = $this->input->post('user_phoneO_3');
+					    	$user_phoneO_3 = $this->input->post('user_phoneO_3');
+					    	$user_cellphone = $this->input->post('user_cellphone');
+					    	$user_fax = $this->input->post('user_fax');
+					    	$user_postcode = $this->input->post('user_postcode');
+					    	$user_addcounty = $this->input->post('user_addcounty');
+					    	$user_area = $this->input->post('user_area');
+					    	$user_postaddr = $this->input->post('user_postadd');
+					    	$user_country = $this->input->post('user_country');
+					    	$user_lang = $this->input->post('user_lang');
+					    	$user_research = $this->input->post('user_research');
 
 					    	$user_phone_o = $user_phoneO_1.",".$user_phoneO_2.",".$user_phoneO_3;
 					    	$user_postaddr = $user_addcounty."|".$user_area."|".$user_postaddr;
@@ -855,51 +730,35 @@ class Dashboard extends MY_Conference {
 					    		$this->alert->js("Edit Success");
 					    	}else{
 					    		$this->alert->js($res['error']);
-					    		$this->form_validation->set_message('signup_error', $res['error']);
 					    	}
 					    }
-						$this->load->view('js/signup');
-						$this->load->view('conf/user/edit',$data);
+						$this->load->view('js/edit',$this->data);
+						$this->load->view('conf/user/edit',$this->data);
 					break;
 				}
 			}
 		}
 		if( !$this->input->is_ajax_request() ){
-			$this->load->view('common/footer',$data);
+			$this->load->view('common/footer',$this->data);
 		}
 		
 	}
 
 	public function news($conf_id='',$type=''){
-		$data['conf_id']      = $conf_id;
-		$data['body_class']   = $this->body_class;
-		
-		$data['spage']        = $this->config->item('spage');
-		$data['conf_config']  = $this->conf_config;
-		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-		$data['conf_content'] = $this->conf->conf_content($conf_id);
-
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
-
+		$this->assets->set_title(lang('dashboard_news'));
+		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 		$this->assets->add_js(base_url('ckeditor/ckeditor.js'));
+
 		$this->load->view('common/header');
-		$this->load->view('common/nav',$data);
-
-		$this->load->view('conf/conf_nav',$data);
-		//$this->load->view('conf/conf_schedule',$data);
-
-		$this->load->view('conf/menu_conf',$data);
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_conf',$this->data);
 		if( is_null( $this->input->get('id', TRUE)) ){
 			switch($type){
 				default:
 				case "all":
-					$data['news']=$this->conf->get_news($conf_id);
-					$this->load->view('conf/news/all',$data);
+					$this->data['news']=$this->conf->get_news($this->conf_id);
+					$this->load->view('conf/news/all',$this->data);
 				break;
 				case "add":
 					$conf_lang = explode(",", $this->conf_config['conf_lang']);
@@ -916,21 +775,21 @@ class Dashboard extends MY_Conference {
 						$news_content     = in_array("zhtw",$conf_lang)?$this->input->post('news_content',false):"";
 						$news_title_eng   = in_array("eng",$conf_lang)?$this->input->post('news_title_eng'):"";
 						$news_content_eng = in_array("eng",$conf_lang)?$this->input->post('news_content_eng',false):"";
-						if( $this->conf->add_news($conf_id,$news_title,$news_content,$news_title_eng,$news_content_eng) ){
-							$this->alert->show("s","成功建立公告",get_url("dashboard",$conf_id,"news","add"));
+						if( $this->conf->add_news($this->conf_id,$news_title,$news_content,$news_title_eng,$news_content_eng) ){
+							$this->alert->show("s","成功建立公告",get_url("dashboard",$this->conf_id,"news","add"));
 						}else{
 							$this->alert->show("d","無法建立公告");
 						}
 					}
-					$this->load->view('conf/news/add',$data);
+					$this->load->view('conf/news/add',$this->data);
 				break;
 			}
 		}else{
 			$news_id = $this->input->get('id', TRUE);
 			switch($type){
 				case "edit":
-					$data['news']=$this->conf->get_news_info($conf_id,$news_id);
-					if( !empty($data['news']) ){
+					$this->data['news']=$this->conf->get_news_info($this->conf_id,$news_id);
+					if( !empty($this->data['news']) ){
 						$conf_lang = explode(",", $this->conf_config["conf_lang"]);
 						if( in_array("zhtw",$conf_lang) ){
 							$this->form_validation->set_rules('news_title', '公告標題', 'required');
@@ -946,65 +805,50 @@ class Dashboard extends MY_Conference {
 							$news_content     = $this->input->post('news_content',false);
 							$news_title_eng   = $this->input->post('news_title_eng');
 							$news_content_eng = $this->input->post('news_content_eng',false);
-							if( $this->conf->update_news($conf_id,$news_id,$news_title,$news_content,$news_title_eng,$news_content_eng) ){
-								$this->alert->show("s","成功更新公告",get_url("dashboard",$conf_id,"news","edit")."?id=".$news_id);
+							if( $this->conf->update_news($this->conf_id,$news_id,$news_title,$news_content,$news_title_eng,$news_content_eng) ){
+								$this->alert->show("s","成功更新公告",get_url("dashboard",$this->conf_id,"news","edit")."?id=".$news_id);
 							}else{
 								$this->alert->show("d","無法更新公告");
 							}
 						}
 
-						$this->load->view('conf/news/edit',$data);
+						$this->load->view('conf/news/edit',$this->data);
 					}else{
-						$this->alert->show("d","查無公告",get_url("dashboard",$conf_id,"news"));
+						$this->alert->show("d","查無公告",get_url("dashboard",$this->conf_id,"news"));
 					}
 				break;
 				case "del":
-					if( $this->conf->del_news($conf_id,$news_id) ){
-						$this->alert->js("刪除公告成功",get_url("dashboard",$conf_id,"news"));
+					if( $this->conf->del_news($this->conf_id,$news_id) ){
+						$this->alert->js("刪除公告成功",get_url("dashboard",$this->conf_id,"news"));
 					}else{
-						$this->alert->js("刪除公告失敗",get_url("dashboard",$conf_id,"news"));
+						$this->alert->js("刪除公告失敗",get_url("dashboard",$this->conf_id,"news"));
 					}
 				break;
 			}
 		}
-		$this->load->view('common/footer',$data);
+		$this->load->view('common/footer',$this->data);
 		
 	}
 
 	public function email($conf_id='',$act='all'){
-		$data['conf_id']        = $conf_id;
-		$data['body_class']     = $this->body_class;
-		
-		$data['spage']          = $this->config->item('spage');
-		$data['conf_config']    = $this->conf_config;
-		$data['schedule']       = $this->conf->get_schedules($this->conf_id);
-		$data['conf_content']   = $this->conf->conf_content($conf_id);
-
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
-
+		$this->assets->set_title(lang('dashboard_email'));
+		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 		$this->assets->add_js(base_url().'tinymce/tinymce.min.js');
+		
 		$this->load->view('common/header');
-		$this->load->view('common/nav',$data);
-
-		$this->load->view('conf/conf_nav',$data);
-		//$this->load->view('conf/conf_schedule',$data);
-
-		$this->load->view('conf/menu_conf',$data);
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_conf',$this->data);
 		
 		switch($act){
 			default:
 			case "all":
-				$data['mail_templates'] = $this->conf->get_mail_templates($conf_id);
-				$this->load->view('conf/email/list',$data);
+				$this->data['mail_templates'] = $this->conf->get_mail_templates($this->conf_id);
+				$this->load->view('conf/email/list',$this->data);
 			break;
 			case "edit":
 				$email_key = $this->input->get("key");
-				if($data['template'] = $this->conf->get_mail_template($conf_id,$email_key,$this->_lang)){
+				if($this->data['template'] = $this->conf->get_mail_template($this->conf_id,$email_key,$this->_lang)){
 					$this->form_validation->set_rules('subject_zhtw', '中文信件主旨', 'required');
 					$this->form_validation->set_rules('body_zhtw', '中文信件內容', 'required');
 					$this->form_validation->set_rules('subject_eng', '英文信件主旨', 'required');
@@ -1021,86 +865,83 @@ class Dashboard extends MY_Conference {
 						}
 						$this->alert->refresh(2);
 					}
-					$this->load->view('common/tinymce',$data);
-					$this->load->view('conf/email/edit',$data);
+					$this->load->view('common/tinymce',$this->data);
+					$this->load->view('conf/email/edit',$this->data);
 				}else{
-					$this->alert->js("找不到信件樣版",get_url("dashboard",$conf_id,"email"));
+					$this->alert->js("找不到信件樣版",get_url("dashboard",$this->conf_id,"email"));
 				}
 			break;
 		}
-		$this->load->view('common/footer',$data);
+		$this->load->view('common/footer',$this->data);
 	}
 
 	public function submit($conf_id='',$act='',$paper_id=''){
-		$data['conf_id']      = $conf_id;
-		$data['body_class']   = $this->body_class;
-		
-		$data['spage']        = $this->config->item('spage');
-		$data['conf_config']  = $this->conf_config;
-		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-		$data['conf_content'] = $this->conf->conf_content($conf_id);
-
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
-
+		$this->assets->set_title(lang('dashboard_submit'));
+		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 		$this->assets->add_css(asset_url().'style/chosen.css');
 		$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
 		$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
 		$this->assets->add_js(asset_url().'js/dataTables.bootstrap.js',true);
-
+		$this->assets->add_js(asset_url().'js/dataTables.buttons.min.js',true);
+		$this->assets->add_js(asset_url().'js/jszip.min.js',true);
+		$this->assets->add_js(asset_url().'js/buttons.html5.min.js',true);
+		
 		$this->load->view('common/header');
-		$this->load->view('common/nav',$data);
-
-		$this->load->view('conf/conf_nav',$data);
-		//$this->load->view('conf/conf_schedule',$data);
-
-		$this->load->view('conf/menu_conf',$data);
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_conf',$this->data);
 		if( empty($paper_id) ){
 			$topic_id = $this->input->get('topic_id', TRUE);
 			$status = $this->input->get('status', TRUE);
 			if( empty($topic_id) ){$topic_id=null;}
 			if( empty($status) ){$status=null;}
 			
-			$data['topic_id'] = $topic_id;
-			$data['status'] = $status;
-			
-			$data['papers']=$this->Submit->get_allpaper($conf_id,$topic_id,$status);
-			$data['topics']=$this->topic->get_topic($conf_id,$this->user_login);
+			$this->data['topic_id'] = $topic_id;
+			$this->data['status'] = $status;
+			$this->data['papers']=$this->submit->get_allpaper($this->conf_id,$topic_id,$status);
+			$this->data['topics']=$this->topic->get_topic($this->conf_id,$this->user_login);
 
 			switch($act){
 				case "list":
 				default:
-					$this->load->view('conf/submit/list',$data);
+					$this->load->view('conf/submit/list',$this->data);
 				break;
 			}
 		}else{
-			$paper = $this->conf->get_paper($conf_id,$paper_id);
-			$data['paper'] = $paper;
+			$paper = $this->conf->get_paper($this->conf_id,$paper_id);
+			$this->data['paper'] = $paper;
 			if(!empty($paper)){
-				$data['paper_id']   = $paper_id;
-				$data['authors']    = $this->Submit->get_author($paper_id);
-				$data['otherfile']  = $this->Submit->get_otherfile($paper_id);
-				$data['otherfiles'] = $this->Submit->get_otherfiles($paper_id);
-				$data['reviewers']  = $this->topic->get_reviewer($paper_id);
-				$data['finishfile'] = $this->Submit->get_finishfile($paper_id);
-				$data['finishother'] = $this->Submit->get_finishother($paper_id);
+				$this->data['paper_id']   = $paper_id;
+				$this->data['authors']    = $this->submit->get_author($paper_id);
+				$this->data['otherfile']  = $this->submit->get_otherfile($paper_id);
+				$this->data['otherfiles'] = $this->submit->get_otherfiles($paper_id);
+				$this->data['reviewers']  = $this->topic->get_reviewer($paper_id);
+				$this->data['finishfile'] = $this->submit->get_finishfile($paper_id);
+				$this->data['finishother'] = $this->submit->get_finishother($paper_id);
 				switch($act){
 					case "detail":
 					default:
-						$this->load->view('conf/submit/detail',$data);
+						$this->load->view('conf/submit/detail',$this->data);
+					break;
+					case "remove":
+						if( $paper->sub_status == -5 ){
+							$this->alert->js("本篇稿件已刪除",get_url("dashboard",$this->conf_id,"submit","detail",$paper_id));
+						}else{
+							if( $this->submit->paper_to_remove($this->conf_id,$paper_id,$paper->sub_status) ){
+								$this->alert->js("刪除成功",get_url("dashboard",$this->conf_id,"submit","detail",$paper_id));
+							}else{
+								$this->alert->js("刪除失敗",get_url("dashboard",$this->conf_id,"submit","detail",$paper_id));
+							}
+						}
 					break;
 					case "edit":
 						$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
 						$this->assets->add_js(asset_url().'js/repeatable.js',true);
 						$this->assets->add_js(asset_url().'js/chosen.jquery.js',true);
-						$data['topics'] = $this->conf->get_topic($conf_id);
-						$data['paper']->sub_summary =str_replace("<br>",PHP_EOL,$data['paper']->sub_summary);
+						$this->data['topics'] = $this->conf->get_topic($this->conf_id);
+						$this->data['paper']->sub_summary = str_replace("<br>",PHP_EOL,$this->data['paper']->sub_summary);
 						$country_list = config_item('country_list');
-						$data['country_list'] = $country_list[$this->_lang];
+						$this->data['country_list'] = $country_list[$this->_lang];
 						$update = $this->input->post("update");
 						switch ($update) {
 							case "info":
@@ -1116,7 +957,7 @@ class Dashboard extends MY_Conference {
 									$sub_topic    = in_array($paper->sub_status,array(-1,1))?$this->input->post('sub_topic'):$paper->topic_id;
 									$sub_lang     = $this->input->post('sub_lang');
 									$sub_sponsor  = $this->input->post('sub_sponsor');
-									if( $this->Submit->update_paper($paper_id,$conf_id,$sub_title,$sub_summary,$sub_keyword,$sub_topic,$sub_lang,$sub_sponsor) ){
+									if( $this->submit->update_paper($paper_id,$this->conf_id,$sub_title,$sub_summary,$sub_keyword,$sub_topic,$sub_lang,$sub_sponsor) ){
 										$this->alert->show("s",$sub_topic ."稿件資訊更新成功");
 									}else{
 										$this->alert->show("d","稿件資訊更新失敗");
@@ -1139,7 +980,7 @@ class Dashboard extends MY_Conference {
 									$user_org     = $this->input->post('user_org');
 									$user_country = $this->input->post('user_country');
 
-									$this->Submit->del_author($paper_id);
+									$this->submit->del_author($paper_id);
 									foreach ($user_fname as $key => $value) {
 			            				$contact_author = 0;
 			            				$user_login = NULL;
@@ -1150,7 +991,7 @@ class Dashboard extends MY_Conference {
 			            				if( is_array($user_info) ){
 			            					$user_login = $user_info['user_login'];
 			            				}
-			            				if( $this->Submit->add_author($paper_id,$user_login,$user_fname[$key],$user_lname[$key],$user_email[$key],$user_org[$key],$user_country[$key],$contact_author,$key+1) ){
+			            				if( $this->submit->add_author($paper_id,$user_login,$user_fname[$key],$user_lname[$key],$user_email[$key],$user_org[$key],$user_country[$key],$contact_author,$key+1) ){
 			            					$this->alert->show("s","更新作者 <strong>".$user_fname[$key]." ".$user_lname[$key]."</strong> 成功");
 			            				}else{
 											$this->alert->show("d","更新作者 <strong>".$user_fname[$key]." ".$user_lname[$key]."</strong> 失敗");
@@ -1165,12 +1006,12 @@ class Dashboard extends MY_Conference {
 									$del_files = $this->input->post('del_file');
 									if(is_array($del_files)){
 										$files = array();
-										foreach ($data['otherfiles'] as $key => $otherfile) {
+										foreach ($this->data['otherfiles'] as $key => $otherfile) {
 											array_push($files,$otherfile->fid);
 										}
 										foreach ($del_files as $key => $del_file) {
 											if( in_array($del_file,$files) ){
-												if( $this->Submit->del_file($conf_id,$paper_id,$del_file) ){
+												if( $this->submit->del_file($this->conf_id,$paper_id,$del_file) ){
 													$this->alert->show("s","成功刪除檔案");
 												}else{
 													$this->alert->show("d","刪除檔案失敗");
@@ -1179,11 +1020,12 @@ class Dashboard extends MY_Conference {
 												$this->alert->show("s","無法刪除檔案編號 ".$del_file."(非本篇稿件檔案)");
 											}
 										}
+										$this->alert->refresh(2);
 									}
 								}
 							break;
 							case "file":
-								$config['upload_path']= $this->conf->get_paperdir($conf_id);
+								$config['upload_path']= $this->conf->get_paperdir($this->conf_id);
 				                $config['allowed_types']= 'pdf';
 				                $config['encrypt_name']= true;
 
@@ -1191,21 +1033,20 @@ class Dashboard extends MY_Conference {
 				                
 				                if ( $this->upload->do_upload('paper_file')){
 			                        $upload_data = $this->upload->data();
-			                        sp($upload_data);
-			                        $data['upload_data'] = $upload_data;
+			                        $this->data['upload_data'] = $upload_data;
 			                        $arrayLevel = arrayLevel($upload_data);
 			                        if( $arrayLevel >1 ){
 			                        	$this->alert->js("投稿檔案僅限一份");
 			                        }
-			                        if(empty($data['otherfile'])){
-			                       		if( $this->Submit->add_file($conf_id,$paper_id,$upload_data['client_name'],$upload_data['file_name'],"F") ){
+			                        if(empty($this->data['otherfile'])){
+			                       		if( $this->submit->add_file($this->conf_id,$paper_id,$upload_data['client_name'],$upload_data['file_name'],"F") ){
 			                       			$this->alert->show("s","上傳投稿檔案成功");
 			                       		}else{
 			                       			$this->alert->show("d","上傳投稿檔案失敗");
 			                       		}
 			                    	}else{
-			                    		delete_files($this->conf->get_paperdir($conf_id).$data['otherfile']->file_system);
-			                    		if( $this->Submit->update_file($this->conf_id,$paper_id,$data['otherfile']->fid,$upload_data['client_name'],$upload_data['file_name']) ){
+			                    		delete_files($this->conf->get_paperdir($this->conf_id).$this->data['otherfile']->file_system);
+			                    		if( $this->submit->update_file($this->conf_id,$paper_id,$this->data['otherfile']->fid,$upload_data['client_name'],$upload_data['file_name']) ){
 			                    			$this->alert->show("s","更新投稿檔案成功");
 			                    		}else{
 			                    			$this->alert->show("d","更新投稿檔案失敗");
@@ -1217,7 +1058,7 @@ class Dashboard extends MY_Conference {
 				                $this->alert->refresh(2);
 							break;
 							case "otherfile":
-								$config['upload_path']= $this->conf->get_paperdir($conf_id);
+								$config['upload_path']= $this->conf->get_paperdir($this->conf_id);
 				                $config['allowed_types']= 'pdf';
 				                $config['encrypt_name']= true;
 
@@ -1226,14 +1067,14 @@ class Dashboard extends MY_Conference {
 			                        $upload_datas = $this->upload->data();
 			                        $arrayLevel = arrayLevel($upload_datas);
 			                        if( $arrayLevel ==1 ){
-				                       	if( $this->Submit->add_file($conf_id,$paper_id,$upload_datas['client_name'],$upload_datas['file_name'],"O") ){
+				                       	if( $this->submit->add_file($this->conf_id,$paper_id,$upload_datas['client_name'],$upload_datas['file_name'],"O") ){
 				                       		$this->alert->show("s","成功新增補充資料：".$upload_datas['client_name']);
 				                       	}else{
 				                       		$this->alert->show("d","新增補充資料失敗：".$upload_datas['client_name']);
 				                       	}
 			                        }else if($arrayLevel == 2){
 			                        	foreach ($upload_datas as $key => $upload_data) {
-				                       		if( $this->Submit->add_file($conf_id,$paper_id,$upload_data['client_name'],$upload_data['file_name'],"O") ){
+				                       		if( $this->submit->add_file($this->conf_id,$paper_id,$upload_data['client_name'],$upload_data['file_name'],"O") ){
 				                       			$this->alert->show("s","成功新增補充資料：".$upload_data['client_name']);
 				                       		}else{
 				                       			$this->alert->show("d","新增補充資料失敗：".$upload_data['client_name']);
@@ -1241,59 +1082,41 @@ class Dashboard extends MY_Conference {
 				                        }
 			                        }
 			                        $this->alert->refresh(2);
-			                        
 			                    }
 							break;
 						}
-						$this->load->view('conf/submit/edit',$data);
+						$this->load->view('conf/submit/edit',$this->data);
 					break;
 				}
 			}else{
-				$this->alert->js("查無本篇稿件",get_url("dashboard",$conf_id,"submit"));
+				$this->alert->js("查無本篇稿件",get_url("dashboard",$this->conf_id,"submit"));
 			}
 		}
-		$this->load->view('common/footer',$data);
-		
+		$this->load->view('common/footer',$this->data);
 	}
 
 	public function register($conf_id='',$act='',$do=''){
-		$data['conf_id']      = $conf_id;
-		$data['body_class']   = $this->body_class;
-		
-		$data['spage']        = $this->config->item('spage');
-		$data['conf_config']  = $this->conf_config;
-		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-		$data['conf_content'] = $this->conf->conf_content($conf_id);
-		
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
+		$this->assets->set_title(lang('dashboard_signup'));
+		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 
 		$this->load->view('common/header');
-		$this->load->view('common/nav',$data);
-
-		$this->load->view('conf/conf_nav',$data);
-		//$this->load->view('conf/conf_schedule',$data);
-
-		$this->load->view('conf/menu_conf',$data);
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_conf',$this->data);
 		switch ($act) {
 			case "price": // 價格管理
-				
 			break;
 			case "meal":
 				$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
 				$this->assets->add_js(asset_url().'js/repeatable-fields.js',true);
 				switch($do){
 					default:
-						$data['register_meals'] = $this->conf->get_register_meals($conf_id);
+						$this->data['register_meals'] = $this->conf->get_register_meals($this->conf_id);
 						$opt = $this->input->post("opt");
 
 						if(!empty($this->input->get("id"))){
 							$id = $this->input->get("id");
-							$meal = $this->conf->get_register_meal($conf_id,$id);
+							$meal = $this->conf->get_register_meal($this->conf_id,$id);
 						}
 						switch($opt){
 							case "add":
@@ -1301,7 +1124,7 @@ class Dashboard extends MY_Conference {
 								if ($this->form_validation->run()){
 									$meal_name = $this->input->post('meal_name');
 									foreach ($meal_name as $key => $name) {
-										if( $this->conf->add_register_meal($conf_id,$name) ){
+										if( $this->conf->add_register_meal($this->conf_id,$name) ){
 											$this->alert->show("s","成功新增：<strong>".$name."</strong>");
 										}else{
 											$this->alert->show("d","新增失敗：<strong>".$name."</strong>");
@@ -1315,14 +1138,14 @@ class Dashboard extends MY_Conference {
 									$this->form_validation->set_rules('meal_name', '餐點名稱', 'required');
 									if ($this->form_validation->run()){
 										$meal_name = $this->input->post('meal_name');
-										if( $this->conf->update_register_meal($conf_id,$id,$meal_name) ){
-											$this->alert->show("s","成功更新：<strong>".$meal_name."</strong>",get_url("dashboard",$conf_id,"register","meal"));
+										if( $this->conf->update_register_meal($this->conf_id,$id,$meal_name) ){
+											$this->alert->show("s","成功更新：<strong>".$meal_name."</strong>",get_url("dashboard",$this->conf_id,"register","meal"));
 										}else{
-											$this->alert->show("d","更新失敗：<strong>".$meal_name."</strong>",get_url("dashboard",$conf_id,"register","meal"));
+											$this->alert->show("d","更新失敗：<strong>".$meal_name."</strong>",get_url("dashboard",$this->conf_id,"register","meal"));
 										}
 									}
 								}else{
-									$this->alert->show("d","更新失敗：查無此餐點",get_url("dashboard",$conf_id,"register","meal"));
+									$this->alert->show("d","更新失敗：查無此餐點",get_url("dashboard",$this->conf_id,"register","meal"));
 								}
 							break;
 							case "del":
@@ -1330,7 +1153,7 @@ class Dashboard extends MY_Conference {
 								if ($this->form_validation->run()){
 									$meal_ids = $this->input->post('meal_id');
 									foreach ($meal_ids as $key => $meal_id) {
-										if( $this->conf->del_register_meal($conf_id,$meal_id) ){
+										if( $this->conf->del_register_meal($this->conf_id,$meal_id) ){
 											$this->alert->show("s","成功刪除：<strong>餐點#".$meal_id."</strong>");
 										}else{
 											$this->alert->show("d","刪除失敗：<strong>餐點#".$meal_id."</strong>");
@@ -1340,308 +1163,124 @@ class Dashboard extends MY_Conference {
 								}
 							break;
 						}
-						$this->load->view('conf/register/meal_list',$data);
+						$this->load->view('conf/register/meal_list',$this->data);
 						if(!empty($meal)){
-							$data['meal'] = $meal;
-							$this->load->view('conf/register/meal_edit',$data);
+							$this->data['meal'] = $meal;
+							$this->load->view('conf/register/meal_edit',$this->data);
 						}
-						$this->load->view('conf/register/meal_add',$data);
+						$this->load->view('conf/register/meal_add',$this->data);
 					break;
 				}
 			break;
 			default:
-				$this->load->view('conf/register/list',$data);
+				$this->load->view('conf/register/list',$this->data);
 			break;
 		}
-		$this->load->view('common/footer',$data);
-		
+		$this->load->view('common/footer',$this->data);
 	}
 
 	public function report($conf_id=''){
-		$data['conf_id']      = $conf_id;
-		$data['body_class']   = $this->body_class;
-		
-		$data['spage']        = $this->config->item('spage');
-		$data['conf_config']  = $this->conf_config;
-		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-		$data['conf_content'] = $this->conf->conf_content($conf_id);
-		
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
+		$this->assets->set_title(lang('dashboard_report'));
+		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 
 		$this->load->view('common/header');
-		$this->load->view('common/nav',$data);
-
-		$this->load->view('conf/conf_nav',$data);
-		//$this->load->view('conf/conf_schedule',$data);
-
-		$this->load->view('conf/menu_conf',$data);
-		//$this->load->view('conf/setting',$data);
-		$this->load->view('common/footer',$data);
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_conf',$this->data);
+		$this->load->view('common/footer',$this->data);
 		
 	}
 
 	public function logs($conf_id=''){
-		$data['conf_id']      = $conf_id;
-		$data['body_class']   = $this->body_class;
-		
-		$data['spage']        = $this->config->item('spage');
-		$data['conf_config']  = $this->conf_config;
-		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-		$data['conf_content'] = $this->conf->conf_content($conf_id);
-		$data['conf_logs']    = $this->conf->get_logs($conf_id);
+		$this->data['conf_logs']    = $this->conf->get_logs($this->conf_id);
 
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
-
-		$this->lang->load("conf_log",$this->_lang);
-
+		$this->assets->set_title(lang('dashboard_logs'));
+		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 		$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
 		$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
 		$this->assets->add_js(asset_url().'js/dataTables.bootstrap.js',true);
-
-		$this->load->view('common/header');
-		$this->load->view('common/nav',$data);
-		$this->load->view('conf/conf_nav',$data);
-		$this->load->view('conf/menu_conf',$data);
-		$this->load->view('conf/logs/index',$data);
-		$this->load->view('common/footer',$data);
+		$this->assets->add_css(asset_url().'style/buttons.dataTables.min.css');
+		$this->assets->add_js(asset_url().'js/dataTables.buttons.min.js',true);
+		$this->assets->add_js(asset_url().'js/jszip.min.js',true);
+		$this->assets->add_js(asset_url().'js/buttons.html5.min.js',true);
 		
+		$this->lang->load("conf_log",$this->_lang);
+		
+		$this->load->view('common/header');
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_conf',$this->data);
+		$this->load->view('conf/logs/index',$this->data);
+		$this->load->view('common/footer',$this->data);
 	}
 
-	// public function modules($conf_id='',$do="all",$module_id=''){
-	// 	$data['conf_id']      = $conf_id;
-	// 	$data['body_class']   = $this->body_class;
-		
-	// 	$data['spage']        = $this->config->item('spage');
-	// 	$data['conf_config']  = $this->conf_config;
-	// 	$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-	// 	$data['conf_content'] = $this->conf->conf_content($conf_id);
-		
-	// 	if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-	// 		$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-	// 	}
-	// 	if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-	// 		$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-	// 	}
-
-	// 	if( empty($module_id) && $do=="all"){
-	// 		$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
-	// 		$this->assets->add_js(asset_url().'js/repeatable.js',true);
-	// 	}
-	// 	$this->assets->add_js(base_url().'tinymce/tinymce.min.js');
-	// 	$this->load->view('common/header');
-	// 	$this->load->view('common/nav',$data);
-
-	// 	$this->load->view('conf/conf_nav',$data);
-	// 	//$this->load->view('conf/conf_schedule',$data);
-		
-	// 	$this->load->view('conf/menu_conf',$data);
-		
-	// 	if( empty($module_id) ){
-	// 		switch($do){
-	// 			case "all":
-	// 				$data['module_zhtw'] = $this->conf->get_modules($conf_id,"zhtw");
-	// 				$data['module_eng'] = $this->conf->get_modules($conf_id,"eng");
-	// 				$this->load->view('conf/module/all',$data);
-	// 			break;
-	// 			case "add":
-	// 				$module = $this->input->get('module');
-	// 				switch ($module) {
-	// 					case "news":
-	// 						$this->conf->module_form_valid("news");
-	// 						if($this->form_validation->run()){
-	// 							$module_title = $this->input->post("module_title");
-	// 							$module_position = $this->input->post("module_position");
-	// 							$module_showtitle = $this->input->post("module_showtitle");
-	// 							$module_lang = $this->input->post("module_lang");
-	// 							if( $this->module->add_news($conf_id,$module_title,$module_position,$module_showtitle,$module_lang) ){
-	// 								$this->alert->show("s","成功新增文字模組");
-	// 							}else{
-	// 								$this->alert->show("d","新增文字模組失敗");
-	// 							}
-	// 							$this->alert->refresh(2);
-	// 						}
-	// 						$this->load->view('conf/module/add_news',$data);
-	// 					break;
-	// 					case "text":
-	// 					default:
-	// 						$this->conf->module_form_valid("text");
-	// 						if($this->form_validation->run()){
-	// 							$module_title = $this->input->post("module_title");
-	// 							$module_position = $this->input->post("module_position");
-	// 							$module_showtitle = $this->input->post("module_showtitle");
-	// 							$module_lang = $this->input->post("module_lang");
-	// 							$module_content = $this->input->post("module_content",false);
-	// 							if( $this->module->add_text($conf_id,$module_title,$module_position,$module_showtitle,$module_lang,$module_content) ){
-	// 								$this->alert->show("s","成功新增文字模組");
-	// 							}else{
-	// 								$this->alert->show("d","新增文字模組失敗");
-	// 							}
-	// 							$this->alert->refresh(2);
-	// 						}
-	// 						$this->load->view('common/tinymce',$data);
-	// 						$this->load->view('conf/module/add_text',$data);
-	// 					break;
-	// 				}
-	// 			break;
-	// 		}
-	// 	}else{
-	// 		switch($do){
-	// 			case "edit":
-	// 				$module = $this->conf->get_module($conf_id,$module_id);
-	// 				if( !empty($module) ){
-	// 					$data['module'] = $module;
-	// 					switch($module->module_type){
-	// 						case "news":
-	// 							$this->conf->module_form_valid("news");
-	// 							if($this->form_validation->run()){
-	// 								$module_title = $this->input->post("module_title");
-	// 								$module_position = $this->input->post("module_position");
-	// 								$module_showtitle = $this->input->post("module_showtitle");
-	// 								$module_lang = $this->input->post("module_lang");
-	// 								if( $this->module->update_news($conf_id,$module_id,$module_title,$module_position,$module_showtitle,$module_lang) ){
-	// 									$this->alert->show("s","成功更新文字模組");
-	// 								}else{
-	// 									$this->alert->show("d","更新文字模組失敗");
-	// 								}
-	// 								$this->alert->refresh(2);
-	// 							}
-	// 							$this->load->view('conf/module/edit_news',$data);
-	// 						break;
-	// 						case "text":
-	// 							$this->conf->module_form_valid("text");
-	// 							if($this->form_validation->run()){
-	// 								$module_title     = $this->input->post("module_title");
-	// 								$module_position  = $this->input->post("module_position");
-	// 								$module_showtitle = $this->input->post("module_showtitle");
-	// 								$module_lang      = $this->input->post("module_lang");
-	// 								$module_content   = $this->input->post("module_content",false);
-	// 								if( $this->module->update_text($conf_id,$module_id,$module_title,$module_position,$module_showtitle,$module_lang,$module_content) ){
-	// 									$this->alert->show("s","成功更新文字模組");
-	// 								}else{
-	// 									$this->alert->show("d","更新文字模組失敗");
-	// 								}
-	// 								$this->alert->refresh(2);
-	// 							}
-	// 							$this->load->view('conf/module/edit_text',$data);
-	// 							$this->load->view('common/tinymce',$data);
-	// 						break;
-	// 					}
-						
-	// 				}else{
-	// 					$this->alert->js("找不到模組",get_url("dashboard",$conf_id,"modules"));
-	// 				}
-	// 			break;
-	// 			case "del":
-	// 				$module = $this->conf->get_module($conf_id,$module_id);
-	// 				if( !empty($module) ){
-	// 					$data['module'] = $module;
-	// 					if( $this->module->del_module($conf_id,$module_id) ){
-	// 						$this->alert->show("s","成功刪除模組",get_url("dashboard",$conf_id,"modules"));
-	// 					}else{
-	// 						$this->alert->show("d","刪除模組失敗",get_url("dashboard",$conf_id,"modules"));
-	// 					}
-	// 				}else{
-	// 					$this->alert->js("找不到模組",get_url("dashboard",$conf_id,"modules"));
-	// 				}
-	// 			break;
-	// 		}
-	// 	}
-	// 	$this->load->view('common/footer',$data);
-		
-	// }
-
 	public function most($conf_id='',$act=''){
-		$data['conf_id']      = $conf_id;
-		$data['body_class']   = $this->body_class;
-		
-		$data['spage']        = $this->config->item('spage');
-		$data['conf_config']  = $this->conf_config;
-		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-		$data['conf_content'] = $this->conf->conf_content($conf_id);
-		
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
-
-		$hold = $this->conf->get_schedule($conf_id,"hold");
+		$hold = $this->conf->get_schedule($this->conf_id,"hold");
 		$day = ($hold->end_value - $hold->start_value)/86400;
 		$hold_day = array();
 		for($i=0; $i<=$day; $i++){
 			array_push($hold_day,date("m-d",strtotime("+".$i." day",$hold->start_value)));
 		}
-		$data['hold_day'] = $hold_day;
+		$this->data['hold_day'] = $hold_day;
 		array_push($hold_day,array("S","P"));
 
+		$this->assets->set_title(lang('dashboard_most'));
+		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
+
 		$this->load->view('common/header');
-		$this->load->view('common/nav',$data);
-
-		$this->load->view('conf/conf_nav',$data);
-		//$this->load->view('conf/conf_schedule',$data);
-
-		$this->load->view('conf/menu_conf',$data);
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_conf',$this->data);
 		
 		switch($act){
 			case "edit":
 				if( !empty( $this->input->get('id') ) ){
 					$most_id = $this->input->get('id');
-					$most = $this->conf->get_most($conf_id,$most_id);
+					$most = $this->conf->get_most($this->conf_id,$most_id);
 					if( !empty($most) ){
-						$data['most'] = $most;
-						$report = $this->Submit->get_most_report($most_id);
-						$mostfile = $this->Submit->get_most_file($conf_id,$most_id);
-						$data['report'] = $report;
-						$data['most_file'] = $mostfile;
+						$this->data['most'] = $most;
+						$report = $this->submit->get_most_report($most_id);
+						$mostfile = $this->submit->get_most_file($this->conf_id,$most_id);
+						$this->data['report'] = $report;
+						$this->data['most_file'] = $mostfile;
 						$do = $this->input->get('do');
 						$can_empty = array("most_status");
 						switch($do){
 							case "submit":
 								foreach ($most as $key => $m) {
 									if( !in_array($key,$can_empty) ){
-										if( empty($m) ){$this->alert->show("d","計畫資料不齊全",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);$this->output->_display();exit;}
+										if( empty($m) ){$this->alert->show("d","計畫資料不齊全",get_url("dashboard",$this->conf_id,"most","edit")."?id=".$most->most_id);$this->output->_display();exit;}
 									}
 								}
 								foreach ($report as $key => $r) {
-									if( empty($r) ){$this->alert->show("d","發表者資料不齊全",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);$this->output->_display();exit;}
+									if( empty($r) ){$this->alert->show("d","發表者資料不齊全",get_url("dashboard",$this->conf_id,"most","edit")."?id=".$most->most_id);$this->output->_display();exit;}
 								}
 								if( empty($mostfile->most_auth) ){
-									$this->alert->show("d","授權同意書未上傳",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+									$this->alert->show("d","授權同意書未上傳",get_url("dashboard",$this->conf_id,"most","edit")."?id=".$most->most_id);
 									$this->output->_display();
 									exit;
 								}
 								if( empty($mostfile->most_result) ){
-									$this->alert->show("d","成果資料表未上傳",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+									$this->alert->show("d","成果資料表未上傳",get_url("dashboard",$this->conf_id,"most","edit")."?id=".$most->most_id);
 									$this->output->_display();
 									exit;
 								}
 								if( $most->most_method == "P" ){
 									if( empty($mostfile->most_poster) ){
-										$this->alert->show("d","成果海報電子檔未上傳",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+										$this->alert->show("d","成果海報電子檔未上傳",get_url("dashboard",$this->conf_id,"most","edit")."?id=".$most->most_id);
 										$this->output->_display();
 										exit;
 									}
 								}
-								if( $this->Submit->submit_most($conf_id,$most_id,$this->user_login) ){
-									$this->alert->js("成功送出資料",get_url("dashboard",$conf_id,"most"));
+								if( $this->submit->submit_most($this->conf_id,$most_id,$this->user_login) ){
+									$this->alert->js("成功送出資料",get_url("dashboard",$this->conf_id,"most"));
 				                }else{
-									$this->alert->js("送出資料失敗",get_url("dashboard",$conf_id,"most"));
+									$this->alert->js("送出資料失敗",get_url("dashboard",$this->conf_id,"most"));
 								}
 								
 							break;
 							case "info":
-								$this->Submit->most_valid();
+								$this->submit->most_valid();
 								if ($this->form_validation->run()){
 									$most_method     = $this->input->post('most_method');
 									$most_number     = $this->input->post('most_number');
@@ -1661,12 +1300,12 @@ class Dashboard extends MY_Conference {
 									$report_mealtype = $this->input->post('report_mealtype');
 									
 									if( in_array($report_mealtype,$hold_day) ){
-										$update_most = $this->Submit->update_most($conf_id,$this->user_login,$most_id,$most_method,$most_number,$most_name,$most_name_eng,$most_host,$most_uni,$most_dept);
-										$update_most_report = $this->Submit->update_most_report($most_id,$report_name,$report_uni,$report_dept,$report_title,$report_email,$report_phone,$report_meal,$report_mealtype);
+										$update_most = $this->submit->update_most($this->conf_id,$this->user_login,$most_id,$most_method,$most_number,$most_name,$most_name_eng,$most_host,$most_uni,$most_dept);
+										$update_most_report = $this->submit->update_most_report($most_id,$report_name,$report_uni,$report_dept,$report_title,$report_email,$report_phone,$report_meal,$report_mealtype);
 										if( $update_most && $update_most_report){
-											$this->alert->js("更新成功",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+											$this->alert->js("更新成功",get_url("dashboard",$this->conf_id,"most","edit")."?id=".$most->most_id);
 										}else{
-											$this->alert->js("更新失敗",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+											$this->alert->js("更新失敗",get_url("dashboard",$this->conf_id,"most","edit")."?id=".$most->most_id);
 										}
 									}else{
 										$this->alert->show("d","請填寫正確的餐券時間");
@@ -1674,7 +1313,7 @@ class Dashboard extends MY_Conference {
 								}
 							break;
 							case "file":
-								$config['upload_path']= $this->conf->get_mostdir($conf_id);
+								$config['upload_path']= $this->conf->get_mostdir($this->conf_id);
 								$config['allowed_types']= 'pdf|doc|docx';
 				                $config['encrypt_name']= true;
 				                $this->load->library('upload', $config);
@@ -1685,42 +1324,42 @@ class Dashboard extends MY_Conference {
 				                		if ( $this->upload->do_upload('most_auth')){
 							                $most_file  = $this->upload->data();
 							                if( $this->conf->update_most_file($most_id,"auth",$most_file['file_name'],$most_file['client_name']) ){
-												$this->alert->js("更新成功",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+												$this->alert->js("更新成功",get_url("dashboard",$this->conf_id,"most","edit")."?id=".$most->most_id);
 							                }else{
-												$this->alert->js("更新失敗",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+												$this->alert->js("更新失敗",get_url("dashboard",$this->conf_id,"most","edit")."?id=".$most->most_id);
 											}
 							            }else{
-											$this->alert->js("更新失敗",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+											$this->alert->js("更新失敗",get_url("dashboard",$this->conf_id,"most","edit")."?id=".$most->most_id);
 							            }
 						            break;
 						            case "result":
 						            	if ( $this->upload->do_upload('most_result')){
 							            	$most_file  = $this->upload->data();
-							            	if( $this->Submit->update_most_file($most_id,"result",$most_file['file_name'],$most_file['client_name']) ){
-												$this->alert->js("更新成功",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+							            	if( $this->submit->update_most_file($most_id,"result",$most_file['file_name'],$most_file['client_name']) ){
+												$this->alert->js("更新成功",get_url("dashboard",$this->conf_id,"most","edit")."?id=".$most->most_id);
 							                }else{
-												$this->alert->js("更新失敗",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+												$this->alert->js("更新失敗",get_url("dashboard",$this->conf_id,"most","edit")."?id=".$most->most_id);
 											}
 							            }else{
-											$this->alert->js("更新失敗",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+											$this->alert->js("更新失敗",get_url("dashboard",$this->conf_id,"most","edit")."?id=".$most->most_id);
 							            }
 						            break;
 						            case "poster":
 						            	if ( $this->upload->do_upload('most_poster')){
 							                $most_file  = $this->upload->data();
-							                if( $this->Submit->update_most_file($most_id,"poster",$most_file['file_name'],$most_file['client_name']) ){
-												$this->alert->js("更新成功",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+							                if( $this->submit->update_most_file($most_id,"poster",$most_file['file_name'],$most_file['client_name']) ){
+												$this->alert->js("更新成功",get_url("dashboard",$this->conf_id,"most","edit")."?id=".$most->most_id);
 							                }else{
-												$this->alert->js("更新失敗",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+												$this->alert->js("更新失敗",get_url("dashboard",$this->conf_id,"most","edit")."?id=".$most->most_id);
 											}
 							            }else{
-											$this->alert->js("更新失敗",get_url("dashboard",$conf_id,"most","edit")."?id=".$most->most_id);
+											$this->alert->js("更新失敗",get_url("dashboard",$this->conf_id,"most","edit")."?id=".$most->most_id);
 							            }
 						            break;
 				                }
 							break;
 						}
-						$this->load->view("conf/most/edit",$data);
+						$this->load->view("conf/most/edit",$this->data);
 					}
 				}else{
 					$this->alert->js("找不到上傳資料");
@@ -1728,23 +1367,23 @@ class Dashboard extends MY_Conference {
 			break;
 			case "detail":
 				$most_id = $this->input->get('id');
-				$most = $this->conf->get_most($conf_id,$most_id);
+				$most = $this->conf->get_most($this->conf_id,$most_id);
 				if( !empty($most) ){
-					$data['most'] = $most;
-					$data['most_file'] = $this->Submit->get_most_file($conf_id,$most_id);
-					$data['report'] = $this->Submit->get_most_report($most_id);
+					$this->data['most'] = $most;
+					$this->data['most_file'] = $this->submit->get_most_file($this->conf_id,$most_id);
+					$this->data['report'] = $this->submit->get_most_report($most_id);
 					if( $most->most_status == 1 ){
 						$this->form_validation->set_rules('options', '操作選項', 'required');
 						if ($this->form_validation->run()){
 							$options = $this->input->post('options');
 							if( $options == 1 ){
-								if( $this->conf->most_review($conf_id,$most_id,2) ){
+								if( $this->conf->most_review($this->conf_id,$most_id,2) ){
 									$this->alert->js("操作成功，接受本報名資料");
 								}else{
 									$this->alert->js("操作失敗，無法接受本報名資料");
 								}
 							}else if( $options == 0 ){
-								if( $this->conf->most_review($conf_id,$most_id,-1) ){
+								if( $this->conf->most_review($this->conf_id,$most_id,-1) ){
 									$this->alert->js("操作成功，拒絕本報名資料");
 								}else{
 									$this->alert->js("操作失敗，無法拒絕本報名資料");
@@ -1754,72 +1393,65 @@ class Dashboard extends MY_Conference {
 							}
 							$this->alert->refresh(1);
 						}
-						$this->load->view("conf/most/reviewer",$data);
+						$this->load->view("conf/most/reviewer",$this->data);
 					}
-					$this->load->view("conf/most/detail",$data);
+					$this->load->view("conf/most/detail",$this->data);
 				}
 			break;
 			case "list":
 			default:
-				$data['mosts'] = $this->conf->get_mosts($conf_id);
-				$this->load->view('conf/most/list',$data);
+				$this->data['mosts'] = $this->conf->get_mosts($this->conf_id);
+				$this->load->view('conf/most/list',$this->data);
 			break;
 		}
-		$this->load->view('common/footer',$data);
-		
+		$this->load->view('common/footer',$this->data);
+	}
+
+	public function menu($conf_id=''){
+		$this->data['pages']=$this->conf->conf_content($this->conf_id);
+
+		$this->assets->add_css(asset_url().'style/nestable.css');
+		$this->assets->add_js(asset_url().'js/jquery.nestable.js');
+
+		$this->load->view('common/header');
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_conf',$this->data);
+		$this->load->view('nestable',$this->data);
+		$this->load->view('common/footer',$this->data);
 	}
 
 	public function export($conf_id=''){
-		$data['conf_id']      = $conf_id;
-		$data['body_class']   = $this->body_class;
-		$data['spage']        = $this->config->item('spage');
-		$data['conf_config']  = $this->conf_config;
-		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-		$data['conf_content'] = $this->conf->conf_content($conf_id);
-		
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
+		$this->assets->set_title(lang('dashboard_report'));
+		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 
 		$this->load->view('common/header');
-		$this->load->view('common/nav',$data);
-		$this->load->view('conf/conf_nav',$data);
-		//$this->load->view('conf/conf_schedule',$data);
-		
-		$this->load->view('conf/menu_conf',$data);
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_conf',$this->data);
+		$this->load->view('common/footer',$this->data);
+	}
 
-		$this->load->view('common/footer',$data);
+	public function widget($conf_id=''){
+		$this->assets->set_title(lang('dashboard_report'));
+		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
+
+		$this->load->view('common/header');
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_conf',$this->data);
+		$this->load->view('common/footer',$this->data);
 	}
 
 	// Template
 	private function _temp($conf_id=''){
-		$data['conf_id']      = $conf_id;
-		$data['body_class']   = $this->body_class;
-		
-		$data['spage']        = $this->config->item('spage');
-		$data['conf_config']  = $this->conf_config;
-		$data['schedule']     = $this->conf->get_schedules($this->conf_id);
-		$data['conf_content'] = $this->conf->conf_content($conf_id);
-		
-		if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-			$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-		}
-		if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-			$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-		}
-		
+		$this->assets->set_title(lang('dashboard_report'));
+		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
+
 		$this->load->view('common/header');
-		$this->load->view('common/nav',$data);
-
-		$this->load->view('conf/conf_nav',$data);
-		//$this->load->view('conf/conf_schedule',$data);
-
-		$this->load->view('conf/menu_conf',$data);
-		//$this->load->view('conf/setting',$data);
-		$this->load->view('common/footer',$data);
-		
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_conf',$this->data);
+		$this->load->view('common/footer',$this->data);
 	}
 }

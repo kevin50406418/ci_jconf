@@ -1,5 +1,4 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');?>
-<div class="col-md-<?php echo $col_right;?>">
 <div class="ui segment blue">
 	<table class="table table-bordered table-hover table-striped">
 		<thead>
@@ -12,10 +11,6 @@
 		<?php foreach ($confs as $key => $conf) {?>
 		<tr>
 			<td>
-				<?php if( in_array($conf->conf_id,$test_conf)){?>
-				<span class="ui label gray">測試</span>
-				<?php }?>
-
 				<?php if( $conf->conf_staus == 1 ){?>
 				<span class="ui basic label pink">隱藏</span>
 				<?php }?>

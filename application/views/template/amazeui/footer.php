@@ -8,35 +8,30 @@
 		</div>
 		<div class="am-modal-bd">
 			<?php foreach ($schedule as $key => $v) {?>
+			<?php if($v['date_showmethod']>0){?>
 			<li>
-				<span class="text-bold"><?php echo lang('schedule_'.$key)?></span>：
-				<?php if( $v['start'] == $v['end']){?>
-					<?php echo $v['end']?>
+				<span class="text-bold">
+				<?php if( empty( $v["date_title_".$this->_lang] ) ){?>
+					<?php echo lang('schedule_'.$key)?>
 				<?php }else{?>
-					<?php echo $v['start']?> ~ <?php echo $v['end']?>
+					<?php echo $v["date_title_".$this->_lang]?>
 				<?php }?>
+				</span>：
+				<?php echo date_showmethod($v['date_showmethod'],$v['start'],$v['end'])?>
 			</li>
+			<?php }?>
+			<?php }?>
+			<?php if( $this->user->is_conf($this->conf_id) ){?>
+				<a class="am-btn am-btn-primary am-btn-xs" href="<?php echo get_url("dashboard",$conf_id,"setting")?>">
+					<i class="fa fa-pencil"></i> 編輯重要時程
+				</a>
 			<?php }?>
 		</div>
 	</div>
 </div>
 <footer class="footer">
 	<p>地址：<?php echo $conf_config['conf_address']?> │ 聯絡電話：<?php echo $conf_config['conf_phone']?></p>
-	<p>E-Mail：<?php echo $conf_config['conf_email']?> │ Copyright © 2015 <?php echo $conf_config['conf_host']?> All right reserved</p>
+	<p>E-Mail：<?php echo $conf_config['conf_email']?> │ Copyright © <?php echo date("Y")?> <?php echo $conf_config['conf_host']?> All right reserved</p>
 </footer>
-<!-- <footer class="ui inverted vertical footer segment">
-	<div class="container-fluid">
-		<h3 class="ui inverted header"></h3>
-		<div class="ui stackable inverted divided grid">
-	        <div class="four wide column">
-				<p>主辦單位：<?php echo $conf_config['conf_host']?></p>
-				
-				<p>聯絡電話：<?php echo $conf_config['conf_phone']?></p>
-				<p></p>
-				<p><i class="fa fa-map-marker fa-lg"></i> 大會地點：<?php echo $conf_config['conf_place']?></p>
-	        </div>
-	    </div>
-	</div>
-</footer> -->
 </body>
 </html>

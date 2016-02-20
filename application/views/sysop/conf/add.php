@@ -1,5 +1,4 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');?>
-<div class="col-md-<?php echo $col_right;?>">
 <div class="ui segment blue">
 	<h2>新增研討會</h2>
 	<?php echo validation_errors('<div class="ui message red">', '</div>');?>

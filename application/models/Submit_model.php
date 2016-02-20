@@ -33,6 +33,11 @@ class Submit_model extends CI_Model {
     	$staus_text="";
     	$desc="";
     	switch($submit_staus){
+            case -5:
+                $staus_text="刪除";
+                $html_class="red";
+                $desc="稿件被刪除";
+            break;
     		case -4:
     			$staus_text=$this->lang->line('status_removing');
     			$html_class="brown";
@@ -105,16 +110,17 @@ class Submit_model extends CI_Model {
     
     function add_paper($sub_title,$sub_summary,$sub_keyword,$sub_topic,$sub_lang,$sub_sponsor,$conf_id,$sub_user){
         $paper = array(
-            "sub_title"   => $sub_title,
-            "sub_summary" => $sub_summary,
-            "sub_keyword" => $sub_keyword,
-            "sub_topic"   => $sub_topic,
-            "sub_lang"    => $sub_lang,
-            "sub_sponsor" => $sub_sponsor,
-            "sub_status"  => -1,
-            "sub_time"    => time(),
-            "conf_id"     => $conf_id,
-            "sub_user"    => $sub_user
+            "sub_title"      => $sub_title,
+            "sub_summary"    => $sub_summary,
+            "sub_keyword"    => $sub_keyword,
+            "sub_topic"      => $sub_topic,
+            "sub_lang"       => $sub_lang,
+            "sub_sponsor"    => $sub_sponsor,
+            "sub_status"     => -1,
+            "sub_time"       => time(),
+            "conf_id"        => $conf_id,
+            "sub_user"       => $sub_user,
+            "sub_lastupdate" => time()
         );
         // $this->conf->add_log("submit","add_paper",$conf_id,$paper);
         if( $this->db->insert('paper', $paper) ){
@@ -126,13 +132,14 @@ class Submit_model extends CI_Model {
 
     function update_paper($paper_id,$conf_id,$sub_title,$sub_summary,$sub_keyword,$sub_topic,$sub_lang,$sub_sponsor){
         $paper = array(
-            "sub_title"   =>$sub_title,
-            "sub_summary" =>$sub_summary,
-            "sub_keyword" =>$sub_keyword,
-            "sub_topic"   =>$sub_topic,
-            "sub_lang"    =>$sub_lang,
-            "sub_sponsor" =>$sub_sponsor,
-            "sub_time"    =>time(),
+            "sub_title"      =>$sub_title,
+            "sub_summary"    =>$sub_summary,
+            "sub_keyword"    =>$sub_keyword,
+            "sub_topic"      =>$sub_topic,
+            "sub_lang"       =>$sub_lang,
+            "sub_sponsor"    =>$sub_sponsor,
+            "sub_time"       =>time(),
+            "sub_lastupdate" => time()
         );
         $this->db->where('sub_id', $paper_id);
         $this->db->where('conf_id', $conf_id);
@@ -148,15 +155,16 @@ class Submit_model extends CI_Model {
     
     function add_author($paper_id,$user_login,$user_first_name,$user_last_name,$user_email,$user_org,$user_country,$main_contract,$author_order){
         $author = array(
-            "paper_id"        =>$paper_id,
-            "user_login"      =>$user_login,
-            "user_first_name" =>$user_first_name,
-            "user_last_name"  =>$user_last_name,
-            "user_email"      =>$user_email,
-            "user_org"        =>$user_org,
-            "user_country"    =>$user_country,
-            "main_contract"   =>$main_contract,
-            "author_order"    =>$author_order
+            "paper_id"        => $paper_id,
+            "user_login"      => $user_login,
+            "user_first_name" => $user_first_name,
+            "user_last_name"  => $user_last_name,
+            "user_email"      => $user_email,
+            "user_org"        => $user_org,
+            "user_country"    => $user_country,
+            "main_contract"   => $main_contract,
+            "author_order"    => $author_order,
+            "author_time"     => time()
         );
         return $this->db->insert('paper_author', $author);
     }
@@ -186,7 +194,7 @@ class Submit_model extends CI_Model {
         return ( $this->db->count_all_results() >= 1 );
     }
 
-    function get_paperinfo($conf_id,$paper_id, $user_login){
+    function get_paperinfo($conf_id,$paper_id,$user_login){
         $this->db->from('paper');
         $this->db->join('topic', 'paper.sub_topic = topic.topic_id');
         $this->db->join('paper_author', 'paper.sub_id = paper_author.paper_id');
@@ -199,10 +207,11 @@ class Submit_model extends CI_Model {
 
     function add_file($conf_id,$paper_id,$file_name,$file_system,$file_type){
         $paper_file = array(
-            "paper_id"=>$paper_id,
-            "file_name"=>$file_name,
-            "file_system"=>$file_system,
-            "file_type"=>$file_type
+            "paper_id"    => $paper_id,
+            "file_name"   => $file_name,
+            "file_system" => $file_system,
+            "file_type"   => $file_type,
+            "file_time"   => time()
         ); 
         
         if( $this->db->insert('paper_file', $paper_file) ){
@@ -218,8 +227,9 @@ class Submit_model extends CI_Model {
 
     function update_file($conf_id,$paper_id,$fid,$file_name,$file_system){
         $paper_file = array(
-            "file_name"=>$file_name,
-            "file_system"=>$file_system
+            "file_name"   => $file_name,
+            "file_system" => $file_system,
+            "file_time"   => time()
         ); 
         $this->db->where("fid",$fid);
         $this->db->where("paper_id",$paper_id);
@@ -236,13 +246,14 @@ class Submit_model extends CI_Model {
         $this->db->where("fid",$fid);
         $query = $this->db->get();
         $file = $query->row();
-        delete_files($this->conf->get_paperdir($conf_id).$file->file_system);
-        //$this->db->where("conf_id",$conf_id);
+        if( empty($file) || !in_array($file->file_type, array("F","O"))){
+            return false;
+        }
         $this->db->where("fid",$fid);
         $this->db->where("paper_id",$paper_id);
-        if( $file->file_type !="F" || $file->file_type !="O" ) return false;
+        
         if( $this->db->delete('paper_file') ){
-            // $this->conf->add_log("submit","del_file",$conf_id,array("paper_id"=>$paper_id,"fid"=>$fid));
+            delete_files($this->conf->get_paperdir($conf_id).$file->file_system);
             return true;
         }
         
@@ -339,8 +350,8 @@ class Submit_model extends CI_Model {
 
     function paper_to_review($conf_id,$paper_id){
         $paper = array(
-            "sub_status"=>1,
-            "sub_review"=>time()
+            "sub_status" => 1,
+            "sub_review" => time()
         );
         $this->db->where("conf_id",$conf_id);
         $this->db->where("sub_id",$paper_id);
@@ -356,7 +367,7 @@ class Submit_model extends CI_Model {
     
     function paper_to_reviewing($conf_id,$paper_id){
         $paper = array(
-            "sub_status"=>3
+            "sub_status" => 3
         );
         $this->db->where("conf_id",$conf_id);
         $this->db->where("sub_id",$paper_id);
@@ -795,7 +806,7 @@ class Submit_model extends CI_Model {
     function update_register_status($register_status,$conf_id,$register_id){
         $pay = array(
             "register_status" => $register_status,
-            "register_time" => time()
+            "register_time"   => time()
         );
         $this->db->where('conf_id', $conf_id);
         $this->db->where('register_id', $register_id);
@@ -884,8 +895,8 @@ class Submit_model extends CI_Model {
 
     function paper_to_finish($conf_id,$paper_id){
         $paper = array(
-            "sub_status"=>5,
-            "sub_time"=>time()
+            "sub_status" => 5,
+            "sub_time"   => time()
         );
         $this->db->where("conf_id",$conf_id);
         $this->db->where("sub_id",$paper_id);
@@ -918,5 +929,19 @@ class Submit_model extends CI_Model {
     function pdf_pages($pdfname) {
         $pdftext = file_get_contents($pdfname);
         return $pdftext;
+    }
+
+     function paper_to_remove($conf_id,$paper_id,$old_status){
+        $paper = array(
+            "sub_status" => -5
+        );
+        $this->db->where("conf_id",$conf_id);
+        $this->db->where("sub_id",$paper_id);
+        if( $this->db->update('paper', $paper) ){
+            $this->conf->add_log("conf","remove_paper",$conf_id,array("paper_id"=>$paper_id,"sub_status" => -5,"old_status"=>$old_status));
+            return true;
+        }else{
+            return false;
+        }
     }
 }

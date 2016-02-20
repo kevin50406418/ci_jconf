@@ -38,7 +38,7 @@
 				<th>投稿資料</th>
 				<td>
 					<?php if(!empty($otherfile)){?>
-					<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" target="_blank"><?php echo $otherfile->file_name?></a>
+					<a target="_blank" href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" target="_blank"><?php echo $otherfile->file_name?></a>
 					<?php }else{?>
 					<span class="ui label red">尚未上傳</span>
 					<?php }?>
@@ -50,7 +50,7 @@
 			<tr>
 				<th>補充資料</th>
 				<td>
-					<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$file->fid;?>" target="_blank"><?php echo $file->file_name?></a>
+					<a target="_blank" href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$file->fid;?>" target="_blank"><?php echo $file->file_name?></a>
 				</td>
 			</tr>
 			<?php }?>

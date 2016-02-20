@@ -6,6 +6,9 @@ $lang['submit_add'] = "Submission";
 $lang['submit_list'] = "Paper List";
 $lang['submit_signup'] = "Registration";
 $lang['submit_news'] = "News";
+$lang['submit_edit'] = "Edit Submission";
+$lang['submit_detail'] = "Submission Detail";
+$lang['submit_finish'] = "Upload finalized";
 
 $lang['conf_dashboard'] = "Conference Dashboard";
 $lang['dashboard_setting'] = "Setting";

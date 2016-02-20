@@ -69,3 +69,6 @@ $lang['add_conf_admin'] = "新增研討會管理員";
 $lang['del_conf_admin'] = "取消研討會管理員";
 $lang['add_reviewer'] = "新增研討會審查人";
 $lang['del_reviewer'] = "取消研討會審查人";
+
+$lang['remove_paper'] = "刪除稿件";
+$lang['update_confstyle'] = "更新研討會樣式";

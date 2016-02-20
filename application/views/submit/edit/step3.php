@@ -12,7 +12,7 @@ if(is_null($this->input->get("upload"))){
 		<div class="form-group">
 			<div class="col-sm-2 control-label">上傳檔案</div>
 			<div class="col-sm-10">
-				<p class="form-control-static"><i class="fa fa-file-pdf-o fa-2x"></i> <a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>"><?php echo $otherfile->file_name;?></a></p>
+				<p class="form-control-static"><i class="fa fa-file-pdf-o fa-2x"></i> <a target="_blank" href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>"><?php echo $otherfile->file_name;?></a></p>
 			</div>
 		</div>
 		<div class="text-center">

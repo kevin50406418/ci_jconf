@@ -69,3 +69,6 @@ $lang['add_conf_admin'] = "Add Conference Administrator";
 $lang['del_conf_admin'] = "Cancel Conference Administrator";
 $lang['add_reviewer'] = "Add Conference Reviewer";
 $lang['del_reviewer'] = "Cancel Conference Reviewer";
+
+$lang['remove_paper'] = "Remove Paper";
+$lang['update_confstyle'] = "Update Website Style";

@@ -7,7 +7,7 @@
 			<div class="header">
 				<?php echo lang('login_hint')?>
 			</div>
-			<p><?php echo sprintf(lang('login_please'),'<a href="'.site_url("user/login").'" class="ui red button">'.lang('signup').'</a>')?></p>
+			<p><?php echo sprintf(lang('login_please'),'<a href="'.site_url("user/login").'" class="ui red button">'.lang('login').'</a>')?></p>
 		</div>
 	</div>
 	<?php echo form_open(site_url('user/signup'),array("class"=>"form-horizontal","id"=>"register"))?>
@@ -93,15 +93,15 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="user_cellphone" class="col-sm-2 control-label"><?php echo lang('user_cellphone')?> <span class="text-danger">*</span></label>
+			<label for="user_cellphone" class="col-sm-2 control-label"><?php echo lang('user_cellphone')?></label>
 			<div class="col-sm-10">
-				<input name="user_cellphone" type="tel" required="required" id="user_cellphone" size="15" maxlength="15" class="form-control" autocomplete="off" value="<?php echo set_value('user_cellphone'); ?>">
+				<input name="user_cellphone" type="tel" id="user_cellphone" size="15" maxlength="15" class="form-control" value="<?php echo set_value('user_cellphone'); ?>">
 			</div>
 		</div>
 		<div class="form-group">
 			<label for="user_fax" class="col-sm-2 control-label"><?php echo lang('user_fax')?></label>
 			<div class="col-sm-10">
-				<input name="user_fax" type="text" id="user_fax" size="15" maxlength="15" class="form-control" autocomplete="off" value="<?php echo set_value('user_fax'); ?>">
+				<input name="user_fax" type="text" id="user_fax" size="15" maxlength="15" class="form-control" value="<?php echo set_value('user_fax'); ?>">
 			</div>
 		</div>
 		<div class="form-group">
@@ -118,7 +118,7 @@
 					</div>
 				</div>
 				<div>
-					<?php echo lang('user_poststreetadd')?>:<input name="user_postadd" type="text" required="required" id="user_postadd" size="20" maxlength="100" class="form-control col-sm-5" autocomplete="off" value="<?php echo set_value('user_postadd'); ?>">
+					<?php echo lang('user_poststreetadd')?>:<input name="user_postadd" type="text" required="required" id="user_postadd" size="20" maxlength="100" class="form-control col-sm-5" value="<?php echo set_value('user_postadd'); ?>">
 				</div>
 			</div>
 		</div>

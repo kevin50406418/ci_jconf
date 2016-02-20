@@ -2,11 +2,11 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /* schedule */
-$lang['schedule_hold']       = "會議舉行日期";
-$lang['schedule_submit']     = "論文徵稿";
-$lang['schedule_early_bird'] = "早鳥繳費";
+$lang['schedule_hold']       = "會議舉辦日期";
+$lang['schedule_submit']     = "論文截稿日期";
+$lang['schedule_early_bird'] = "早鳥繳費期限";
 $lang['schedule_register']   = "研討會註冊";
-$lang['schedule_finish']     = "上傳完稿截止";
+$lang['schedule_finish']     = "完稿截稿日期";
 $lang['schedule_most']       = "科技部成果發表";
 
 /* nav */
@@ -35,3 +35,11 @@ $lang['datatable.paginate.first'] = "首頁";
 $lang['datatable.paginate.last'] = "最後一頁";
 $lang['datatable.paginate.next'] = "下一頁";
 $lang['datatable.paginate.previous'] = "上一頁";
+
+/* cisc2016_schedule */
+$lang['cisc2016_schedule_hold']       = "會議舉辦日期";
+$lang['cisc2016_schedule_submit']     = "論文截稿日期";
+$lang['cisc2016_schedule_early_bird'] = "早鳥繳費期限";
+$lang['cisc2016_schedule_register']   = "研討會註冊";
+$lang['cisc2016_schedule_finish']     = "完稿截稿日期";
+$lang['cisc2016_schedule_most']       = "科技部成果發表";

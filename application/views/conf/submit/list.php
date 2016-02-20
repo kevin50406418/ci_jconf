@@ -51,9 +51,9 @@
 		<tr>
 			<td class="text-center"><?php echo $list->sub_id?></td>
 			<td data-search="<?php echo $list->sub_keyword?>,<?php echo $list->sub_title?>"><?php echo $list->sub_title?></td>
-			<td><span title="<?php echo $list->topic_info?>"><?php echo $list->topic_name?></span></td>
+			<td><?php echo $list->topic_name?></td>
 			<td class="text-center" data-order="<?php echo $list->sub_status?>">
-				<?php echo $this->Submit->sub_status($list->sub_status,true,true)?>
+				<?php echo $this->submit->sub_status($list->sub_status,true,true)?>
 			</td>
 			<td data-order="0">
 				<div class="small icon ui buttons">
@@ -74,9 +74,21 @@ $(function() {
 	$('.datatable').dataTable( {
 		"order": [[ 0, "desc" ]],
 		columnDefs: [
-			
 			{ orderable: false, "targets": -1 },
 		],
+		dom: 'Bfrtip',
+		buttons: [
+			{
+                extend: 'excelHtml5',
+                text: '匯出 excel 檔',
+                className: 'ui button green'
+            },
+            {
+                extend: 'csvHtml5',
+                text: '匯出 csv 檔',
+                className: 'ui button teal'
+            }
+        ],
 		stateSave: true,
         "language": {
             "lengthMenu": "每頁顯示 _MENU_ 筆資料",

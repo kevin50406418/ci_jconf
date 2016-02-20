@@ -27,7 +27,11 @@
 					</tr>
 					<tr>
 						<th>稿件狀態</th>
-						<td><?php echo $this->Submit->sub_status($paper->sub_status,true)?></td>
+						<td><?php echo $this->submit->sub_status($paper->sub_status,true)?></td>
+					</tr>
+					<tr>
+						<th>送審時間</th>
+						<td><?php echo date("Y-m-d H:i:s",$paper->sub_review)?></td>
 					</tr>
 					<tr>
 						<th>語言</th>
@@ -134,7 +138,7 @@
 					<tr>
 						<td><?php echo $reviewer->user_login?></td>
 						<td class="text-center">
-							<?php echo $this->Submit->sub_status($reviewer->review_status,true)?>
+							<?php echo $this->submit->sub_status($reviewer->review_status,true)?>
 						</td>
 						<td class="text-center">
 							<?php echo date("Y-m-d H:i",$reviewer->review_timeout)?>

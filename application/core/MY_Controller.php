@@ -9,12 +9,23 @@ class MY_Controller extends CI_Controller{
 	public $pg_id;
 	public $spage;
 	public $user_login;
+	public $site_title = "";
+	public $user_sysop = 0;
+	public $is_sysop = 0;
+	public $is_conf = 0;
+	public $is_topic = 0;
+	public $is_reviewer = 0;
     public function __construct(){
 		parent::__construct();
 		$this->cinfo['show_confinfo'] = false;
 		$this->body_class = "container";
 		$this->spage = $this->config->item('spage');
-
+		if( ENVIRONMENT == "development" ){
+			$this->assets->add_meta_tag("robots", "noindex", "name");
+			$this->assets->add_meta_tag("googlebot", "noindex", "name");
+			// do_action("render.page");
+		}
+		$this->assets->set_title($this->config->item('site_name'));
 		$this->assets->add_css(asset_url().'style/bootstrap.min.css');
 		$this->assets->add_css(asset_url().'style/label.min.css');
 		$this->assets->add_css(asset_url().'style/segment.min.css');
@@ -35,13 +46,14 @@ class MY_Controller extends CI_Controller{
 
 		if( $this->user->is_login() ){
 			$this->user_login = $this->session->userdata('user_login');
-			$bool_conf     = $this->session->has_userdata('priv_conf');
-			$bool_topic    = $this->session->has_userdata('priv_topic');
-			$bool_reviewer = $this->session->has_userdata('priv_reviewer');
+			$this->user->get_auth($this->user_login);
+			// $bool_conf     = $this->session->has_userdata('priv_conf');
+			// $bool_topic    = $this->session->has_userdata('priv_topic');
+			// $bool_reviewer = $this->session->has_userdata('priv_reviewer');
 			
-			if( !$bool_conf || !$bool_topic || !$bool_reviewer ){
-				$this->user->get_auth($this->session->user_login);
-			}
+			// if( !$bool_conf || !$bool_topic || !$bool_reviewer ){
+			// 	$this->user->get_auth($this->session->user_login);
+			// }
 			/*switch( $this->router->fetch_method() ){
 				default:
 					$this->conf_id = $this->uri->segment(3);
@@ -79,29 +91,20 @@ class MY_Conference extends MY_Controller{
     }
 }
 
-class MY_Sysop extends MY_Controller{
+class MY_Sysop extends MY_Conference{
     public function __construct(){
 		parent::__construct();
-		if( !$this->user->is_login() ){
-			redirect('/user/login', 'location', 301);
-		}else{
-			if( !$this->user->is_sysop() ){
-				redirect(base_url(), 'location', 301);
-			}
+		if( !$this->user->is_sysop() ){
+			redirect(base_url(), 'location', 301);
 		}
     }
 }
 
-class MY_Topic extends MY_Controller{
+class MY_Topic extends MY_Conference{
     public function __construct(){
 		parent::__construct();
-		if( !$this->user->is_login() ){
-			redirect('/user/login', 'location', 301);
-			if( $this->user->is_topic($this->conf_id) || $this->user->is_sysop()){
-				
-			}else{
-				redirect(base_url(), 'location', 301);
-			}
+		if( !$this->user->is_topic($this->conf_id) ){
+			redirect(base_url(), 'location', 301);
 		}
     }
 }

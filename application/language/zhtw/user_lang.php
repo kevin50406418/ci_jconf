@@ -52,7 +52,7 @@ $lang['user_lastname_required'] = "姓氏尚未填寫";
 $lang['user_org_required'] = "所屬機構尚未填寫";
 $lang['user_email_required'] = "電子信箱尚未填寫";
 $lang['user_email_email'] = "請輸入正確的電子信箱";
-$lang['user_email_remote'] = "電子信箱 {0} 已存在";
+$lang['user_email_remote'] = "電子信箱 {0} 已被註冊使用，如果不是您註冊，請洽管理員";
 $lang['user_phoneO_1_required'] = "電話(公)區碼為必填欄位";
 $lang['user_phoneO_1_maxlength'] = "請輸入正常的區碼";
 $lang['user_phoneO_1_number'] = "有非法字元";
@@ -73,6 +73,7 @@ $lang['user_research_required'] = "請輸入研究領域";
 $lang['user_research_minlength'] = "輸入的內容至少四個字";
 
 /* passwd */
+$lang['reset_passwd'] = "重置密碼";
 $lang['old_pass'] = "舊密碼";
 $lang['user_pass'] = "新密碼";
 $lang['user_pass2'] = "確認新密碼";
@@ -84,3 +85,12 @@ $lang['fail_password'] = "更改密碼失敗";
 $lang['send_lostpwd_mail'] = "重置密碼信寄出成功，請查閱信箱(收件匣若無信件，請查閱垃圾信箱)";
 $lang['user_notfound'] = "查無此使用者";
 $lang['lostpwd_submit'] = "送出";
+
+/* review_confirm */
+$lang['user_review_confirm'] = "審稿確認";
+
+/* alert */
+$lang['alert_signup_success'] = "註冊成功";
+$lang['alert_signup_fail'] = "註冊失敗,原因:";
+$lang['alert_username_exists'] = "帳號 %s 已被註冊";
+$lang['alert_email_exists'] = "電子信箱 %s 已被註冊使用";

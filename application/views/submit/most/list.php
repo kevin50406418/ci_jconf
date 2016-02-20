@@ -22,8 +22,8 @@
 					<div><?php echo $most->most_name?>(<?php echo $most->most_number?>)</div>
 					<div><?php echo $most->most_name_eng?></div>
 				</td>
-				<td class="text-center"><?php echo $this->Submit->most_method($most->most_method)?></td>
-				<td class="text-center"><?php echo $this->Submit->most_status($most->most_status,true)?></td>
+				<td class="text-center"><?php echo $this->submit->most_method($most->most_method)?></td>
+				<td class="text-center"><?php echo $this->submit->most_status($most->most_status,true)?></td>
 				<td>
 					<a href="<?php echo get_url("submit",$conf_id,"most","detail")?>?id=<?php echo $most->most_id?>" class="ui button teal">查看</a>
 					<?php if( $most->most_status == 0 ){?><a href="<?php echo get_url("submit",$conf_id,"most","edit")?>?id=<?php echo $most->most_id?>" class="ui button blue">編輯</a><?php }?>

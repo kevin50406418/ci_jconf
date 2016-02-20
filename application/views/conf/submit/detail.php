@@ -7,6 +7,8 @@
 			<li> <a href="#tab_author" data-toggle="tab"> 作者資訊 </a> </li>
 			<li> <a href="#tab_file" data-toggle="tab"> 稿件檔案 </a> </li>
 			<?php if( $paper->sub_status >= 3 || $paper->sub_status == -2){?><li> <a href="#tab_review" data-toggle="tab"> 審查資料 </a> </li><?php }?>
+			<?php if( $paper->sub_status != -5 ){?><a onclick="return confirm('確定是否刪除稿件? \n注意：本操作無法恢復');" href="<?php echo get_url("dashboard",$conf_id,"submit","remove",$paper->sub_id)?>" class="ui red button pull-right">刪除稿件</a>
+			<?php }?>
 			<a href="<?php echo get_url("dashboard",$conf_id,"submit","edit",$paper->sub_id)?>" class="ui teal button pull-right">編輯稿件</a>
 		</ul>
 		<div class="tab-content">
@@ -27,7 +29,15 @@
 					</tr>
 					<tr>
 						<th>稿件狀態</th>
-						<td><?php echo $this->Submit->sub_status($paper->sub_status,true,true)?></td>
+						<td><?php echo $this->submit->sub_status($paper->sub_status,true,true)?></td>
+					</tr>
+					<tr>
+						<th>最後更新時間</th>
+						<td><?php echo date("Y-m-d H:i:s",$paper->sub_lastupdate)?></td>
+					</tr>
+					<tr>
+						<th>送審時間</th>
+						<td><?php echo date("Y-m-d H:i:s",$paper->sub_review)?></td>
 					</tr>
 					<tr>
 						<th>語言</th>
@@ -81,7 +91,8 @@
 					<thead>
 						<tr>
 							<th class="text-center col-md-2">檔案類型</th>
-							<th class="text-center col-md-8">檔案名稱</th>
+							<th class="text-center col-md-6">檔案名稱</th>
+							<th class="text-center col-md-2">上傳時間</th>
 							<th class="text-center col-md-2">操作</th>
 						</tr>
 					</thead>
@@ -90,6 +101,7 @@
 						<tr>
 							<td class="text-center"><span class="ui blue basic label">完稿投稿資料</span></td>
 							<td><?php echo $finishfile->file_name?></td>
+							<td><?php echo date("Y-m-d H:i:s",$finishfile->file_time)?></td>
 							<td class="text-center">
 								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$finishfile->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
 								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$finishfile->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
@@ -100,6 +112,7 @@
 						<tr>
 							<td class="text-center"><span class="ui teal basic label">完稿補充資料</span></td>
 							<td><?php echo $finish->file_name?></td>
+							<td><?php echo date("Y-m-d H:i:s",$finishfile->file_time)?></td>
 							<td class="text-center">
 								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$finish->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
 								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$finish->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
@@ -115,7 +128,8 @@
 					<thead>
 						<tr>
 							<th class="text-center col-md-2">檔案類型</th>
-							<th class="text-center col-md-8">檔案名稱</th>
+							<th class="text-center col-md-6">檔案名稱</th>
+							<th class="text-center col-md-2">上傳時間</th>
 							<th class="text-center col-md-2">操作</th>
 						</tr>
 					</thead>
@@ -128,6 +142,7 @@
 							<span class="ui label red">尚未上傳</span>
 							<?php }?>
 						</td>
+						<td><?php if(!empty($otherfile)){?><?php echo date("Y-m-d H:i:s",$otherfile->file_time)?><?php }?></td>
 						<td class="text-center">
 							<?php if(!empty($otherfile)){?>
 								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
@@ -140,8 +155,9 @@
 					<tr>
 						<td class="text-center"><span class="ui teal basic label">補充資料</span></td>
 						<td>
-							<?php echo $otherfile->file_name?>
+							$otherfile->file_name?>
 						</td>
+						<td><?php echo date("Y-m-d H:i:s",$otherfile->file_time)?></td>
 						<td class="text-center">
 							<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
 							<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
@@ -169,7 +185,7 @@
 						
 						<td><?php echo $reviewer->user_login?></td>
 						<td>
-							<?php echo $this->Submit->sub_status($reviewer->review_status,true)?>
+							<?php echo $this->submit->sub_status($reviewer->review_status,true)?>
 						</td>
 						<td>
 							<?php

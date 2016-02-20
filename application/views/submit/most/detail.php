@@ -11,7 +11,7 @@
 			<tr>
 				<th class="col-sm-2 control-label">發表方式</th>
 				<td class="col-sm-10">
-					<?php echo $this->Submit->most_method($most->most_method);?>
+					<?php echo $this->submit->most_method($most->most_method);?>
 				</td>
 			</tr>
 			<tr>
@@ -23,7 +23,7 @@
 			<tr>
 				<th class="col-sm-2 control-label">審核狀態</th>
 				<td class="col-sm-10">
-					<?php echo $this->Submit->most_status($most->most_status,true)?>
+					<?php echo $this->submit->most_status($most->most_status,true)?>
 				</td>
 			</tr>
 			<tr>

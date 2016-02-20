@@ -17,7 +17,7 @@
 			<td><?php echo $list->sub_title?></td>
 			<td><span title="<?php echo $list->topic_info?>"><?php echo $list->topic_name?></span></td>
 			<td class="text-center" data-order="<?php echo $list->sub_status?>">
-				<?php echo $this->Submit->sub_status($list->sub_status,true)?>
+				<?php echo $this->submit->sub_status($list->sub_status,true)?>
 			</td>
 			<td data-order="0">
 				<a href="<?php echo get_url("submit",$conf_id,"detail",$list->sub_id)?>" class="ui blue button">查看</a>

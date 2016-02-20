@@ -1,16 +1,12 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <div class="container">
-
 	<?php if(is_array($confs)){?>
 	<?php foreach ($confs as $key => $conf) {?>
-	<?php if( !in_array($conf->conf_id,$test_conf)){?>
-	
+	<?php if( $conf->conf_staus == 0 || $this->user->is_conf($conf->conf_id) ){?>
 		<div class="ui segment teal">
 			<h3 class="text-bold">
-				<?php if( $this->user->is_sysop() ){?>
-					<?php if( $conf->conf_staus == 1 ){?>
-					<span class="ui basic label pink">隱藏</span>
-					<?php }?>
+				<?php if( $conf->conf_staus == 1 ){?>
+				<span class="ui basic label pink">隱藏</span>
 				<?php }?>
 				<?php echo $conf->conf_name?>
 			</h3>
@@ -37,9 +33,7 @@
 				<?php }?>
 			</div>
 		</div>
-	
 	<?php }?>
 	<?php }?>
 	<?php }?>
-
 </div>

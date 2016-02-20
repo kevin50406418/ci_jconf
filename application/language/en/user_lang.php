@@ -73,6 +73,7 @@ $lang['user_research_required'] = "The Research Areas field is required.";
 $lang['user_research_minlength'] = "Enter content least four words";
 
 /* passwd */
+$lang['reset_passwd'] = "Reset Passwd";
 $lang['old_pass'] = "Old Password";
 $lang['user_pass'] = "New Password";
 $lang['user_pass2'] = "Confirm New Password";
@@ -84,3 +85,12 @@ $lang['fail_password'] = "Change password failed";
 $lang['send_lostpwd_mail'] = "Reset Password letter sent successfully，Please Check the mailbox";
 $lang['user_notfound'] = "User not found";
 $lang['lostpwd_submit'] = "Submit";
+
+/* review_confirm */
+$lang['user_review_confirm'] = "Confirm Review";
+
+/* alert */
+$lang['alert_signup_success'] = "Signup Success";
+$lang['alert_signup_fail'] = "Signup Fail,Reson:";
+$lang['alert_username_exists'] = "Account %s is already registered";
+$lang['alert_email_exists'] = "E-mail %s is already registered to use";

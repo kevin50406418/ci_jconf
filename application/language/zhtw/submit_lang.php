@@ -51,3 +51,4 @@ $lang['paper.step_3'] = "上傳投稿資料檔案";
 $lang['paper.step_4'] = "上傳投稿補充資料";
 $lang['paper.step_5'] = "稿件資料最後確認";
 $lang['paper.step_6'] = "送出審查";
+$lang['paper.edit'] = "編輯投稿資料";

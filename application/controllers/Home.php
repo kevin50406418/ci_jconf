@@ -1,74 +1,81 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+/*
+ * @package	Jconf
+ * @author	Jingxun Lai
+ * @copyright	Copyright (c) 2015 - 2016, Jingxun Lai, Inc. (https://jconf.tw/)
+ * @license	http://opensource.org/licenses/MIT	MIT License
+ * @link	https://jconf.tw
+ * @since	Version 1.0.0
+ * @date	2016/2/20 
+ */
 
 class Home extends MY_Controller {
 	public function __construct(){
 		parent::__construct();
 		$this->cinfo['show_confinfo'] = true;
-		/*$CI = & get_instance();
-		$CI->load->vars($data);*/
+		$this->data['body_class']     = $this->body_class;
+		$this->data['conf_id']        = $this->conf_id;
+		$this->data['spage']          = $this->config->item('spage');
+		$this->user_sysop  = $this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
+		$this->is_sysop    = $this->user_sysop;
+		$this->is_conf     = $this->user->is_conf($this->conf_id);
+		$this->is_topic    = $this->user->is_topic($this->conf_id);
+		$this->is_reviewer = $this->user->is_reviewer($this->conf_id);
 	}
-	
-	public function index($conf_id=''){
-		$data['body_class'] = $this->body_class;
-		$data['conf_id'] = $conf_id;
-		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
-		if(empty($conf_id)){
-			$data['confs']=$this->conf->all_conf_config($user_sysop);
-			$data['test_conf'] = in_array($this->user_login,$this->config->item("tester"))?array():$this->config->item("test_conf");
-			
+	public function index($conf_id=""){
+		if( empty($conf_id) ){
+			$this->data['confs']=$this->conf->all_conf_config(1);
+			$this->assets->set_title_separator("");
 			$this->cinfo['show_confinfo'] = false;
 			$this->load->view('common/header');
-			$this->load->view('common/nav',$data);
-			$this->load->view('common/index',$data);
-			$this->load->view('common/footer',$data);
+			$this->load->view('common/nav',$this->data);
+			$this->load->view('common/index',$this->data);
+			$this->load->view('common/footer',$this->data);
 		}else{
-			$data['spage']=$this->config->item('spage');
-			if( $this->conf->confid_exists($conf_id,$user_sysop) ){
-				$data['conf_config']=$this->conf->conf_config($conf_id,$user_sysop);
-				//$data['schedule']=$this->conf->conf_schedule($conf_id);
-				$data['conf_content']=$this->conf->conf_content($conf_id);
-				$data['conf_news'] = $this->conf->get_news($conf_id);
-				$data['content']=$this->conf->get_content($this->conf_id,"index",$this->_lang);
-				$data['conf_id'] = $conf_id;
-				$conf_col=$data['conf_config']['conf_col'];
-				$conf_template=$data['conf_config']['conf_template'];
-				$template_dir = "template/".$conf_template."/";
-				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
-				$this->assets->add_meta_tag("keywords", $data['conf_config']['conf_keywords'], "name");
+			if( $this->conf->confid_exists($this->conf_id,$this->is_conf) ){
+				$this->data['conf_config']=$this->conf->conf_config($this->conf_id,$this->is_conf);
+				$this->data['conf_content'] = $this->conf->conf_content($this->conf_id);
+				$this->data['conf_news']    = $this->conf->get_news($this->conf_id);
+				$this->data['content']      = $this->conf->get_content($this->conf_id,"index",$this->_lang);
+				$this->data['schedule']     = $this->conf->get_schedules($this->conf_id);
 
-				$schedule = $this->conf->get_schedules($this->conf_id);
-				$data['schedule'] = $schedule;
-				
-				if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-					$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
+				$this->assets->set_title($this->data['content']->page_title);
+				$this->assets->set_title_separator(" | ");
+				$this->assets->set_site_name($this->data['conf_config']['conf_name']);
+				$this->assets->add_meta_tag("description", $this->data['conf_config']['conf_desc'], "name");
+				$this->assets->add_meta_tag("keywords", $this->data['conf_config']['conf_keywords'], "name");
+
+				$conf_col      = $this->data['conf_config']['conf_col'];
+				$conf_template = $this->data['conf_config']['conf_template'];
+				$template_dir  = "template/".$conf_template."/";
+
+				if( $this->is_topic || $this->is_sysop ){
+					$this->data['topic_pedding'] = $this->topic->count_pedding_paper($this->conf_id,$this->user_login);
 				}
-				if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-					$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
+				if( $this->is_reviewer || $this->is_sysop ){
+					$this->data['reviewer_pedding'] = $this->reviewer->count_review($this->conf_id,$this->user_login);
 				}
 
 				if( $conf_template == "default"){
-					$this->load->view('common/header');
-					$this->load->view('common/nav',$data);
-					$this->load->view('conf/index');
-					$this->load->view('conf/conf_nav',$data);
-					//$this->load->view('conf/conf_schedule',$data);
-					
-					$data['col_index'] = array("index","news");
-					$data['col_sidebar_1'] = array("schedule");
-					$data['col_sidebar_2'] = array("");
+					$this->data['col_index'] = array("index","news");
+					$this->data['col_sidebar_1'] = array("schedule");
+					$this->data['col_sidebar_2'] = array("");
 
-					$this->load->view($template_dir."col-".$conf_col,$data);
-
-					$this->load->view('common/footer',$data);
+					$this->load->view('common/header',$this->data);
+					$this->load->view('common/nav',$this->data);
+					$this->load->view('conf/index',$this->data);
+					$this->load->view('conf/conf_nav',$this->data);
+					$this->load->view($template_dir."col-".$conf_col,$this->data);
+					$this->load->view('common/footer',$this->data);
 				}else{
-					$data['col_index'] = array("index");// 
-					$data['col_sidebar_1'] = array("schedule","news");
-					$data['col_sidebar_2'] = array("");
+					$this->data['col_index'] = array("index");// 
+					$this->data['col_sidebar_1'] = array("schedule","news");
+					$this->data['col_sidebar_2'] = array("");
 					
-					$this->load->view($template_dir.'header',$data);
-					$this->load->view($template_dir."col-".$conf_col,$data);
-					$this->load->view($template_dir.'footer',$data);
+					$this->load->view($template_dir.'header',$this->data);
+					$this->load->view($template_dir."col-".$conf_col,$this->data);
+					$this->load->view($template_dir.'footer',$this->data);
 				}
 			}else{
 				$this->cinfo['show_confinfo'] = false;
@@ -76,182 +83,164 @@ class Home extends MY_Controller {
 			}
 		}
 	}
-	public function news($conf_id=''){
-		$data['body_class'] = $this->body_class;
-		$data['conf_id'] = $conf_id;
-		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
-		if(empty($conf_id)){
-			$data['confs']=$this->conf->all_conf_config($user_sysop);
-			$this->load->view('common/header');
-			$this->load->view('common/nav',$data);
-			$this->load->view('common/index',$data);
-			$this->load->view('common/footer',$data);
-		}else{
-			$data['spage']=$this->config->item('spage');
-			if( $this->conf->confid_exists($conf_id,$user_sysop) ){
-				$data['conf_config']=$this->conf->conf_config($conf_id,$user_sysop);
-				//$data['schedule']=$this->conf->conf_schedule($conf_id);
-				$data['conf_content']=$this->conf->conf_content($conf_id);
-				$data['conf_news'] = $this->conf->get_news($conf_id);
-				$conf_col=$data['conf_config']['conf_col'];
-				$conf_template=$data['conf_config']['conf_template'];
-				$template_dir = "template/".$conf_template."/";
-				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
-				$this->assets->add_meta_tag("keywords", $data['conf_config']['conf_keywords'], "name");
-				
-				$schedule = $this->conf->get_schedules($this->conf_id);
-				$data['schedule'] = $schedule;
-				if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-					$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-				}
-				if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-					$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-				}
-				if( $conf_template == "default"){
-					$this->load->view('common/header');
-					$this->load->view('common/nav',$data);
-					$this->load->view('conf/index');
-					$this->load->view('conf/conf_nav',$data);
-					//$this->load->view('conf/conf_schedule',$data);
-					
-					$data['col_index'] = array("index","news");
-					$data['col_sidebar_1'] = array("schedule");
-					$data['col_sidebar_2'] = array("");
+	public function news($conf_id=""){
+		if( $this->conf->confid_exists($this->conf_id,$this->is_conf) ){
+			$this->data['conf_config']  = $this->conf->conf_config($this->conf_id,$this->is_conf);
+			$this->data['conf_content'] = $this->conf->conf_content($this->conf_id);
+			$this->data['conf_news']    = $this->conf->get_news($this->conf_id);
+			$this->data['content']      = $this->conf->get_content($this->conf_id,"news",$this->_lang);
+			$this->data['schedule']     = $this->conf->get_schedules($this->conf_id);
 
-					$this->load->view('conf/news',$data);
+			$this->assets->set_title($this->data['content']->page_title);
+			$this->assets->set_title_separator(" | ");
+			$this->assets->set_site_name($this->data['conf_config']['conf_name']);
+			$this->assets->add_rss_feed(get_url("rss",$conf_id), $this->data['conf_config']['conf_name']);
+			$this->assets->add_meta_tag("description", $this->data['conf_config']['conf_desc'], "name");
+			$this->assets->add_meta_tag("keywords", $this->data['conf_config']['conf_keywords'], "name");
 
-					$this->load->view('common/footer',$data);
-				}else{
-					$data['col_index'] = array("news");// 
-					$data['col_sidebar_1'] = array("schedule");
-					$data['col_sidebar_2'] = array("");
-					
-					$this->load->view($template_dir.'header',$data);
-					$this->load->view($template_dir."col-".$conf_col,$data);
-					$this->load->view($template_dir.'footer',$data);
-				}
-			}else{
-				$this->cinfo['show_confinfo'] = false;
-				$this->conf->show_404conf();
+			$conf_col      = $this->data['conf_config']['conf_col'];
+			$conf_template = $this->data['conf_config']['conf_template'];
+			$template_dir  = "template/".$conf_template."/";
+
+			if( $this->is_topic || $this->user_sysop ){
+				$this->data['topic_pedding'] = $this->topic->count_pedding_paper($this->conf_id,$this->user_login);
 			}
+			if( $this->is_reviewer || $this->user_sysop ){
+				$this->data['reviewer_pedding'] = $this->reviewer->count_review($this->conf_id,$this->user_login);
+			}
+			if( $conf_template == "default"){
+				$this->data['col_index'] = array("index","news");
+				$this->data['col_sidebar_1'] = array("schedule");
+				$this->data['col_sidebar_2'] = array("");
+
+				$this->load->view('common/header',$this->data);
+				$this->load->view('common/nav',$this->data);
+				$this->load->view('conf/index',$this->data);
+				$this->load->view('conf/conf_nav',$this->data);
+				$this->load->view('conf/news',$this->data);
+				$this->load->view('common/footer',$this->data);
+			}else{
+				$this->data['col_index'] = array("news");// 
+				$this->data['col_sidebar_1'] = array("schedule");
+				$this->data['col_sidebar_2'] = array("");
+				
+				$this->load->view($template_dir.'header',$this->data);
+				$this->load->view($template_dir."col-".$conf_col,$this->data);
+				$this->load->view($template_dir.'footer',$this->data);
+			}
+		}else{
+			$this->cinfo['show_confinfo'] = false;
+			$this->conf->show_404conf();
 		}
 	}
-	public function main($conf_id=''){
-		$data['body_class'] = $this->body_class;
-		$data['conf_id'] = $conf_id;
-		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
-		if(empty($conf_id)){
-			$data['confs']=$this->conf->all_conf_config($user_sysop);
-			$this->load->view('common/header');
-			$this->load->view('common/nav',$data);
-			$this->load->view('common/index',$data);
-			$this->load->view('common/footer',$data);
-		}else{
+	public function main($conf_id=""){
+		if( $this->conf->confid_exists($this->conf_id,$this->is_conf) ){
 			if( !$this->user->is_login() ){
 				redirect('/user/login', 'location', 301);
 			}
-			$data['spage']=$this->config->item('spage');
-			if( $this->conf->confid_exists($conf_id,$user_sysop) ){
-				$data['conf_config']=$this->conf->conf_config($conf_id,$user_sysop);
-				//$data['schedule']=$this->conf->conf_schedule($conf_id);
-				$data['conf_content']=$this->conf->conf_content($conf_id);
+			$this->data['conf_config']  = $this->conf->conf_config($this->conf_id,$this->is_conf);
+			$this->data['conf_content'] = $this->conf->conf_content($this->conf_id);
+			$this->data['content']      = $this->conf->get_content($this->conf_id,"main",$this->_lang);
+			$this->data['schedule']     = $this->conf->get_schedules($this->conf_id);
 
-				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
-				$this->assets->add_meta_tag("keywords", $data['conf_config']['conf_keywords'], "name");
-				$this->assets->add_css(asset_url().'style/statistic.min.css');
-				$data['schedule'] = $this->conf->get_schedules($this->conf_id);
-				
-				if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-					$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
-				}
-				if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-					$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
-				}
-		
-				$this->load->view('common/header');
-				$this->load->view('common/nav',$data);
-				$this->load->view('conf/index');
-				$this->load->view('conf/conf_nav',$data);
-				//$this->load->view('conf/conf_schedule',$data);
-				
-				$this->load->view('conf/menu_submit',$data);
-				if($this->user->is_conf($conf_id) || $this->user->is_sysop()){
-					$this->load->view('conf/menu_conf',$data);
-				}
-				if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-					$this->load->view('conf/menu_topic',$data);
-				}
-				if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-					$this->load->view('conf/menu_reviewer',$data);
-				}
-				
-				$this->load->view('common/footer',$data);
-			}else{
-				$this->cinfo['show_confinfo'] = false;
-				$this->conf->show_404conf();
+			$this->assets->set_title($this->data['content']->page_title);
+			$this->assets->set_title_separator(" | ");
+			$this->assets->set_site_name($this->data['conf_config']['conf_name']);
+			$this->assets->add_meta_tag("description", $this->data['conf_config']['conf_desc'], "name");
+			$this->assets->add_meta_tag("keywords", $this->data['conf_config']['conf_keywords'], "name");
+			$this->assets->add_css(asset_url().'style/statistic.min.css');
+			
+			if( $this->is_topic || $this->is_sysop ){
+				$this->data['topic_pedding'] = $this->topic->count_pedding_paper($this->conf_id,$this->user_login);
 			}
+			if( $this->is_reviewer || $this->is_sysop ){
+				$this->data['reviewer_pedding'] = $this->reviewer->count_review($this->conf_id,$this->user_login);
+			}
+	
+			$this->load->view('common/header',$this->data);
+			$this->load->view('common/nav',$this->data);
+			$this->load->view('conf/index',$this->data);
+			$this->load->view('conf/conf_nav',$this->data);
+			
+			$this->load->view('conf/menu_submit',$this->data);
+			if( $this->is_conf || $this->is_sysop ){
+				$this->load->view('conf/menu_conf',$this->data);
+			}
+			if( $this->is_topic || $this->is_sysop ){
+				$this->load->view('conf/menu_topic',$this->data);
+			}
+			if( $this->is_reviewer || $this->is_sysop ){
+				$this->load->view('conf/menu_reviewer',$this->data);
+			}
+			
+			$this->load->view('common/footer',$this->data);
+		}else{
+			$this->cinfo['show_confinfo'] = false;
+			$this->conf->show_404conf();
 		}
+		
 	}
-	public function about($conf_id='',$page_id=''){
-		$data['body_class'] = $this->body_class;
-		$data['conf_id'] = $conf_id;
-		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
-		if(empty($conf_id) || empty($page_id)){
-			$data['confs']=$this->conf->all_conf_config($user_sysop);
+	public function about($conf_id="",$page_id=""){
+		$this->data['conf_id'] = $this->conf_id;
+		
+		if( empty($conf_id) || empty($page_id) ){
+			$this->data['confs'] = $this->conf->all_conf_config($this->user_sysop);
 			$this->load->view('common/header');
-			$this->load->view('common/nav',$data);
-			$this->load->view('common/index',$data);
-			$this->load->view('common/footer',$data);
+			$this->load->view('common/nav',$this->data);
+			$this->load->view('common/index',$this->data);
+			$this->load->view('common/footer',$this->data);
 		}else{
 			$spage = $this->config->item('spage');
-			$data['spage'] = $spage;
-			if(in_array($page_id,$spage)){
-				redirect($conf_id."/".$page_id,'location',301);
+			$this->data['spage'] = $spage;
+			if( in_array($page_id,$spage) ){
+				redirect($this->conf_id."/".$page_id,'location',301);
 			}
-			if( $this->conf->confid_exists($conf_id,$user_sysop) ){
-				$data['conf_config']=$this->conf->conf_config($conf_id,$user_sysop);
-				//$data['schedule']=$this->conf->conf_schedule($conf_id);
-				$data['conf_content']=$this->conf->conf_content($conf_id);
-				$data['content']=$this->conf->get_content($conf_id,$page_id,$this->_lang);
-				$data['conf_news'] = $this->conf->get_news($conf_id);
-				$schedule = $this->conf->get_schedules($this->conf_id);
-				$data['schedule'] = $schedule;
-				$conf_col=$data['conf_config']['conf_col'];
-				$conf_template=$data['conf_config']['conf_template'];
-				$template_dir = "template/".$conf_template."/";
-				$this->assets->add_meta_tag("description", $data['conf_config']['conf_desc'], "name");
-				$this->assets->add_meta_tag("keywords", $data['conf_config']['conf_keywords'], "name");
+			if( $this->conf->confid_exists($this->conf_id,$this->is_conf) ){
+				$this->data['conf_config']  = $this->conf->conf_config($this->conf_id,$this->is_conf);
+				$this->data['conf_content'] = $this->conf->conf_content($this->conf_id);
+				$this->data['content']      = $this->conf->get_content($this->conf_id,$page_id,$this->_lang);
+				$this->data['conf_news']    = $this->conf->get_news($this->conf_id);
+				$this->data['schedule']     = $this->conf->get_schedules($this->conf_id);
+				
+				$this->assets->set_title($this->data['content']->page_title);
+				$this->assets->set_title_separator(" | ");
+				$this->assets->set_site_name($this->data['conf_config']['conf_name']);
+				$this->assets->add_meta_tag("description", $this->data['conf_config']['conf_desc'], "name");
+				$this->assets->add_meta_tag("keywords", $this->data['conf_config']['conf_keywords'], "name");
 				$this->assets->add_css(asset_url().'style/statistic.min.css');
 
-				if($this->user->is_topic($conf_id) || $this->user->is_sysop()){
-					$data['topic_pedding'] = $this->topic->count_pedding_paper($conf_id,$this->user_login);
+				$conf_col      = $this->data['conf_config']['conf_col'];
+				$conf_template = $this->data['conf_config']['conf_template'];
+				$template_dir  = "template/".$conf_template."/";
+
+				if( $this->is_topic || $this->is_sysop ){
+					$this->data['topic_pedding'] = $this->topic->count_pedding_paper($this->conf_id,$this->user_login);
 				}
-				if($this->user->is_reviewer($conf_id) || $this->user->is_sysop()){
-					$data['reviewer_pedding'] = $this->reviewer->count_review($conf_id,$this->user_login);
+				if( $this->is_reviewer || $this->is_sysop ){
+					$this->data['reviewer_pedding'] = $this->reviewer->count_review($this->conf_id,$this->user_login);
 				}
 
 				if( $conf_template == "default"){
-					$this->load->view('common/header');
-					$this->load->view('common/nav',$data);
-					$this->load->view('conf/index');
-					$this->load->view('conf/conf_nav',$data);
-					//$this->load->view('conf/conf_schedule',$data);
-					
-					$data['col_index'] = array("index","news");
-					$data['col_sidebar_1'] = array("schedule");
-					$data['col_sidebar_2'] = array("");
+					$this->data['col_index'] = array("index","news");
+					$this->data['col_sidebar_1'] = array("schedule");
+					$this->data['col_sidebar_2'] = array("");
 
-					if($data['content']->page_show == 1){
-						$this->load->view('conf/about',$data);
+					$this->load->view('common/header');
+					$this->load->view('common/nav',$this->data);
+					$this->load->view('conf/index');
+					$this->load->view('conf/conf_nav',$this->data);
+
+					if( $this->data['content']->page_show == 1 ){
+						$this->load->view('conf/about',$this->data);
 					}else{
 						$this->cinfo['show_confinfo'] = false;
 						$this->conf->show_404conf();
 					}
-					$this->load->view('common/footer',$data);
+					$this->load->view('common/footer',$this->data);
 				}else{
-					$this->load->view($template_dir.'header',$data);
-					$this->load->view($template_dir.'about',$data);
-					$this->load->view($template_dir.'footer',$data);
+					$this->load->view($template_dir.'header',$this->data);
+					$this->load->view($template_dir.'about',$this->data);
+					$this->load->view($template_dir.'footer',$this->data);
 				}
 			}else{
 				$this->cinfo['show_confinfo'] = false;
@@ -260,7 +249,7 @@ class Home extends MY_Controller {
 		}
 	}
 
-	public function change_lang($lang='zhtw'){
+	public function change_lang($lang="zhtw"){
 		if ( $this->input->is_ajax_request() ){
 			switch($lang){
 				case "zhtw":
@@ -282,20 +271,28 @@ class Home extends MY_Controller {
 			$this->alert->js("No direct script access allowed",site_url());
 		}
 	}
-	public function page404($conf_id=''){
-		$data['body_class'] = $this->body_class;
-		$data['conf_id'] = $this->conf_id;
+
+	public function rss($conf_id=""){
+		if( $this->conf->confid_exists($this->conf_id,$this->is_conf) ){
+			$this->load->helper('xml');
+			$this->output->set_content_type('application/rss+xml', 'UTF-8');
+			$this->data['conf_config'] = $this->conf->conf_config($this->conf_id,$this->is_conf);
+			$this->data['conf_news']   = $this->conf->get_news($this->conf_id);
+
+			$this->load->view('common/rss',$this->data);
+		}else{
+			$this->cinfo['show_confinfo'] = false;
+			$this->conf->show_404conf();
+		}
+		
+	}
+	public function page404($conf_id=""){
+		$this->data['conf_id'] = $this->conf_id;
 		$this->cinfo['show_confinfo'] = false;
-		$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
-		if( !empty($this->conf_id) ){
-			if( $this->conf->confid_exists($this->conf_id,$user_sysop) ){
-				redirect(get_url("index",$this->conf_id), 'location', 301);
-			}else{
-				$this->conf->show_404conf();
-			}
+		if( $this->conf->confid_exists($this->conf_id,$this->user_sysop) ){
+			redirect(get_url("index",$this->conf_id), 'location', 301);
 		}else{
 			$this->conf->show_404conf();
 		}
 	}
-	
 }

@@ -1,5 +1,4 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
-<div class="col-md-<?php echo $col_right;?>">
 <div class="ui segment">
 	<div class="pull-right">
 		<a href="<?php echo site_url("sysop/user/all");?>" class="ui button brown">所有使用者</a>

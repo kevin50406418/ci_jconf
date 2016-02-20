@@ -35,6 +35,21 @@ class Conf_model extends CI_Model {
 		}
 	}
 
+	function get_conf($conf_id,$user_sysop=false){
+    	if(!$user_sysop){
+    		$user_sysop=0;
+    	}else{
+    		$user_sysop=1;
+    	}
+		if($this->conf->confid_exists( $conf_id , $user_sysop)){
+			$this->db->from('conf');
+			$this->db->where('conf_id', $conf_id);
+			$this->db->join('style','conf.conf_template = style.style_template');
+			// $this->db->join('style','conf.conf_template = style.style_template');
+			return $this->db->get()->row();
+		}
+	}
+
 	function update_status($conf_id,$conf_staus){
 		if( $this->db->update('conf',array("conf_staus"=> $conf_staus),array("conf_id"=>$conf_id)) ){
 			$this->add_log("conf","update_status",$conf_id,array("conf_staus"=> $conf_staus));
@@ -44,13 +59,17 @@ class Conf_model extends CI_Model {
 	}
 
 	function all_conf_config($sysop=false){
-		$this->db->select('*');
+		return $this->get_confs($sysop);
+	}
+
+	function get_confs($sysop=false){
 		$this->db->from('conf');
+		$this->db->join('conf_date','conf.conf_id = conf_date.conf_id');
 		if(!$sysop){
-			$this->db->where('conf_staus', 0);
+			$this->db->where('conf.conf_staus', 0);
 		}
-		$query = $this->db->get();
-		return $query->result();
+		$this->db->where('conf_date.date_type', "hold");
+		return $this->db->get()->result();
 	}
 
 	function conf_schedule($conf_id){
@@ -60,19 +79,19 @@ class Conf_model extends CI_Model {
 		$query = $this->db->get();
 		$conf_schedule=$query->row_array();
 
-		$schedule['conf']     =explode(",", $conf_schedule['time_conf']);
-		$schedule['submit']   =explode(",", $conf_schedule['time_submit']);
-		$schedule['invite']   =explode(",", $conf_schedule['time_invite']);
-		$schedule['reviewer'] =explode(",", $conf_schedule['time_reviewer']);
-		$schedule['finish']   =explode(",", $conf_schedule['time_finish']);
-		$schedule['singup']   =explode(",", $conf_schedule['time_singup']);
+		$schedule['conf']     = explode(",", $conf_schedule['time_conf']);
+		$schedule['submit']   = explode(",", $conf_schedule['time_submit']);
+		$schedule['invite']   = explode(",", $conf_schedule['time_invite']);
+		$schedule['reviewer'] = explode(",", $conf_schedule['time_reviewer']);
+		$schedule['finish']   = explode(",", $conf_schedule['time_finish']);
+		$schedule['singup']   = explode(",", $conf_schedule['time_singup']);
 
-		$schedule['conf']     =array_map("schedule_dates", $schedule['conf']);
-		$schedule['submit']   =array_map("schedule_dates", $schedule['submit']);
-		$schedule['invite']   =array_map("schedule_dates", $schedule['invite']);
-		$schedule['reviewer'] =array_map("schedule_dates", $schedule['reviewer']);
-		$schedule['finish']   =array_map("schedule_dates", $schedule['finish']);
-		$schedule['singup']   =array_map("schedule_dates", $schedule['singup']);
+		$schedule['conf']     = array_map("schedule_dates", $schedule['conf']);
+		$schedule['submit']   = array_map("schedule_dates", $schedule['submit']);
+		$schedule['invite']   = array_map("schedule_dates", $schedule['invite']);
+		$schedule['reviewer'] = array_map("schedule_dates", $schedule['reviewer']);
+		$schedule['finish']   = array_map("schedule_dates", $schedule['finish']);
+		$schedule['singup']   = array_map("schedule_dates", $schedule['singup']);
 
 		return $schedule;
 	}
@@ -285,6 +304,7 @@ class Conf_model extends CI_Model {
 		$conf = array(
 			"conf_template" => $conf_template
 		);
+		$this->db->where("conf_id", $conf_id);
 		if( $this->db->update('conf', $conf) ){
 			$this->add_log("conf","update_confstyle",$conf_id,$conf);
 		 	return true;
@@ -302,6 +322,10 @@ class Conf_model extends CI_Model {
 
 	function get_mostdir($conf_id){
 		return './upload/most/'.$conf_id.'/';
+	}
+
+	function get_filesdir($conf_id){
+		return './upload/files/'.$conf_id.'/';
 	}
 
 	function mkconf_dir($conf_id){
@@ -328,14 +352,21 @@ class Conf_model extends CI_Model {
 			);
 			return $return;
 		}
-
+		if( file_exists($this->get_filesdir($conf_id)) ){
+			$return = array(
+				"error" => "Directory '".$this->get_filesdir($conf_id)."' exists."
+			);
+			return $return;
+		}
 		$data = "<!DOCTYPE html><html><head><title>403 Forbidden</title></head><body><p>Directory access is forbidden.</p></body></html>";
 		mkdir($this->get_paperdir($conf_id), 0755);
 		mkdir($this->get_regdir($conf_id), 0755);
 		mkdir($this->get_mostdir($conf_id), 0755);
+		mkdir($this->get_filesdir($conf_id), 0755);
 		write_file($this->get_paperdir($conf_id)."index.html", $data);
 		write_file($this->get_regdir($conf_id)."index.html", $data);
 		write_file($this->get_mostdir($conf_id)."index.html", $data);
+		write_file($this->get_filesdir($conf_id)."index.html", $data);
 		
 		$return['status'] = true;
 		return $return;
@@ -355,18 +386,19 @@ class Conf_model extends CI_Model {
 				$return["error"] = $mkdir['error'];
 			}else{
 				$conf = array(
-					"conf_id"      => $conf_id,
-					"conf_name"    => $conf_name,
-					"conf_master"  => $conf_master,
-					"conf_email"   => $conf_email,
-					"conf_phone"   => $conf_phone,
-					"conf_address" => $conf_address,
-					"conf_host"    => $conf_host,
-					"conf_place"   => $conf_place,
-					"conf_staus"   => $conf_staus,
-					"conf_lang"    => $conf_lang,
-					"conf_fax"     => $conf_fax,
-					"conf_desc"    => $conf_desc
+					"conf_id"       => $conf_id,
+					"conf_name"     => $conf_name,
+					"conf_master"   => $conf_master,
+					"conf_email"    => $conf_email,
+					"conf_phone"    => $conf_phone,
+					"conf_address"  => $conf_address,
+					"conf_host"     => $conf_host,
+					"conf_place"    => $conf_place,
+					"conf_staus"    => $conf_staus,
+					"conf_lang"     => $conf_lang,
+					"conf_fax"      => $conf_fax,
+					"conf_keywords" => $conf_keywords,
+					"conf_desc"     => $conf_desc
 				);
 				if( $this->db->insert('conf', $conf) ){
 					$return = array(
@@ -463,22 +495,22 @@ class Conf_model extends CI_Model {
 	        array(
 				'conf_id'     => $conf_id,
 				'page_id'     => 'main',
-				'page_title'  => "研討會系統",
+				'page_title'  => "投稿系統",
 				'page_lang'   => "zhtw",
 				'page_show'   => 1,
 				"page_order"  => 1,
-				"page_edit"   => 0,
+				"page_edit"   => 1,
 				"page_hidden" => 0,
 				"page_del"    => 0
 	        ),
 	        array(
 				'conf_id'     => $conf_id,
 				'page_id'     => 'main',
-				'page_title'  => "Conference System",
+				'page_title'  => "Submission System",
 				'page_lang'   => "en",
 				'page_show'   => 1,
 				"page_order"  => 1,
-				"page_edit"   => 0,
+				"page_edit"   => 1,
 				"page_hidden" => 0,
 				"page_del"    => 0
 	        ),
@@ -489,7 +521,7 @@ class Conf_model extends CI_Model {
 				'page_lang'   => "zhtw",
 				'page_show'   => 1,
 				"page_order"  => 2,
-				"page_edit"   => 0,
+				"page_edit"   => 1,
 				"page_hidden" => 0,
 				"page_del"    => 0
 	        ),
@@ -500,7 +532,7 @@ class Conf_model extends CI_Model {
 				'page_lang'   => "en",
 				'page_show'   => 1,
 				"page_order"  => 2,
-				"page_edit"   => 0,
+				"page_edit"   => 1,
 				"page_hidden" => 0,
 				"page_del"    => 0
 	        ),
@@ -771,7 +803,17 @@ class Conf_model extends CI_Model {
 		return $query->result();
 	}
 
+	function get_conf_lang($conf_id){
+		$conf_config = $this->conf_config($conf_id,true);
+		$conf_lang = explode(",", $conf_config['conf_lang']);
+		return $conf_lang;
+	}
+
 	function get_content($conf_id,$page_id,$page_lang){
+		$conf_lang = $this->get_conf_lang($conf_id);
+		if( !in_array($page_lang, $conf_lang) ){
+			$page_lang = $conf_lang[0];
+		}
 		$this->db->from('conf_content');
 		$this->db->where('conf_id', $conf_id);
 		$this->db->where('page_lang', $page_lang);
@@ -909,24 +951,37 @@ class Conf_model extends CI_Model {
 		return $query->row();
 	}
 
-	function update_schedule($conf_id,$date_type,$start_value,$end_value){
-		$schedule = array(
-			"start_value" => $start_value,
-			"end_value" => $end_value
-		);
+	function update_schedule($conf_id,$date_type,$date){
 		$this->db->where('conf_id', $conf_id);
 		$this->db->where('date_type', $date_type);
-		
-		if( $this->db->update('conf_date', $schedule) ){
-			$this->add_log("conf","update_schedule",$conf_id,$schedule);
+		if( $this->db->update('conf_date', $date) ){
+			$this->add_log("conf","update_schedule",$conf_id,$date);
 			return true;
 		}
 		return false;
 	}
 
+	function update_schedules($conf_id,$dates){
+		$update = array();
+		$i = 1;
+		foreach ($dates as $key => $date) {
+			$tmp = array();
+			$tmp["start_value"] = strtotime($date["start"]);
+			$tmp["end_value"] = strtotime($date["end"]);
+			$tmp["date_title_zhtw"] = $date["date_title_zhtw"];
+			$tmp["date_title_en"] = $date["date_title_en"];
+			$tmp["date_showmethod"] = $date["showmethod"];
+			$tmp["date_order"] = $i;
+			$this->update_schedule($conf_id,$key,$tmp);
+			$i++;
+		}
+		return true;
+	}
+
 	function get_schedules($conf_id){
 		$this->db->from('conf_date');
 		$this->db->where('conf_id', $conf_id);
+		$this->db->order_by('date_order', "asc");
 		$query = $this->db->get();
 		$dates = $query->result();
 		$schedule =array();
@@ -934,6 +989,9 @@ class Conf_model extends CI_Model {
 			$schedule[$date->date_type] = array();
 			$schedule[$date->date_type]['start'] = date("Y-m-d",$date->start_value);
 			$schedule[$date->date_type]['end'] = date("Y-m-d",$date->end_value);
+			$schedule[$date->date_type]['date_title_zhtw'] = $date->date_title_zhtw;
+			$schedule[$date->date_type]['date_title_en'] = $date->date_title_en;
+			$schedule[$date->date_type]['date_showmethod'] = $date->date_showmethod;
 		}
 		return $schedule;
 	}
@@ -1107,6 +1165,7 @@ class Conf_model extends CI_Model {
 	function get_logs($conf_id){
 		$this->db->from('conf_log');
 		$this->db->where("log_conf",$conf_id);
+		$this->db->order_by("log_id","desc");
 		$query = $this->db->get();
 		return $query->result();
 	}
@@ -1212,5 +1271,51 @@ class Conf_model extends CI_Model {
 		return $query->result();
 	}
 
-	
+	function add_apply_conf($user_login,$conf_id,$conf_name,$conf_master,$conf_email,$conf_phone,$conf_address,$conf_host,$conf_place,$conf_keywords,$conf_staus,$conf_admin,$apply_message){
+		$conf_apply = array(
+			"user_login"    => $user_login,
+			"conf_id"       => $conf_id,
+			"conf_name"     => $conf_name,
+			"conf_master"   => $conf_master,
+			"conf_email"    => $conf_email,
+			"conf_phone"    => $conf_phone,
+			"conf_address"  => $conf_address,
+			"conf_host"     => $conf_host,
+			"conf_place"    => $conf_place,
+			"conf_keywords" => $conf_keywords,
+			"conf_staus"    => $conf_staus,
+			"conf_admin"    => $conf_admin,
+			"apply_message" => $apply_message,
+			"apply_time"    => time()
+		);
+		return $this->db->insert('conf_apply', $conf_apply);
+	}
+
+	function get_apply_conf($user_login){
+		$this->db->from("conf_apply");
+		$this->db->where("user_login",$user_login);
+		$query = $this->db->get();
+		return $query->result();
+	}
+
+	function get_apply_conf_status($conf_status){
+		$status_text = "";
+		switch($conf_status){
+			case -1:
+				$status_text = "尚未審核";
+			break;
+			case 0:
+				$status_text = "拒絕申請";
+			break;
+			case 1:
+				$status_text = "申請通過";
+			break;
+			case 2:
+				$status_text = "取消申請";
+			break;
+			default:
+				$status_text = "未知錯誤";
+		}
+		return $status_text;
+	}
 }

@@ -48,8 +48,8 @@
 						<?php if( $paper->review_confirm == -1 ){?>
 						論文審查請求
 						<div class="btn-group btn-group-xs">
-						<a target="_blank" class="btn btn-success" href="<?php echo site_url("review_confirm/accept/".$paper->review_token);?>">接受</a>
-						<a target="_blank" class="btn btn-danger" href="<?php echo site_url("review_confirm/reject/".$paper->review_token);?>">不方便</a>
+						<a target="_blank" class="confirm btn btn-success" href="<?php echo site_url("review_confirm/accept/".$paper->review_token);?>">接受</a>
+						<a target="_blank" class="confirm btn btn-danger" href="<?php echo site_url("review_confirm/reject/".$paper->review_token);?>">不方便</a>
 						</div>
 						<?php }else{?>
 						<a href="<?php echo get_url("reviewer",$conf_id,"detail",$paper->sub_id)?>" class="ui blue button basic">進行審查</a>
@@ -65,3 +65,10 @@
 	</table>
 </div>
 </div>
+<script>
+$(function(){
+	$(".confirm").click(function(e){
+		window.location.reload();
+	});
+});
+</script>

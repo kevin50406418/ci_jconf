@@ -88,10 +88,15 @@
 		<div class="form-group">
 			<label for="user_postadd" class="col-sm-2 control-label">聯絡地址</label>
 			<div class="col-sm-10">
-				<div id="addr_6" class="row form-inline">
-					<div data-role="zipcode" data-readonly="true" class="col-sm-3" data-value="<?php echo $user->user_postcode?>"></div>
-					<div data-role="county" class="col-sm-2"></div>
-					<div data-role="district" class="col-sm-2"></div>
+				<div id="addr_6" class="row">
+					<div class="form-group">
+						<label class="col-sm-2 control-label">郵遞區號: <span class="text-danger">*</span></label>
+						<div data-role="zipcode" class="col-sm-2" data-readonly="true"></div>
+					</div>
+					<div>
+						<div data-role="county" class="col-sm-2"></div>
+						<div data-role="district" class="col-sm-2"></div>
+					</div>
 				</div>
 				<div class="help-block">
 					<input name="user_postadd" type="text" required="required" id="user_postadd" size="20" maxlength="100" class="form-control col-sm-5" autocomplete="off" value="<?php echo $user->user_postaddr[2]?>">
@@ -126,3 +131,4 @@
 		</div>
 	<?php echo form_close();?>
 </div>
+

@@ -1,5 +1,4 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
-<div class="col-md-<?php echo $col_right;?>">
 	<div class="col-xs-12 col-sm-12">
    		<div class="panel panel-info">
 			<div class="panel-heading">

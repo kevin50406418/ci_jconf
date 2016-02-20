@@ -8,6 +8,8 @@
 			<li> <a href="#tab_file" data-toggle="tab"> 稿件檔案 </a> </li>
 			<?php if( in_array($paper->sub_status,array(-2,4,5)) ){?><li> <a href="#tab_review" data-toggle="tab"> 審查資料 </a> </li><?php }?>
 			<a href="<?php echo get_url("dashboard",$conf_id,"submit")?>" class="ui button teal pull-right">稿件列表</a>
+			<?php if( $paper->sub_status != -5 ){?><a onclick="return confirm('確定是否刪除稿件? \n注意：本操作無法恢復');" href="<?php echo get_url("dashboard",$conf_id,"submit","remove",$paper->sub_id)?>" class="ui red button pull-right">刪除稿件</a>
+			<?php }?>
 			<a href="<?php echo get_url("dashboard",$conf_id,"submit","detail",$paper->sub_id)?>" class="ui button blue pull-right">查看</a>
 		</ul>
 		<div class="tab-content">
@@ -41,7 +43,7 @@
 					</tr>
 					<tr>
 						<th>稿件狀態 <span class="text-danger">*</span></th>
-						<td><?php echo $this->Submit->sub_status($paper->sub_status,true)?></td>
+						<td><?php echo $this->submit->sub_status($paper->sub_status,true)?></td>
 					</tr>
 					<tr>
 						<th>語言 <span class="text-danger">*</span></th>
@@ -272,7 +274,7 @@
 						
 						<td><?php echo $reviewer->user_login?></td>
 						<td>
-							<?php echo $this->Submit->sub_status($reviewer->review_status,true)?>
+							<?php echo $this->submit->sub_status($reviewer->review_status,true)?>
 						</td>
 						<td>
 							<?php

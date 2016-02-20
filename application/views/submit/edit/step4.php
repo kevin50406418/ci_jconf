@@ -49,7 +49,7 @@ if(!is_null($this->input->get("upload"))){
 				</td>
 				<td>
 					<i class="fa fa-file-pdf-o fa-2x"></i>
-					<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" target="_blank"><?php echo $otherfile->file_name;?></a>
+					<a target="_blank" href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$otherfile->fid;?>" target="_blank"><?php echo $otherfile->file_name;?></a>
 				</td>
 			</tr>
 			<?php }?>

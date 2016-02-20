@@ -144,7 +144,7 @@ class Topic_model extends CI_Model {
 
 	function sendmail_notice_reviewer($paper_id,$user_login,$conf_id,$review_timeout,$review_token){
 		$user_info = $this->user->get_user_info($user_login);
-		$paper     = $this->Submit->mail_get_paper($conf_id,$paper_id);
+		$paper     = $this->submit->mail_get_paper($conf_id,$paper_id);
 
 		$reviewer_email    = $user_info->user_email;
 		$reviewer_name     = preg_match("/[\x{4e00}-\x{9fa5}]/u", $user_info->user_last_name)?$user_info->user_last_name.$user_info->user_first_name:$user_info->user_first_name." ".$user_info->user_last_name;
@@ -331,7 +331,7 @@ class Topic_model extends CI_Model {
 
 	function count_pedding_paper($conf_id,$user_login){
 		$papers=$this->topic->get_paper($conf_id,$user_login,null,1); // need to review paper
-		$paper_author_array=$this->Submit->show_mypaper($user_login,$conf_id); // user submit paper
+		$paper_author_array=$this->submit->show_mypaper($user_login,$conf_id); // user submit paper
 		$paper_author = array();
 		if(is_array($paper_author_array)){
 			foreach ($paper_author_array as $key => $pa) {

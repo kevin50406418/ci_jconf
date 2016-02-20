@@ -13,7 +13,7 @@ class Assets{
 	protected $head_add = '';
 	protected $_title = '';
     protected $_title_separator = '-';
-    protected $site_name = '亞大研討會系統';
+    protected $site_name = '';
 	
     function __construct(){
 		$this->CI =& get_instance();
@@ -28,6 +28,15 @@ class Assets{
 
     }
 
+    public function set_title_separator($title_separator){
+        $this->_title_separator = $title_separator;
+
+    }
+
+    public function set_site_name($site_name){
+        $this->site_name = $site_name;
+    }
+
 	public function add_css($href = NULL, $media = 'screen'){
         $link = array(
             'href' => $href,
@@ -40,6 +49,10 @@ class Assets{
         }
 
         $this->_styles[] = link_tag($link);
+    }
+
+    public function add_rss_feed($href, $title){
+        $this->_styles[] = link_tag($href, 'alternate', 'application/rss+xml', $title.' RSS Feed');
     }
 
     public function add_js($src, $is_footer = FALSE){
@@ -65,6 +78,13 @@ class Assets{
     public function add_meta_tag($name, $value, $key = "name"){
         if ($name == 'canonical') {
             $this->_meta_tags[] = '<link rel="canonical" href="' . $value . '" />';
+        } elseif($name == 'description') {
+            if(mb_strlen($value)>200){
+                $value = mb_substr(strip_tags(str_replace(PHP_EOL, '', $value)),0,200)."...";
+            }else{
+                $value = strip_tags($value);
+            }
+            $this->_meta_tags[] = '<meta ' . $key . '="' . $name . '" content="' . $value . '" />';
         } else {
             $this->_meta_tags[] = '<meta ' . $key . '="' . $name . '" content="' . $value . '" />';
         }
@@ -99,6 +119,6 @@ class Assets{
     public function show_title(){
         echo "<title>";
         echo $this->get_title();
-        echo "</title>";
+        echo "</title>\n";
     }
 }

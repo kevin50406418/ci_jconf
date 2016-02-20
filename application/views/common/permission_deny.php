@@ -5,6 +5,6 @@
 	<p>
 		<a class="btn btn-danger btn-lg" href="javascript:location.reload();" role="button"><i class="fa fa-refresh"></i> 重整權限</a>
 		<a class="btn btn-mint btn-lg" href="javascript:history.back();" role="button"><i class="fa fa-arrow-circle-left"></i> 返回上一頁</a>
-		<a class="btn btn-primary btn-lg" href="<?php echo base_url();?>" role="button"><i class="fa fa-home"></i> 返回首頁</a>
+		<a class="btn btn-primary btn-lg" href="/" role="button"><i class="fa fa-home"></i> 返回首頁</a>
 	</p>
 </div>

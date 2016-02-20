@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 function asset_url($dir = ""){
-	return base_url().'assets/'.$dir;
+	return site_url().'assets/'.$dir;
 }
 
 function template_url($template,$script){
@@ -21,7 +21,7 @@ function sp($text){
 
 function get_url($page='',$conf_id='',$act='',$id='',$step=''){
 	$url=array();
-	$return="";
+	$return="/";
 	if(!empty($conf_id)){
 		$url['conf_id']=$conf_id;
 	}
@@ -156,4 +156,20 @@ function is_login(){
 function get_current_user_login(){
 	$ci =&get_instance();
 	return $ci->session->user_login;
+}
+
+function date_showmethod($showmethod,$start,$end,$sep="~"){
+	$str = "";
+	switch($showmethod){
+		case 1: //顯示開始日期
+			$str = $start;
+		break;
+		case 2: //顯示結束日期
+			$str = $end;
+		break;
+		case 3: //顯示所有日期
+			$str = $start.$sep.$end;
+		break;
+	}
+	return $str;
 }

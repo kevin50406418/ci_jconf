@@ -1,14 +1,13 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
-<div class="col-md-<?php echo $col_right;?>">
 <?php echo validation_errors('<div class="ui message red">', '</div>');?>
 <?php echo form_open(site_url("sysop/user/all"),array("class"=>"ui segment","id"=>"users"))?>
 	<p>
+		<a href="<?php echo site_url("sysop/user/adds")?>" class="ui button green">批量新增使用者</a>
 		<button value="sysop" name="type" class="ui button blue basic" id="sysop">設為系統管理員</button>
 		<button value="unsysop" name="type" class="ui button red basic" id="unsysop">取消系統管理員</button>
 	</p>
 	<div id="alert"></div>
 	<table class="table table-hover table-bordered datatable_users">
-
 		<thead>
 			<tr>
 				<th></th>

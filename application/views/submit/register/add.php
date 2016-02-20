@@ -97,7 +97,7 @@
 									<span title="<?php echo $paper->topic_info?>"><?php echo $paper->topic_name?></span>
 								</td>
 								<td class="text-center">
-									<?php echo $this->Submit->sub_status($paper->sub_status,true)?>
+									<?php echo $this->submit->sub_status($paper->sub_status,true)?>
 								</td>
 							</tr>
 						<?php }?>

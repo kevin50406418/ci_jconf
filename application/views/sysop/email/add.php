@@ -1,5 +1,4 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
-<div class="col-md-<?php echo $col_right;?>">
 <div class="ui segment blue">
 	<div class="page-header">
 		<h2>新增電子郵件樣版</h2>

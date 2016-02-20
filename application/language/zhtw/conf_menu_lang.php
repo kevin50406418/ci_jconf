@@ -6,6 +6,9 @@ $lang['submit_add'] = "投稿";
 $lang['submit_list'] = "投稿清單";
 $lang['submit_signup'] = "研討會註冊";
 $lang['submit_news'] = "最新公告";
+$lang['submit_edit'] = "編輯投稿資料";
+$lang['submit_detail'] = "投稿資料";
+$lang['submit_finish'] = "完稿上傳";
 
 $lang['conf_dashboard'] = "研討會管理";
 $lang['dashboard_setting'] = "控制台";

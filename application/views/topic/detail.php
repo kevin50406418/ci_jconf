@@ -48,8 +48,12 @@
 					<tr>
 						<th>稿件狀態</th>
 						<td class="row">
-							<?php echo $this->Submit->sub_status($paper->sub_status,true,true)?>
+							<?php echo $this->submit->sub_status($paper->sub_status,true,true)?>
 						</td>
+					</tr>
+					<tr>
+						<th>送審時間</th>
+						<td><?php echo date("Y-m-d H:i:s",$paper->sub_review)?></td>
 					</tr>
 					<tr>
 						<th>語言</th>
@@ -166,7 +170,7 @@
 							<?php if( $reviewer->review_confirm == -1  ){?>
 							<span class="ui grey label">確認中</span>
 							<?php }else{?>
-							<?php echo $this->Submit->sub_status($reviewer->review_status,true)?>
+							<?php echo $this->submit->sub_status($reviewer->review_status,true)?>
 							<?php }?>
 						</td>
 						<td class="text-center">
