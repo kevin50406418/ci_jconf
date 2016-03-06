@@ -6,8 +6,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @copyright	Copyright (c) 2015 - 2016, Jingxun Lai, Inc. (https://jconf.tw/)
  * @license	http://opensource.org/licenses/MIT	MIT License
  * @link	https://jconf.tw
- * @since	Version 1.0.0
- * @date	2016/2/20 
+ * @since	Version 1.1.0
+ * @date	2016/3/4
  */
 
 class Dashboard extends MY_Conference {
@@ -33,6 +33,7 @@ class Dashboard extends MY_Conference {
 			$this->conf->show_permission_deny($this->data);
 		}
 		$this->assets->set_title_separator(" | ");
+		$this->assets->set_site_name($this->conf_config['conf_name']);
 
 		$this->data['spage']        = $this->config->item('spage');
 		$this->data['schedule']     = $this->conf->get_schedules($this->conf_id);
@@ -52,9 +53,8 @@ class Dashboard extends MY_Conference {
 		$this->assets->add_css(asset_url().'style/datepicker.css');
 		$this->assets->add_js(asset_url().'js/bootstrap-datepicker.js');
 		$this->assets->add_js(asset_url().'js/locales/bootstrap-datepicker.zh-TW.js');
-		$this->assets->add_js(asset_url().'js/repeatable.js');
+		$this->assets->add_js(asset_url().'js/repeatable-fields.js');
 		$this->assets->set_title(lang('dashboard_setting'));
-		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 
 		$schedule = $this->conf->get_schedules($this->conf_id);
 		$this->data['schedule'] = $schedule;
@@ -189,7 +189,6 @@ class Dashboard extends MY_Conference {
 		}
 
 		$this->assets->set_title(lang('dashboard_topic'));
-		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$this->data);
@@ -278,7 +277,7 @@ class Dashboard extends MY_Conference {
 					$this->load->view('conf/topic/edit',$this->data);
 				break;
 				case "assign":
-					$this->data['users']=$this->user->get_all_users(0);
+					$this->data['users'] = $this->user->get_all_users(0);
 					$this->data["topic"] = $this->conf->get_topic_info($this->conf_id,$topic_id);
 					if( !empty($this->data["topic"]) ){
 						$this->data["topic_users"] = $this->conf->get_editor($topic_id,$this->conf_id);
@@ -344,7 +343,6 @@ class Dashboard extends MY_Conference {
 		}
 
 		$this->assets->set_title(lang('dashboard_website'));
-		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$this->data);
@@ -478,7 +476,6 @@ class Dashboard extends MY_Conference {
 
 	public function filter($conf_id='',$type=''){
 		$this->assets->set_title(lang('dashboard_filter'));
-		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 		$this->assets->add_js(base_url('ckeditor/ckeditor.js'));
 
 		$this->load->view('common/header');
@@ -545,11 +542,12 @@ class Dashboard extends MY_Conference {
 
 
 	public function user($conf_id='',$do="all",$user_login=""){
+		$this->lang->load("user",$this->_lang);
+		
 		$this->data['do']           = $do;
 		$this->data['topics']       = $this->conf->get_topic($this->conf_id);
 
 		$this->assets->set_title(lang('dashboard_user'));
-		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 
 		if(  !empty($user_login) && $do== "edit"  ){
 			$country_list = config_item('country_list');
@@ -687,8 +685,6 @@ class Dashboard extends MY_Conference {
 						$this->load->view('conf/user/all',$this->data);
 					}
 				break;
-				case "import":
-				break;
 			}
 		}else{
 			if($this->user->username_exists($user_login)){
@@ -700,7 +696,7 @@ class Dashboard extends MY_Conference {
 
 				switch($do){
 					case "edit":
-						$this->user->user_valid();
+						$this->user->updateuser_valid();
 						if ($this->form_validation->run()){
 					    	$user_email = $this->input->post('user_email');
 					    	$user_title = $this->input->post('user_title');
@@ -746,7 +742,6 @@ class Dashboard extends MY_Conference {
 
 	public function news($conf_id='',$type=''){
 		$this->assets->set_title(lang('dashboard_news'));
-		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 		$this->assets->add_js(base_url('ckeditor/ckeditor.js'));
 
 		$this->load->view('common/header');
@@ -832,7 +827,6 @@ class Dashboard extends MY_Conference {
 
 	public function email($conf_id='',$act='all'){
 		$this->assets->set_title(lang('dashboard_email'));
-		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 		$this->assets->add_js(base_url().'tinymce/tinymce.min.js');
 		
 		$this->load->view('common/header');
@@ -877,7 +871,6 @@ class Dashboard extends MY_Conference {
 
 	public function submit($conf_id='',$act='',$paper_id=''){
 		$this->assets->set_title(lang('dashboard_submit'));
-		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 		$this->assets->add_css(asset_url().'style/chosen.css');
 		$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
 		$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
@@ -921,6 +914,16 @@ class Dashboard extends MY_Conference {
 				switch($act){
 					case "detail":
 					default:
+						$this->form_validation->set_rules('sub_status', '稿件狀態', 'required');
+						if ($this->form_validation->run()){
+							$paper_status = $this->input->post("sub_status");
+							if( $this->submit->change_paper_status($paper->sub_status,$paper_status,$this->conf_id,$paper_id) ){
+								$this->alert->js("更改稿件狀態成功");
+							}else{
+								$this->alert->js("更改稿件狀態失敗");
+							}
+							$this->alert->refresh(2);
+						}
 						$this->load->view('conf/submit/detail',$this->data);
 					break;
 					case "remove":
@@ -1097,7 +1100,6 @@ class Dashboard extends MY_Conference {
 
 	public function register($conf_id='',$act='',$do=''){
 		$this->assets->set_title(lang('dashboard_signup'));
-		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$this->data);
@@ -1181,7 +1183,6 @@ class Dashboard extends MY_Conference {
 
 	public function report($conf_id=''){
 		$this->assets->set_title(lang('dashboard_report'));
-		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$this->data);
@@ -1195,7 +1196,6 @@ class Dashboard extends MY_Conference {
 		$this->data['conf_logs']    = $this->conf->get_logs($this->conf_id);
 
 		$this->assets->set_title(lang('dashboard_logs'));
-		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 		$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
 		$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
 		$this->assets->add_js(asset_url().'js/dataTables.bootstrap.js',true);
@@ -1225,7 +1225,6 @@ class Dashboard extends MY_Conference {
 		array_push($hold_day,array("S","P"));
 
 		$this->assets->set_title(lang('dashboard_most'));
-		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$this->data);
@@ -1421,21 +1420,186 @@ class Dashboard extends MY_Conference {
 		$this->load->view('common/footer',$this->data);
 	}
 
-	public function export($conf_id=''){
-		$this->assets->set_title(lang('dashboard_report'));
-		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
+	public function export_download($conf_id=''){
+		$this->form_validation->set_rules('type', '', 'required');
+		if ($this->form_validation->run()){
+			$type = $this->input->post("type");
+			switch( $type ){
+				case "paperlist":
+					$topic    = $this->input->post("topic");
+					$status   = $this->input->post("status");
+					$format   = $this->input->post("format");
+					$filename = $this->input->post("filename");
+					$this->exportdata->paperlist($topic,$status,$format,$this->conf_id,$filename);
+				break;
+				case "finishfiles":
+					$filename = $this->input->post("filename");
+					$this->exportdata->finishfiles($conf_id,$filename);
+				break;
+			}
+		}
+	}
 
+	public function export($conf_id=''){
+		$this->assets->set_title(lang('dashboard_export'));
+		$this->data['topics'] = $this->conf->get_topic($this->conf_id);
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$this->data);
 		$this->load->view('conf/conf_nav',$this->data);
 		$this->load->view('conf/menu_conf',$this->data);
+		$this->load->view('conf/export/index',$this->data);
+		$this->load->view('common/footer',$this->data);
+	}
+
+	public function review($conf_id='',$act='all'){
+		$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js');
+		$this->assets->add_js(asset_url().'js/repeatable-fields.js');
+		$this->assets->set_title("審查表單");
+		
+		$this->load->view('common/header');
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_conf',$this->data);
+
+		switch($act){
+			default:
+			case "all":
+				$this->data["review_forms"]    = $this->conf->get_review_forms($this->conf_id);
+				$this->data["form_elements"]   = $this->conf->get_review_form_elements($this->conf_id);
+				$this->data["recommend_forms"] = $this->conf->get_recommend_forms($this->conf_id);
+				switch( $this->input->post("do") ){
+					case "addform":
+						$this->form_validation->set_rules('review_form_title[]', '審查項目', 'required');
+						$this->form_validation->set_rules('element_name[]', '元素', 'required');
+						$this->form_validation->set_rules('element_value[]', '分數', 'required');
+						if ($this->form_validation->run()){
+							$review_form_title = $this->input->post("review_form_title");
+							$element_name      = $this->input->post("element_name");
+							$element_value     = $this->input->post("element_value");
+
+							$add = $this->conf->add_review_form($this->conf_id,$review_form_title,$element_name,$element_value);
+							if( !$add["status"] ){
+								$this->alert->show("d",$add["message"]);
+							}
+						}
+					break;
+					case "sortform":
+						$this->form_validation->set_rules('review_form_id[]', '', 'required');
+						if ( $this->form_validation->run() ){
+							$review_form_id = $this->input->post("review_form_id");
+							if( $this->conf->update_review_form_sort($review_form_id,$this->conf_id) ){
+								$this->alert->show("s","更新審查表單排序成功");
+							}else{
+								$this->alert->show("d","更新審查表單排序失敗");
+							}
+							$this->alert->refresh(2);
+						}
+					break;
+					case "updaterecommend":
+						$this->form_validation->set_rules('recommend_form_title[]', '推薦項目', 'required');
+						$this->form_validation->set_rules('recommend_form_name[]', '', 'required');
+						if ( $this->form_validation->run() ){
+							$recommend_form_title = $this->input->post("recommend_form_title");
+							$recommend_form_name = $this->input->post("recommend_form_name");
+							if( $this->conf->update_recommend_form_sort($this->conf_id,$recommend_form_title,$recommend_form_name) ){
+								$this->alert->show("s","更新推薦項目成功");
+							}else{
+								$this->alert->show("d","更新推薦項目失敗");
+							}
+							$this->alert->refresh(2);
+						}
+
+					break;
+					case "addrecommend":
+						$this->form_validation->set_rules('recommend_form_title[]', '推薦項目', 'required');
+						if ($this->form_validation->run()){
+							$recommend_form_title = $this->input->post("recommend_form_title");
+							if( $this->conf->add_recommend_forms($this->conf_id,$recommend_form_title) ){
+								$this->alert->show("s","新增推薦項目成功");
+							}else{
+								$this->alert->show("d","新增推薦項目失敗");
+							}
+							$this->alert->refresh(1);
+						}
+					break;
+				}
+				$this->load->view('conf/review/index',$this->data);
+			break;
+			case "edit_form":
+				$id = $this->input->get("id");
+				$this->data["review_form"] = $this->conf->get_review_form($this->conf_id,$id);
+				$this->data["form_element"] = $this->conf->get_review_form_element($this->conf_id,$id);
+				switch( $this->input->post("do") ){
+					case "update":
+						$this->form_validation->set_rules('form_title', '審查項目', 'required');
+						$this->form_validation->set_rules('element_name[]', '元素', 'required');
+						$this->form_validation->set_rules('element_value[]', '分數', 'required');
+						if ($this->form_validation->run()){
+							$form_title  = $this->input->post("form_title");
+							$element_names  = $this->input->post("element_name");
+							$element_values = $this->input->post("element_value");
+							if( $this->conf->update_review_form($this->conf_id,$id,$form_title) ){
+								$this->alert->show("s","更新審查項目名稱成功");
+							}else{
+								$this->alert->show("d","更新審查項目名稱失敗");
+							}
+							if( $this->conf->update_review_element($id,$element_names,$element_values) ){
+								$this->alert->show("s","更新評分項目成功");
+							}else{
+								$this->alert->show("d","更新評分項目失敗");
+							}
+							$this->alert->refresh(1);
+						}
+					break;
+					case "add":
+						$this->form_validation->set_rules('element_name[]', '元素', 'required');
+						$this->form_validation->set_rules('element_value[]', '分數', 'required');
+						if ($this->form_validation->run()){
+							$element_names  = $this->input->post("element_name");
+							$element_values = $this->input->post("element_value");
+
+							if( $this->conf->add_review_form_elements($id,$element_names,$element_values) ){
+								$this->alert->js("新增成功");
+							}else{
+								$this->alert->js("新增失敗");
+							}
+							$this->alert->refresh(1);
+						}
+					break;
+				}
+				$this->load->view('conf/review/form_edit',$this->data);
+			break;
+			case "del_form":
+				$id = $this->input->get("id");
+				if( $this->conf->get_review_form($this->conf_id,$id) ){
+					if( $this->conf->del_review_form($this->conf_id,$id) ){
+						$this->alert->js("刪除審查項目成功",get_url("dashboard",$this->conf_id,"review"));
+					}else{
+						$this->alert->js("刪除審查項目失敗",get_url("dashboard",$this->conf_id,"review"));
+					}
+				}else{
+					$this->alert->js("找不到此審查項目",get_url("dashboard",$this->conf_id,"review"));
+				}
+			break;
+			case "del_element":
+				$id = $this->input->get("id");
+				$element_id = $this->input->get("element_id");
+				if( $this->conf->get_review_element($this->conf_id,$id,$element_id) ){
+					if( $this->conf->del_review_element($id,$element_id) ){
+						$this->alert->js("刪除元素成功",get_url("dashboard",$this->conf_id,"review","edit_form")."?id=".$id);
+					}else{
+						$this->alert->js("刪除元素失敗",get_url("dashboard",$this->conf_id,"review","edit_form")."?id=".$id);
+					}
+				}else{
+					$this->alert->js("找不到此項目",get_url("dashboard",$this->conf_id,"review"));
+				}
+			break;
+		}
 		$this->load->view('common/footer',$this->data);
 	}
 
 	public function widget($conf_id=''){
 		$this->assets->set_title(lang('dashboard_report'));
-		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
-
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$this->data);
 		$this->load->view('conf/conf_nav',$this->data);
@@ -1446,7 +1610,6 @@ class Dashboard extends MY_Conference {
 	// Template
 	private function _temp($conf_id=''){
 		$this->assets->set_title(lang('dashboard_report'));
-		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
 
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$this->data);

@@ -3,6 +3,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 /* index */
 $lang['update_profile'] = "更改";
+$lang['update_profile_success'] = "更改成功";
+$lang['update_email_exists'] = "電子信箱已被註冊使用";
 
 /* login */
 $lang['regist_hint'] = "尚未建立帳號？";
@@ -88,6 +90,9 @@ $lang['lostpwd_submit'] = "送出";
 
 /* review_confirm */
 $lang['user_review_confirm'] = "審稿確認";
+
+/* reset */
+$lang['invalid_password_reset_key'] = "密碼重置金鑰無效";
 
 /* alert */
 $lang['alert_signup_success'] = "註冊成功";

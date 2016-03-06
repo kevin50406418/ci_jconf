@@ -22,8 +22,8 @@
 			<td><?php echo lang('log_'.$log->log_type)?></td>
 			<td>
 				<?php 
-					$template = lang($log->log_act);
 					$data = json_decode($log->log_to);
+					$template = $this->conf->loglang($data,lang($log->log_act),$log->log_act);
 				?>
 				<?php echo $template;?>
 				<!-- <?php echo $log->log_act?> -->
@@ -58,7 +58,7 @@
 $(document).ready(function() {
 	$('.datatable').dataTable( {
 		"order": [[ 0, "desc" ]],
-		//stateSave: true,
+		stateSave: true,
 		columnDefs: [
 			{ orderable: false, "targets": -1 },
 		],

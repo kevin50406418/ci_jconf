@@ -30,7 +30,6 @@
 	<?php }else{?>
 	<div class="alert alert-danger">尚未建立研討會主題，請洽研討會會議管理人員</div>
 	<?php }?>
-	
 </div>
 <div class="ui blue segment repeat">
 	<h2>作者資訊</h2>

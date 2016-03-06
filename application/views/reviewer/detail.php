@@ -35,7 +35,7 @@
 					</tr>
 					<tr>
 						<th>語言</th>
-						<td><?php echo $paper->sub_lang?></td>
+						<td><?php echo langabbr2str($paper->sub_lang)?></td>
 					</tr>
 					<tr>
 						<th>關鍵字</th>
@@ -72,7 +72,7 @@
 						</td>
 						<td><?php echo $author->user_email?></td>
 						<td><?php echo $author->user_org?></td>
-						<td><?php echo $author->user_country?></td>
+						<td><?php echo $this->user->abbr2country($author->user_country)?></td>
 					</tr>
 					<?php }?>
 					<?php }?>
@@ -130,7 +130,8 @@
 							<th class="text-center" style="width:10%">審查狀態</th>
 							<th class="text-center" style="width:10%">審查期限</th>
 							<th class="text-center" style="width:10%">審查時間</th>
-							<th class="text-center" style="width:55%">審查建議</th>
+							<th class="text-center" style="width:5%">審查分數</th>
+							<th class="text-center" style="width:50%">審查建議</th>
 						</tr>
 					</thead>
 					<?php foreach ($reviewers as $key => $reviewer) {?>
@@ -138,17 +139,22 @@
 					<tr>
 						<td><?php echo $reviewer->user_login?></td>
 						<td class="text-center">
-							<?php echo $this->submit->sub_status($reviewer->review_status,true)?>
+							<?php echo $this->reviewer->review_status($reviewer->review_status)?>
 						</td>
 						<td class="text-center">
 							<?php echo date("Y-m-d H:i",$reviewer->review_timeout)?>
 						</td>
 						<td class="text-center">
 							<?php
-								if( in_array($reviewer->review_status, array(-2,0,2,4)) ){
+								if( $reviewer->review_time > 0 ){
 									echo date('Y-m-d H:i', $reviewer->review_time);	
+								}else{
+									echo "-";
 								}
 							?>
+						</td>
+						<td class="text-center">
+							<?php echo $reviewer->review_score?>
 						</td>
 						<td>
 							<?php echo $reviewer->review_comment?>

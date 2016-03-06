@@ -213,7 +213,7 @@ $config['directory_trigger'] = 'd';
 | your log files will fill up very fast.
 |
 */
-$config['log_threshold'] = 1;
+$config['log_threshold'] = array(1,2);;
 
 /*
 |--------------------------------------------------------------------------
@@ -360,7 +360,7 @@ $config['encryption_key'] = '';
 $config['sess_driver'] = 'database';
 $config['sess_cookie_name'] = 'ccs_conf';
 $config['sess_expiration'] = 7200;
-$config['sess_save_path'] = 'users_sessions';
+$config['sess_save_path'] = 'sessions';
 $config['sess_match_ip'] = false;
 $config['sess_time_to_update'] = 0;
 $config['sess_regenerate_destroy'] = false;

@@ -20,6 +20,7 @@ $lang['dashboard_filter'] = "Filter List";
 $lang['dashboard_email'] = "Email Template";
 $lang['dashboard_submit'] = "Paper List";
 $lang['dashboard_signup'] = "Registration";
+$lang['dashboard_export'] = "Export";
 $lang['dashboard_report'] = "Report";
 $lang['dashboard_logs'] = "Logs";
 $lang['dashboard_most'] = "MOST Results";

@@ -46,17 +46,17 @@
 <script>
 $(document).ready(function() {
 	$('.datatable_logs').dataTable( {
-		"order": [[ 1, "desc" ]],
+		"order": [[ 0, "desc" ]],
 		stateSave: true,
-        "language": {
-            "lengthMenu": "每頁顯示 _MENU_ 筆資料",
-            "zeroRecords": "找不到使用者",
-            "info": "第 _PAGE_ 頁，共 _PAGES_ 頁",
-            "infoEmpty": "目前尚無任何使用者",
-            "infoFiltered": "(filtered from _MAX_ total records)",
+		"language": {
+			"lengthMenu": "每頁顯示 _MENU_ 筆資料",
+			"zeroRecords": "找不到登入記錄",
+			"info": "第 _PAGE_ 頁，共 _PAGES_ 頁",
+			"infoEmpty": "目前尚無任何登入記錄",
+			"infoFiltered": "(filtered from _MAX_ total records)",
 			"loadingRecords": "載入中...",
 			"processing":     "處理中...",
-			"search":         "使用者資料搜尋：",
+			"search":         "登入記錄資料搜尋：",
 			"paginate": {
 				"first":      "首頁",
 				"last":       "最後一頁",

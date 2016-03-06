@@ -173,3 +173,16 @@ function date_showmethod($showmethod,$start,$end,$sep="~"){
 	}
 	return $str;
 }
+
+function langabbr2str($abbr){
+	switch($abbr){
+		case "zhtw":
+			echo "繁體中文(Traditional Chinese)";
+		break;
+		case "en":
+			echo "英文(English)";
+		break;
+		default:
+			echo "-";
+	}
+}

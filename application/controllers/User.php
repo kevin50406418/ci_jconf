@@ -6,8 +6,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @copyright	Copyright (c) 2015 - 2016, Jingxun Lai, Inc. (https://jconf.tw/)
  * @license	http://opensource.org/licenses/MIT	MIT License
  * @link	https://jconf.tw
- * @since	Version 1.0.0
- * @date	2016/2/20 
+ * @since	Version 1.0.3
+ * @date	2016/3/2 
  */
 class User extends MY_Controller {
 	public function __construct() {        
@@ -35,7 +35,7 @@ class User extends MY_Controller {
 
 			$this->load->view('common/header',$this->data);
 			$this->load->view('common/nav',$this->data);
-			$this->user->user_valid();
+			$this->user->updateuser_valid();
 			if ($this->form_validation->run()){
 		    	$user_email = $this->input->post('user_email');
 		    	$user_title = $this->input->post('user_title');
@@ -60,10 +60,10 @@ class User extends MY_Controller {
 		    	$user_phone_o = $user_phoneO_1.",".$user_phoneO_2.",".$user_phoneO_3;
 		    	$user_postaddr = $user_addcounty."|".$user_area."|".$user_postaddr;
 
-				$res = $this->user->updateuser($user_login,$user_title,$user_email,$user_firstname,$user_lastname,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research);
+				$res = $this->user->updateuser($this->user_login,$user_title,$user_email,$user_firstname,$user_lastname,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research);
 		    	if( $res['status'] ){
-		    		$this->alert->js("Edit Success",site_url("user/index"));
-		    		redirect($redirect, 'refresh');
+		    		$this->alert->show("s",lang('update_profile_success'),site_url("user/index"));
+		    		$this->alert->refresh(2);
 		    	}else{
 		    		$this->alert->js($res['error']);
 		    	}
@@ -88,7 +88,6 @@ class User extends MY_Controller {
 				$redirect   = $this->input->post('redirect');
 		    	$result = $this->user->login($user_login, $user_pwd);
 		    	if($result){
-		    		$this->form_validation->set_message('login_success', 'Login Success');
 		    		if( preg_match('/(favicon|clang|assets|upload|tinymce|rss|piwik)/i',$redirect) ){
 						$redirect = "";
 					}
@@ -127,7 +126,8 @@ class User extends MY_Controller {
 		$this->assets->set_title(lang('nav_user_log'));
 		$this->lang->load("user_login_log",$this->_lang);
 		if($this->user->is_login()){
-			$this->data['logs'] = $this->user->get_login_log($this->session->user_login);
+			$user = $this->user->get_user_info($this->user_login);
+			$this->data['logs'] = $this->user->get_login_log($this->user_login,$user->user_email);
 			$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
 			$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
 			$this->assets->add_js(asset_url().'js/dataTables.bootstrap.js',true);
@@ -323,7 +323,7 @@ class User extends MY_Controller {
 		}else{
 			$this->load->view('common/header',$this->data);
 			$this->load->view('common/nav',$this->data);
-
+			$this->data["recaptcha_sitekey"] = $this->config->item('recaptcha_sitekey');
 			$this->form_validation->set_rules('user_login', lang('account'), 'required');
 		    $this->form_validation->set_rules('user_email', lang('user_email'), 'required|valid_email');
 		    $this->form_validation->set_rules('g-recaptcha-response', 'Recaptcha', 'required');
@@ -361,24 +361,24 @@ class User extends MY_Controller {
 				$this->data['reset_token'] = $reset_token;
 
 				if( empty($reset_token) ){
-					$this->alert->js("密碼重製金鑰無效",site_url('/user/lostpwd'));
+					$this->alert->js(lang('invalid_password_reset_key'),site_url('/user/lostpwd'));
 				}else{
 					if( $reset_token->reset_staus == 0 && time() < $reset_token->reset_failtime ){
-					    $this->form_validation->set_rules('user_pass', '新密碼', 'required|min_length[6]');
-					    $this->form_validation->set_rules('user_pass2', '確認新密碼', 'required|matches[user_pass]|min_length[6]');
+					    $this->form_validation->set_rules('user_pass', lang('user_pass'), 'required|min_length[6]');
+					    $this->form_validation->set_rules('user_pass2', lang('user_pass2'), 'required|matches[user_pass]|min_length[6]');
 						if ( $this->form_validation->run() ){
 							$user_pass  = $this->input->post('user_pass', TRUE);
 							if( $this->user->change_passwd($user_login,$user_pass,3) ){
 								$this->user->set_reset_token($user_login,$reset_token->reset_token);
-								$this->alert->js("更改密碼成功",site_url('/user/login'));
+								$this->alert->js(lang('success_password'),site_url('/user/login'));
 							}else{
-								$this->alert->js("更改密碼失敗",site_url('/user/login'));
+								$this->alert->js(lang('fail_password'),site_url('/user/login'));
 							}
 						}
 
 						$this->load->view('user/reset',$this->data);
 					}else{
-						$this->alert->js("密碼重製金鑰無效",site_url('/user/lostpwd'));
+						$this->alert->js(lang('invalid_password_reset_key'),site_url('/user/lostpwd'));
 					}
 				}	
 				$this->load->view('common/footer',$this->data);
@@ -412,5 +412,18 @@ class User extends MY_Controller {
 			}
 		}
 		$this->load->view('common/footer',$this->data);
+	}
+
+	public function email(){
+		$this->data['body_class'] = $this->body_class;
+		$this->assets->set_title("郵件備份");
+		if($this->user->is_login()){
+
+			$this->load->view('common/header');
+			$this->load->view('common/nav',$this->data);
+			$this->load->view('common/footer',$this->data);
+		}else{
+			redirect('/user/login', 'location', 301);
+		}
 	}
 }

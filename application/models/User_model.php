@@ -8,6 +8,7 @@ class User_model extends CI_Model {
 		$this->db->select('user_login, user_sysop');
 		$this->db->from('users');
 		$this->db->where('user_login', $username);
+		$this->db->or_where('user_email', $username);
 		$this->db->where('user_pass', hash('sha256',$password));
 		$this->db->where('user_staus', 0);
 		$this->db->limit(1);
@@ -29,22 +30,13 @@ class User_model extends CI_Model {
 	}
 
 
-    function is_login(){ //wil bug
-		if($this->session->has_userdata('user_login')){
-			return true;
-		}else{
-			return false;
-		}
+    function is_login(){
+		return $this->session->has_userdata('user_login');
 	}
 
 	function is_sysop(){
 		if($this->session->has_userdata('user_sysop')){
-			if( $this->session->user_sysop == 1 ){
-				return true;
-			}else{
-				return false;
-			}
-			return true;
+			return $this->session->user_sysop;
 		}else{
 			return false;
 		}
@@ -200,7 +192,7 @@ class User_model extends CI_Model {
 
 		if( !$this->email_exists_userlogin($user_email,$user_login) ){
 			if($this->email_exists($user_email)){
-				$return["error"] = "Email is exist. If you are not signup this email,please contact system administrator.";
+				$return["error"] = lang('update_email_exists');
 				return $return;
 			}
 		}
@@ -292,9 +284,10 @@ class User_model extends CI_Model {
 		return $this->db->insert("login_log", $log);
 	}
 
-	function get_login_log($login_user){
+	function get_login_log($login_user,$user_email){
 		$this->db->from('login_log');
 		$this->db->where('login_user', $login_user);
+		$this->db->or_where('login_user', $user_email);
 		$this->db->order_by('login_id', 'DESC');
 		$query = $this->db->get();
 		return $query->result();
@@ -423,6 +416,21 @@ class User_model extends CI_Model {
 		$this->form_validation->set_rules('user_research', lang('user_research'), 'required|min_length[1]');
 	}
 
+	function updateuser_valid(){
+		$this->form_validation->set_rules('user_email', lang('user_email'), 'required|valid_email');
+		$this->form_validation->set_rules('user_title', lang('user_title'), 'required');
+		$this->form_validation->set_rules('user_firstname', lang('user_firstname'), 'required');
+		$this->form_validation->set_rules('user_lastname', lang('user_lastname'), 'required');
+		$this->form_validation->set_rules('user_gender', lang('user_gender'), 'required');
+		$this->form_validation->set_rules('user_org', lang('user_org'), 'required');
+		$this->form_validation->set_rules('user_phoneO_1', lang('user_phoneO'), 'required|is_natural');
+		$this->form_validation->set_rules('user_phoneO_2', lang('user_phoneO'), 'required|is_natural');
+		$this->form_validation->set_rules('user_postcode', lang('user_postcode'), 'required|is_natural');
+		$this->form_validation->set_rules('user_postadd', lang('user_poststreetadd'), 'required');
+		$this->form_validation->set_rules('user_country', lang('user_country'), 'required');
+		$this->form_validation->set_rules('user_research', lang('user_research'), 'required|min_length[1]');
+	}
+
 	function users_valid(){
 		$this->form_validation->set_rules('user_id[]', lang('account'), 'required');
 		$this->form_validation->set_rules('user_email[]', lang('user_email'), 'required|valid_email');
@@ -520,7 +528,8 @@ class User_model extends CI_Model {
 	}
 
 	function passwd_reset($user_login,$user_email,$g_recaptcha_response){
-		$response=file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=6Lf-HgITAAAAAK8nwI1ZjVq_6IitifEueos00VUn&response=".$g_recaptcha_response);
+		$recaptcha_secretkey = $this->config->item('recaptcha_secretkey');
+		$response=file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=".$recaptcha_secretkey."&response=".$g_recaptcha_response);
 		$response=json_decode($response);
 
 		if($response->success){
@@ -557,14 +566,34 @@ class User_model extends CI_Model {
 	function send_resetpwd_mail($user_login,$user_email,$reset_token){
 		$time = date("Y-m-d H:i:s",time());
 		$site_name = $this->config->item('site_name');
-    	$message = "會員 ".$user_login." 您好,<br><br>您於 ".$time." 送出重置密碼請求，重置訊息如下：<br>".site_url("user/reset/".$user_login."/".$reset_token)."<br>(若非本人所提出的請求，請忽略本信件)<br><br>".$site_name;
-    	// sp("TO:".$user_email."\n".$message);
+		$reset_link = site_url("user/reset/".$user_login."/".$reset_token);
     	
-    	$this->email->from('ccs@asia.edu.tw', $site_name);
-		$this->email->to($user_email);
-		$this->email->subject('[重設密碼]'.$site_name.'重設密碼');
-		$this->email->message($message);
+    	$message = '嗨 '.$user_login.'，您好！<br><br>
+			我們收到您在 '.$site_name.'的 "'.$user_login.'" 帳號的密碼重新設定的請求。<br><br>
+			為了確認這個請求，並為您的帳號設定一個新密碼，請到下列網址：<br><br>
+			<br>
+			<a href="'.$reset_link.'">'.$reset_link.'</a><br>
+			(這一鏈結只有在接收到重設請求之後 60 分鐘之內有效)<br><br><br>
+			如果這密碼重設請求不是您提出來的，請不要做任何動作。<br><br><hr>
+			Hi '.$user_login.',<br><br>
+			A password reset was requested for your account "'.$user_login.'" at '.$site_name.'.<br><br>
+			To confirm this request, and set a new password for your account, please go to the following web address:<br><br>
+			<br>
+			<a href="'.$reset_link.'">'.$reset_link.'</a><br>
+			(This link is valid for 60 minutes from the time this reset was first requested)<br><br><br>
+			If this password reset was not requested by you, no action is needed.<br>
+		';
 
+		$subject = $site_name.'密碼重設請求 Password reset request';
+		$to      = $user_email;
+		
+		$this->email->from('ccs@asia.edu.tw', $site_name);
+		$this->email->to($to);
+		$this->email->reply_to('help@jconf.tw', 'Adminstritor');
+		$this->email->subject($subject);
+		$this->email->message($message);
+		
+		$this->conf->addmail($to,$subject,$message,$user_login);
 		return $this->email->send();
 	}
 
@@ -589,10 +618,16 @@ class User_model extends CI_Model {
 		In most mail programs, this should appear as a blue link which you can just click on. If that doesn\'t work, then cut and paste the address into the address line at the top of your web browser window.<br><br>
 		Cheers from the "'.$site_name.'" administrator';
 
-    	$this->email->from('ccs@asia.edu.tw', $site_name);
-		$this->email->to($user_email);
-		$this->email->subject('新用戶帳號 New user account');
+		$subject = '新用戶帳號 New user account';
+		$to      = $user_email;
+		
+		$this->email->from('ccs@asia.edu.tw', $site_name);
+		$this->email->to($to);
+		$this->email->reply_to('help@jconf.tw', 'Adminstritor');
+		$this->email->subject($subject);
 		$this->email->message($message);
+		
+		$this->conf->addmail($to,$subject,$message,$user_login,$conf_id);
 		return $this->email->send();
 	}
 
@@ -617,10 +652,16 @@ class User_model extends CI_Model {
 		In most mail programs, this should appear as a blue link which you can just click on. If that doesn\'t work, then cut and paste the address into the address line at the top of your web browser window.<br><br>
 		Cheers from the "'.$site_name.'" administrator';
 
-    	$this->email->from('ccs@asia.edu.tw', $site_name);
-		$this->email->to($user_email);
-		$this->email->subject('新用戶帳號 New user account');
+		$subject = '新用戶帳號 New user account';
+		$to      = $user_email;
+		
+		$this->email->from('ccs@asia.edu.tw', $site_name);
+		$this->email->to($to);
+		$this->email->reply_to('help@jconf.tw', 'Adminstritor');
+		$this->email->subject($subject);
 		$this->email->message($message);
+		
+		$this->conf->addmail($to,$subject,$message,$user_login,$conf_id);
 		return $this->email->send();
 	}
 
@@ -641,5 +682,10 @@ class User_model extends CI_Model {
 		return $this->db->update('login_reset', $login_reset);
 	}
 
+	function abbr2country($abbr){
+		$country = config_item('country_list');
+		$country_list = $country[$this->_lang];
+		return $country_list[$abbr];
+	}
 }
 ?>

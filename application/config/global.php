@@ -1,10 +1,12 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-//$config['assets_url'] = "http://120.108.113.38/conf/assets/";
-$config['version'] = "1.0.0"; // 系統版本號
+$config['version'] = "1.5.0"; // 系統版本號
+
 $config['site_name'] = "研討會系統";
 
+$config['recaptcha_sitekey'] = "";
+$config['recaptcha_secretkey'] = "";
 $config['spage']=array("index","news","main","dashboard","submit","topic","reviewer");
 
 $config['subdomain'] = true;

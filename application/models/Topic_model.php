@@ -162,17 +162,23 @@ class Topic_model extends CI_Model {
 
 		$search = array("{reviewer_name}","{reviewer}","{paper_title}","{paper_summary}","{conf_name}","{conf_link}","{review_accept}","{review_reject}","{review_deadline}","{password_reseturl}","{review_url}");
         $replace = array($reviewer_name,$reviewer,$paper_title,$paper_summary,$conf_name,$conf_link,$review_accept,$review_reject,$review_deadline,$password_reseturl,$review_url);
-		
+		/* TODO: Need to fix 2 lang system */
 		$mail_template = $this->conf->mail_get_template($conf_id,"confirm_review");
         $mail_subject = str_replace($search,$replace,$mail_template->email_subject_zhtw);
         $mail_content = str_replace($search,$replace,$mail_template->email_body_zhtw);
 
-        $this->email->from($conf_email, $conf_name);
-        $this->email->to($reviewer_email);
-        $this->email->subject($mail_subject);
-        $this->email->message($mail_content);
-        
-        $this->email->send();
+        $subject = $mail_subject;
+		$to      = $reviewer_email;
+		$message = $mail_content;
+
+		$this->email->from('ccs@asia.edu.tw', $site_name);
+		$this->email->to($to);
+		$this->email->reply_to('help@jconf.tw', 'Adminstritor');
+		$this->email->subject($subject);
+		$this->email->message($message);
+		
+		$this->conf->addmail($to,$subject,$message,$user_login,$conf_id);
+		return $this->email->send();
 	}
 
 	function get_reviewer($paper_id){
@@ -188,7 +194,7 @@ class Topic_model extends CI_Model {
 		$site_name = $this->config->item('site_name');
     	$message = "審查者 ".$user_login." 您好,<br><br>目前尚有稿件尚未審查，請盡速審查稿件。<br><br>稿件名稱：".$paper_name."<br>稿件主題：".$topic_name."(".$topic_name_eng.")<br><br><a href=\"".get_url("reviewer",$conf_id,"index")."\">前往審查</a><br>* 若已審查該稿件，請忽略本通知<br><br>主編 ".$topic_login."@".$conf_name." - ".$site_name;
     	//sp("TO:".$user_email."\n".$message);
-    	
+    	/* TODO: SQL 化 */
     	$this->email->from('ccs@asia.edu.tw', $site_name);
 		$this->email->to($user_email);
 		$this->email->subject('[審查提醒]'.$conf_name.'稿件審查');
@@ -277,7 +283,7 @@ class Topic_model extends CI_Model {
 	}
 
 	function mail_get_topic($conf_id,$paper_id){
-		$this->db->select("users.user_login,users.user_email,users.user_first_name,users.user_last_name,conf.conf_name,conf.conf_email,paper.sub_title");
+		$this->db->select("users.user_login,users.user_email,users.user_first_name,users.user_last_name,conf.conf_name,conf.conf_email,paper.sub_title,paper.sub_summary");
 		$this->db->from('paper');
         $this->db->join('topic', 'paper.sub_topic = topic.topic_id');
         $this->db->join('auth_topic', 'auth_topic.topic_id = topic.topic_id');
@@ -291,25 +297,42 @@ class Topic_model extends CI_Model {
 
 	function notice_editor($conf_id,$paper_id){
 		$editors = $this->mail_get_topic($conf_id,$paper_id);
+		$mail_template = $this->conf->mail_get_template($conf_id,"editor_paper_assign");
 		foreach ($editors as $key => $editor) {
-			$editor_name =preg_match("/[\x{4e00}-\x{9fa5}]/u", $editor->user_last_name)?$editor->user_last_name.$editor->user_first_name:$editor->user_first_name." ".$editor->user_last_name;
-			$user_login  = $editor->user_login;
-			$conf_name   = $editor->conf_name;
-			$paper_title = $editor->sub_title;
-			$user_email  = $editor->user_email;
-			$conf_email  = $editor->conf_email;
-			$search = array("{editor_name}","{editor}","{conf_name}","{paper_title}");
-			$replace = array($editor_name,$user_login,$conf_name,$paper_title);
+			$topic_name_zhtw = $editor->user_last_name.$editor->user_first_name;
+			$topic_name_en   = $editor->user_first_name." ".$editor->user_last_name;
+			
+			$user_login    = $editor->user_login;
+			$conf_name     = $editor->conf_name;
+			$paper_title   = $editor->sub_title; 
+			$paper_summary = $editor->sub_summary; 
+			$user_email    = $editor->user_email;
+			$conf_email    = $editor->conf_email;
+			$topic_link    = get_url("topic",$conf_id,"index");
+			$conf_link     = site_url($conf_id);
 
-			$mail_template = $this->conf->mail_get_template($conf_id,"editor_paper_assign");
-			$mail_subject = str_replace($search,$replace,$mail_template->email_subject_zhtw);
-        	$mail_content = str_replace($search,$replace,$mail_template->email_body_zhtw);
+			$search = array("{editor_name}","{editor}","{paper_title}","{paper_summary}","{conf_name}","{conf_link}","{topic_link}");
+			$replace_zhtw = array($topic_name_zhtw,$user_login,$paper_title,$paper_summary,$conf_name,$conf_link,$topic_link);
+			$replace_en   = array($topic_name_en,$user_login,$paper_title,$paper_summary,$conf_name,$conf_link,$topic_link);
 
-        	$this->email->from($conf_email, $conf_name);
-			$this->email->to($user_email);
-			$this->email->subject($mail_subject);
-			$this->email->message($mail_content);
-			$this->email->send();
+			$mail_subject_zhtw = str_replace($search,$replace_zhtw,$mail_template->email_subject_zhtw);
+			$mail_subject_en   = str_replace($search,$replace_en,$mail_template->email_subject_eng);
+			$mail_content_zhtw = str_replace($search,$replace_zhtw,$mail_template->email_body_zhtw);
+			$mail_content_en   = str_replace($search,$replace_en,$mail_template->email_body_eng);
+
+			$subject = $mail_subject_zhtw." ".$mail_subject_en;
+			$to      = $user_email;
+			$message = $mail_content_zhtw."<br><br><hr>".$mail_content_en;
+
+			$this->email->from($conf_email, $conf_name);
+			$this->email->to($to);
+			$this->email->bcc('sysop@jconf.tw');
+			$this->email->reply_to('help@jconf.tw', 'Adminstritor');
+			$this->email->subject($subject);
+			$this->email->message($message);
+			
+			$this->conf->addmail($to,$subject,$message,$user_login,$conf_id);
+			return $this->email->send();
 		}
 	}
 

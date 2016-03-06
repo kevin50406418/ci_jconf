@@ -145,6 +145,7 @@ $autoload['model'] = array(
 	'alert_model'    => 'alert',
 	'topic_model'    => 'topic',
 	'module_model'   => 'module',
-	'reviewer_model' => 'reviewer'
+	'reviewer_model' => 'reviewer',
+	'exportdata_model' => 'exportdata'
 );
 

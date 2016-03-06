@@ -14,7 +14,7 @@
 		</thead>
 		<?php if(is_array($papers)){?>
 		<?php foreach ($papers as $key => $paper) {?>
-		<tr class="<?php $bool = $paper->review_timeout > $time;?>">
+		<tr>
 			<td class="text-center"><?php echo $paper->sub_id?></td>
 			<td>
 				<?php echo $paper->sub_title?>
@@ -27,24 +27,25 @@
 				<?php }?>
 			</td>
 			<td class="text-center">
-				<?php if( !$bool ){?>
+				<?php $bool = $paper->review_timeout < $time && $paper->review_status == 0;?>
+				<?php if( $bool ){?>
 					審查逾期
 				<?php }else{?>
-					<?php echo $this->Submit->sub_status($paper->review_status,true)?>
+					<?php echo $this->reviewer->review_status($paper->review_status)?>
 				<?php }?>
 			</td>
 			<td class="text-center">
-				<?php if($paper->review_status != 3){?>
+				<?php if($paper->review_time > 0){?>
 					<?php echo date("Y-m-d",$paper->review_time);?>
 				<?php }else{?>
 					-
 				<?php }?>
 			</td>
 			<td class="text-center">
-				<?php if($paper->review_status != 3){?>
-				<a href="<?php echo get_url("reviewer",$conf_id,"detail",$paper->sub_id)?>" class="ui button basic">查看審查</a>
-				<?php }else{?>
+				<?php if($paper->sub_status == 3){?>
 					<?php if( $bool ){?>	
+						審查逾期
+					<?php }else{?>
 						<?php if( $paper->review_confirm == -1 ){?>
 						論文審查請求
 						<div class="btn-group btn-group-xs">
@@ -54,8 +55,6 @@
 						<?php }else{?>
 						<a href="<?php echo get_url("reviewer",$conf_id,"detail",$paper->sub_id)?>" class="ui blue button basic">進行審查</a>
 						<?php }?>
-					<?php }else{?>
-						審查逾期
 					<?php }?>
 				<?php }?>
 			</td>

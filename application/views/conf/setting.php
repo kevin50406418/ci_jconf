@@ -1,30 +1,4 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');?>
-<script>
-$(function() { 
-	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-		localStorage.setItem('<?php echo $conf_config['conf_id'];?>_confsetting', $(this).attr('href'));
-	});
-	var lastTab = localStorage.getItem('<?php echo $conf_config['conf_id'];?>_confsetting');
-	if (lastTab) {
-		$('[href="'+lastTab+'"]').tab('show');
-	};
-	$('.input-daterange').datepicker({
-		format: "yyyy-mm-dd",
-		todayBtn: "linked",
-		<?php if($this->_lang == "zhtw"){?>language: "zh-TW",<?php }?>
-		todayHighlight: true,
-	});
-	$(".repeat").each(function() {
-		$(this).repeatable_fields({
-			wrapper: '#dates',
-			container: 'tbody',
-			row: 'tr',
-			cell: 'td',
-		});
-	});
-});
-</script>
-
 <div class="ui segment raised">
 <div class="tabbable-panel">
 	<div class="tabbable-line">
@@ -33,7 +7,6 @@ $(function() {
 			<li> <a href="#tab_style" data-toggle="tab"> <i class="fa fa-magic fa-lg"></i> <?php echo lang('conf_style')?> </a> </li>
 			<li> <a href="#tab_function" data-toggle="tab"> <i class="fa fa-cog fa-lg"></i> <?php echo lang('conf_function')?> </a> </li>
 			<li> <a href="#tab_schedule" data-toggle="tab"> <i class="fa fa-calendar fa-lg"></i> <?php echo lang('schedule')?> </a> </li>
-			<!--<li> <a href="#tab_org" data-toggle="tab"> <i class="fa fa-users fa-lg"></i> 大會組織 </a> </li>-->
 			<?php echo form_open(get_url("dashboard",$conf_id,"setting"),array("class"=>"pull-right"))?>
 			<?php echo form_hidden('do', 'status');?>
 			<?php if( $conf_config['conf_staus']==0 ){?>
@@ -283,10 +256,32 @@ $(function() {
 				</div>
 				<?php echo form_close()?>
 			</div>
-			<div class="tab-pane container-fluid" id="tab_org">
-				<h2><i class="fa fa-users fa-lg"></i> 大會組織</h2>
-			</div>
 		</div>
 	</div>
 </div>
 </div>
+<script>
+$(function() { 
+	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+		localStorage.setItem('<?php echo $conf_config['conf_id'];?>_confsetting', $(this).attr('href'));
+	});
+	var lastTab = localStorage.getItem('<?php echo $conf_config['conf_id'];?>_confsetting');
+	if (lastTab) {
+		$('[href="'+lastTab+'"]').tab('show');
+	};
+	$('.input-daterange').datepicker({
+		format: "yyyy-mm-dd",
+		todayBtn: "linked",
+		<?php if($this->_lang == "zhtw"){?>language: "zh-TW",<?php }?>
+		todayHighlight: true,
+	});
+	$(".repeat").each(function() {
+		$(this).repeatable_fields({
+			wrapper: '#dates',
+			container: 'tbody',
+			row: 'tr',
+			cell: 'td',
+		});
+	});
+});
+</script>

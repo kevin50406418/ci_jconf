@@ -29,7 +29,13 @@
 					</tr>
 					<tr>
 						<th>稿件狀態</th>
-						<td><?php echo $this->submit->sub_status($paper->sub_status,true,true)?></td>
+						<td>
+							<p><?php echo $this->submit->sub_status($paper->sub_status,true,true)?></p>
+							<?php echo form_open(get_url("dashboard",$conf_id,"submit","detail",$paper->sub_id))?>
+								<?php $this->submit->get_paper_status_select("sub_status",$paper->sub_status)?>
+								<button type="submit" class="ui button blue">更新狀態</button>
+							<?php echo form_close()?>
+						</td>
 					</tr>
 					<tr>
 						<th>最後更新時間</th>
@@ -41,7 +47,7 @@
 					</tr>
 					<tr>
 						<th>語言</th>
-						<td><?php echo $paper->sub_lang?></td>
+						<td><?php echo langabbr2str($paper->sub_lang)?></td>
 					</tr>
 					<tr>
 						<th>關鍵字</th>
@@ -78,7 +84,7 @@
 						</td>
 						<td><?php echo $author->user_email?></td>
 						<td><?php echo $author->user_org?></td>
-						<td><?php echo $author->user_country?></td>
+						<td><?php echo $this->user->abbr2country($author->user_country)?></td>
 					</tr>
 					<?php }?>
 					<?php }?>
@@ -155,7 +161,7 @@
 					<tr>
 						<td class="text-center"><span class="ui teal basic label">補充資料</span></td>
 						<td>
-							$otherfile->file_name?>
+							<?php echo $otherfile->file_name?>
 						</td>
 						<td><?php echo date("Y-m-d H:i:s",$otherfile->file_time)?></td>
 						<td class="text-center">
@@ -171,28 +177,37 @@
 			<?php if( $paper->sub_status >= 3 || $paper->sub_status == -2){?>
 			<div class="tab-pane container-fluid" id="tab_review">
 				<h3>審查資料</h3>
-				<table class="table table-striped">
+				<table class="table table-bordered table-striped">
 					<thead>
 						<tr>
 							<th style="width:10%">審查人</th>
 							<th style="width:10%">審查狀態</th>
-							<th style="width:15%">審查時間</th>
-							<th style="width:65%">審查建議</th>
+							<th style="width:10%">審查分數</th>
+							<th style="width:10%">審查時間</th>
+							<th style="width:10%">審稿意願</th>
+							<th style="width:50%">審查建議</th>
 						</tr>
 					</thead>
 					<?php foreach ($reviewers as $key => $reviewer) {?>
 					<tr>
-						
 						<td><?php echo $reviewer->user_login?></td>
-						<td>
-							<?php echo $this->submit->sub_status($reviewer->review_status,true)?>
+						<td class="text-center">
+							<?php echo $this->reviewer->review_status($reviewer->review_status)?>
 						</td>
-						<td>
+						<td class="text-center">
+							<?php echo $reviewer->review_score;?>
+						</td>
+						<td class="text-center">
 							<?php
-								if( in_array($reviewer->review_status, array(-2,2,4)) ){
+								if( $reviewer->review_status > 0 ){
 									echo date('Y/m/d H:i', $reviewer->review_time);	
+								}else{
+									echo "-";
 								}
 							?>
+						</td>
+						<td class="text-center">
+							<?php echo $this->reviewer->review_wishes($reviewer->review_confirm)?>
 						</td>
 						<td>
 							<?php echo $reviewer->review_comment?>

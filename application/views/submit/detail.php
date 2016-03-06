@@ -39,7 +39,9 @@
 					</tr>
 					<tr>
 						<th>語言</th>
-						<td><?php echo $paper->sub_lang?></td>
+						<td>
+							<?php echo langabbr2str($paper->sub_lang)?>
+						</td>
 					</tr>
 					<tr>
 						<th>關鍵字</th>
@@ -76,7 +78,7 @@
 						</td>
 						<td><?php echo $author->user_email?></td>
 						<td><?php echo $author->user_org?></td>
-						<td><?php echo $author->user_country?></td>
+						<td><?php echo $this->user->abbr2country($author->user_country)?></td>
 					</tr>
 					<?php }?>
 					<?php }?>
@@ -177,7 +179,7 @@
 					<thead>
 						<tr>
 							<th class="text-center" style="width:10%">審查人</th>
-							<th class="text-center" style="width:10%">審查狀態</th>
+							<th class="text-center" style="width:10%">審查分數</th>
 							<th class="text-center" style="width:10%">審查時間</th>
 							<th class="text-center" style="width:70%">審查建議</th>
 						</tr>
@@ -188,9 +190,9 @@
 					<tr>
 						<td class="text-center">
 							審查人 <?php echo array_search($reviewer->user_login, $review_array)+1?>
-						</td>						
+						</td>
 						<td class="text-center">
-							<?php echo $this->submit->sub_status($reviewer->review_status,true);?>
+							<?php echo $reviewer->review_score;?>
 						</td>
 						<td class="text-center">
 							<?php echo date('Y/m/d H:i', $reviewer->review_time);?>

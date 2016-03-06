@@ -316,6 +316,10 @@ class Conf_model extends CI_Model {
 		return './upload/paper/'.$conf_id.'/';
 	}
 
+	function dget_paperdir($conf_id){
+		return FCPATH.'upload/paper/'.$conf_id.'/';
+	}
+
 	function get_regdir($conf_id){
 		return './upload/registration/'.$conf_id.'/';
 	}
@@ -933,24 +937,6 @@ class Conf_model extends CI_Model {
 		return false;
 	}
 
-	function get_modules($conf_id,$module_lang){
-		$this->db->from('module');
-		$this->db->where('module_lang', $module_lang);
-		$this->db->where('conf_id', $conf_id);
-		$this->db->order_by("module_position","DESC");
-		$this->db->order_by("module_order","DESC");
-		$query = $this->db->get();
-		return $query->result();
-	}
-
-	function get_module($conf_id,$module_id){
-		$this->db->from('module');
-		$this->db->where('module_id', $module_id);
-		$this->db->where('conf_id', $conf_id);
-		$query = $this->db->get();
-		return $query->row();
-	}
-
 	function update_schedule($conf_id,$date_type,$date){
 		$this->db->where('conf_id', $conf_id);
 		$this->db->where('date_type', $date_type);
@@ -1317,5 +1303,267 @@ class Conf_model extends CI_Model {
 				$status_text = "未知錯誤";
 		}
 		return $status_text;
+	}
+
+	function addmail($to,$subject,$message,$user_login,$conf_id=NULL){
+		$mail = array(
+			"user_login"    => $user_login,
+			"conf_id"       => $conf_id,
+			"email_subject" => $subject,
+			"email_content" => $message,
+			"email_to"      => $to,
+			"email_time"    => time()
+		);
+		return $this->db->insert('email_backup', $mail);
+	}
+
+	function add_review_form($conf_id,$review_form_title,$element_name,$element_value){
+		$this->load->helper('string');
+		$return = array(
+			"status" => false,
+			"message" => ""
+		);
+		foreach ($review_form_title as $key => $title) {
+			$form = array(
+				"review_form_title" => $title,
+				"conf_id"           => $conf_id,
+				"review_form_name"  => random_string('alnum', 10),
+				"review_form_sort"  => $key
+			);
+		
+			if( $this->db->insert('review_forms', $form) ){
+				$review_form_id = $this->db->insert_id();
+				if( $review_form_id ){
+					$form_elements = array();
+					foreach ($element_name[$key] as $key2 => $element) {
+						$form_element = array(
+							"element_name"   => $element,
+							"element_value"  => $element_value[$key][$key2],
+							"review_form_id" => $review_form_id
+						);
+						array_push($form_elements,$form_element);
+					}
+					$this->db->insert_batch("review_form_element", $form_elements);
+				}
+			}else{
+				$return["message"] = "Could not add review item '".$title."'";
+				return $return;
+			}
+		}
+		$return["status"] = true;
+		return $return;
+	}
+
+	function add_review_form_elements($review_form_id,$element_names,$element_values){
+		$elements = array();
+		foreach ($element_names as $key => $element) {
+			$form_element = array(
+				"element_name"   => $element,
+				"element_value"  => $element_values[$key],
+				"review_form_id" => $review_form_id
+			);
+			array_push($elements,$form_element);
+		}
+		return $this->db->insert_batch("review_form_element", $elements);
+	}
+
+	function update_review_form_sort($review_form_id,$conf_id){
+		foreach ($review_form_id as $key => $form_id) {
+			$review_form = array(
+				"review_form_sort" => $key
+			);
+			$this->db->where("conf_id",$conf_id);
+			$this->db->where("review_form_id",$form_id);
+			if( !$this->db->update('review_forms', $review_form) ){
+				return false;
+			}
+		}
+		return true;
+	}
+
+	function update_review_form($conf_id,$form_id,$form_title){
+		$form = array(
+			"review_form_title" => $form_title
+		);
+		$this->db->where("conf_id",$conf_id);
+		$this->db->where("review_form_id",$form_id);
+		return $this->db->update('review_forms', $form);
+	}
+
+	function update_review_element($form_id,$element_name,$element_value){
+		// wii bug? security?
+		foreach ($element_name as $key => $name) {
+			$form = array(
+				"element_name" => $name,
+				"element_value" => $element_value[$key]
+			);
+			$this->db->where("element_id",$key);
+			$this->db->where("review_form_id",$form_id);
+			if( !$this->db->update('review_form_element', $form) ){
+				return false;
+			}
+		}
+		return true;
+	}
+
+	function update_recommend_form_sort($conf_id,$recommend_form_title,$recommend_form_name){
+		foreach ($recommend_form_name as $key => $form_name) {
+			$recommend_form = array(
+				"recommend_form_sort"  => $key,
+				"recommend_form_title" => $recommend_form_title[$key]
+			);
+			$this->db->where("conf_id",$conf_id);
+			$this->db->where("recommend_form_name",$form_name);
+			if( !$this->db->update('recommend_forms', $recommend_form) ){
+				return false;
+			}
+		}
+		return true;
+	}
+
+	function get_review_forms($conf_id){
+		$this->db->from("review_forms");
+		$this->db->where("conf_id",$conf_id);
+		$this->db->order_by("review_form_sort","asc");
+		$query = $this->db->get();
+		return $query->result();
+	}
+
+	function get_review_form($conf_id,$review_form_id){
+		$this->db->from("review_forms");
+		$this->db->where("conf_id",$conf_id);
+		$this->db->where("review_form_id",$review_form_id);
+		$query = $this->db->get();
+		return $query->row();
+	}
+
+	function get_review_form_elements($conf_id){
+		$this->db->from("review_form_element");
+		$this->db->join("review_forms","review_form_element.review_form_id = review_forms.review_form_id");
+		$this->db->where("review_forms.conf_id",$conf_id);
+		$this->db->order_by("review_form_element.element_value","desc");
+		$elements = $this->db->get()->result();
+		$return = array();
+		foreach ($elements as $key => $element) {
+			$return[$element->review_form_id] = array();
+		}
+		foreach ($elements as $key => $element) {
+			$tmp = array(
+				"element_id" => $element->element_id,
+				"element_name" => $element->element_name,
+				"element_value" => $element->element_value
+			);
+			array_push($return[$element->review_form_id],$tmp);
+		}
+		return $return;
+	}
+
+	function get_review_form_element($conf_id,$review_form_id){
+		$this->db->from("review_form_element");
+		$this->db->join("review_forms","review_form_element.review_form_id = review_forms.review_form_id");
+		$this->db->where("review_forms.conf_id",$conf_id);
+		$this->db->where("review_forms.review_form_id",$review_form_id);
+		$this->db->order_by("review_form_element.element_value","desc");
+		$elements = $this->db->get()->result();
+		$return = array();
+		foreach ($elements as $key => $element) {
+			$tmp = array(
+				"element_id" => $element->element_id,
+				"element_name" => $element->element_name,
+				"element_value" => $element->element_value
+			);
+			array_push($return,$tmp);
+		}
+		return $return;
+	}
+
+	function get_review_element($conf_id,$review_form_id,$element_id){
+		$this->db->from("review_form_element");
+		$this->db->join("review_forms","review_form_element.review_form_id = review_forms.review_form_id");
+		$this->db->where("review_forms.conf_id",$conf_id);
+		$this->db->where("review_forms.review_form_id",$review_form_id);
+		$this->db->where("review_form_element.element_id",$element_id);
+		return $this->db->get()->row();
+	}
+
+	function del_review_form($conf_id,$review_form_id){
+		$this->db->where("conf_id",$conf_id);
+		$this->db->where("review_form_id",$review_form_id);
+		if( $this->db->delete('review_forms') ){
+			$this->db->where("review_form_id",$review_form_id);
+			return $this->db->delete('review_form_element');
+		}else{
+			return false;
+		}
+	}
+
+	function del_review_element($review_form_id,$element_id){
+		$this->db->where("review_form_id",$review_form_id);
+		$this->db->where("element_id",$element_id);
+		return $this->db->delete('review_form_element');
+	}
+
+	function add_recommend_forms($conf_id,$recommend_form_title){
+		$this->load->helper('string');
+		$forms = array();
+		foreach ($recommend_form_title as $key => $title) {
+			$form = array(
+				"recommend_form_title" => $title,
+				"conf_id"              => $conf_id,
+				"recommend_form_name"  => random_string('alnum', 10),
+				"recommend_form_sort"  => $key
+			);
+			array_push($forms,$form);
+		}
+		return $this->db->insert_batch("recommend_forms", $forms);
+	}
+
+	function get_recommend_forms($conf_id){
+		$this->db->from("recommend_forms");
+		$this->db->where("conf_id",$conf_id);
+		$this->db->order_by("recommend_form_sort","asc");
+		$query = $this->db->get();
+		return $query->result();
+	}
+
+	function loglang($log_to,$lang_template,$log_act){
+		$search = array();
+		$replace = array();
+		foreach ($log_to as $key => $to) {
+			array_push($search, "{".$key."}");
+			switch($key){
+				case "sub_status":
+				case "paper_status":
+				case "old_status":
+					$to = $this->submit->sub_status($to,true,true);
+				break;
+				case "start_value":
+				case "end_value":
+				case "review_timeout":
+					if(is_numeric($to)) $to = date("Y-m-d",$to);
+				break;
+				case "review_time":
+					if(is_numeric($to)) $to = date("Y-m-d H:i:s",$to);
+				break;
+				case "conf_staus":
+				if( $to ){$to='<label class="ui label green">顯示</label>';}else{$to='<label class="ui label red">隱藏</label>';}
+				break;
+				case "conf_col":
+					$to='<img src="'.asset_url().'img/col/col-'.$to.'.png" class="img-thumbnail">';
+				break;
+				case "topic_assign":
+				case "conf_most":
+				if( $to ){$to='<label class="ui label green">開啟</label>';}else{$to='<label class="ui label red">關閉</label>';}
+				break;
+			}
+			array_push($replace, $to);
+		}
+		switch($log_act){
+			case "update_mail_template":
+				return $lang_template;
+			break;
+			default:
+				return str_replace($search,$replace,$lang_template);
+		}
 	}
 }

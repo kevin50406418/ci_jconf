@@ -6,8 +6,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @copyright	Copyright (c) 2015 - 2016, Jingxun Lai, Inc. (https://jconf.tw/)
  * @license	http://opensource.org/licenses/MIT	MIT License
  * @link	https://jconf.tw
- * @since	Version 1.0.0
- * @date	2016/2/20 
+ * @since	Version 1.0.1
+ * @date	2016/2/21 
  */
 class Submit extends MY_Conference {
 	public function __construct(){
@@ -61,7 +61,6 @@ class Submit extends MY_Conference {
 		$this->assets->set_title(lang('submit_add'));
 		$this->assets->set_title_separator(" | ");
 		$this->assets->set_site_name($this->data['conf_config']['conf_name']);
-
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$this->data);
 		$this->load->view('conf/conf_nav',$this->data);
@@ -1136,12 +1135,5 @@ class Submit extends MY_Conference {
 		$this->load->view('conf/conf_nav',$this->data);
 		$this->load->view('conf/menu_submit',$this->data);
 		$this->load->view('common/footer',$this->data);
-	}
-
-	private function _get_conf_info($conf_id){
-		if( $this->cinfo['show_confinfo'] ){
-			$user_login = $this->session->userdata('user_login');
-			$user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
-		}
 	}
 }

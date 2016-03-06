@@ -23,9 +23,8 @@ class MY_Controller extends CI_Controller{
 		if( ENVIRONMENT == "development" ){
 			$this->assets->add_meta_tag("robots", "noindex", "name");
 			$this->assets->add_meta_tag("googlebot", "noindex", "name");
-			// do_action("render.page");
 		}
-		$this->assets->set_title($this->config->item('site_name'));
+		$this->assets->set_site_name($this->config->item('site_name'));
 		$this->assets->add_css(asset_url().'style/bootstrap.min.css');
 		$this->assets->add_css(asset_url().'style/label.min.css');
 		$this->assets->add_css(asset_url().'style/segment.min.css');

@@ -1,6 +1,6 @@
 body {
 	font-family: "Microsoft JhengHei UI", "Microsoft JhengHei", sans-serif;
-	background-color: #eee;
+	background-color: #8999A8;
 	padding-top: 70px; 
 	font-size: 15px;
 }
@@ -953,4 +953,10 @@ textarea.form-control {
 }
 .ui.button,.ui.statistic>.label, .ui.statistics .statistic>.label {
 	font-family: "Microsoft JhengHei UI", "Microsoft JhengHei", sans-serif !important;
+}
+#menu_page_list{
+	min-height: 42px;
+    max-height: 200px;
+    overflow: auto;
+    padding: 0 .9em;
 }

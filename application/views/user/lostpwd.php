@@ -18,7 +18,7 @@
 		</div>
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-10">
-				<div class="g-recaptcha" id="recaptcha" data-sitekey="6Lf-HgITAAAAAMXFSUusTegO_eHAGjP0Ux_viuaN"></div>
+				<div class="g-recaptcha" id="recaptcha" data-sitekey="<?php echo $recaptcha_sitekey?>"></div>
 			</div>
 		</div>
 		<div class="form-group">

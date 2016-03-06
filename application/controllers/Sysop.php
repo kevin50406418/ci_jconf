@@ -328,11 +328,6 @@ class Sysop extends MY_Sysop {
 					$this->load->view('sysop/nav',$this->data);
 					$this->load->view('sysop/user/all',$this->data);
 				break;
-				case "import":
-					$this->load->view('common/header');
-					$this->load->view('common/nav',$this->data);
-					$this->load->view('sysop/nav',$this->data);
-				break;
 				case "manage":
 					if ( $this->input->is_ajax_request() ) {
 						$this->form_validation->set_rules('user_login[]', '帳號', 'required');
@@ -390,10 +385,16 @@ class Sysop extends MY_Sysop {
 				switch($do){
 					default:
 					case "view": // view user
+						$this->lang->load("user_login_log",$this->_lang);
+						$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
+						$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js');
+						$this->assets->add_js(asset_url().'js/dataTables.bootstrap.js');
+						$this->data['logs'] = $this->user->get_login_log($user_login,$this->data['user']->user_email);
 						$this->load->view('common/header');
 						$this->load->view('common/nav',$this->data);
 						$this->load->view('sysop/nav',$this->data);
 						$this->load->view('sysop/user/view',$this->data);
+						$this->load->view('common/footer',$this->data);
 					break;
 					case "edit": // edit user
 						$this->assets->add_css(asset_url().'style/chosen.css');
@@ -439,6 +440,7 @@ class Sysop extends MY_Sysop {
 					    }
 						$this->load->view('sysop/user/edit',$this->data);
 						$this->load->view('js/edit');
+						$this->load->view('common/footer',$this->data);
 					break;
 					case "reset": // reset user password
 						$this->data['passwd'] = "";
@@ -466,6 +468,7 @@ class Sysop extends MY_Sysop {
 					    	}
 					    }
 						$this->load->view('sysop/user/reset',$this->data);
+						$this->load->view('common/footer',$this->data);
 					break;
 				}
 			}else{

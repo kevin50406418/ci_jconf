@@ -57,7 +57,7 @@
 					</tr>
 					<tr>
 						<th>語言</th>
-						<td><?php echo $paper->sub_lang?></td>
+						<td><?php echo langabbr2str($paper->sub_lang)?></td>
 					</tr>
 					<tr>
 						<th>關鍵字</th>
@@ -94,7 +94,7 @@
 						</td>
 						<td><?php echo $author->user_email?></td>
 						<td><?php echo $author->user_org?></td>
-						<td><?php echo $author->user_country?></td>
+						<td><?php echo $this->user->abbr2country($author->user_country)?></td>
 					</tr>
 					<?php }?>
 					<?php }?>
@@ -149,28 +149,29 @@
 				<div class="table-responsive">
 				<?php echo form_open(get_url("topic",$conf_id,"detail",$paper->sub_id))?>
 				<?php echo form_hidden('do', 'notice');?>
-				<table class="table">
+				<table class="table table-bordered">
 					<thead>
 						<tr>
-							<th style="width:5%"> </th>
-							<th style="width:10%">審查人</th>
-							<th style="width:10%">審查狀態</th>
-							<th style="width:10%">審查期限</th>
-							<th style="width:10%">審查時間</th>
-							<th style="width:55%">審查建議</th>
+							<th class="text-center" style="width:5%"> </th>
+							<th class="text-center" style="width:10%">審查人</th>
+							<th class="text-center" style="width:10%">審查狀態</th>
+							<th class="text-center" style="width:10%">審查期限</th>
+							<th class="text-center" style="width:10%">審查時間</th>
+							<th class="text-center" style="width:10%">審查分數</th>
+							<th class="text-center" style="width:45%">審查建議</th>
 						</tr>
 					</thead>
 					<?php foreach ($reviewers as $key => $reviewer) {?>
 					<tr<?php if( $reviewer->topic_review == 1 ){?> class="active"<?php }?>>
 						<td class="text-center">
-							<input type="checkbox" value="<?php echo $reviewer->user_login?>" name="user_login[]"<?php if( in_array($reviewer->review_status, array(-2,2,0,4)) || $reviewer->review_confirm == -1 ){ $cnt++;?> disabled<?php }?>>
+							<input type="checkbox" value="<?php echo $reviewer->user_login?>" name="user_login[]"<?php if( $reviewer->review_status || $reviewer->review_confirm == -1 ){ $cnt++;?> disabled<?php }?>>
 						</td>
 						<td><?php echo $reviewer->user_login?></td>
-						<td>
+						<td class="text-center">
 							<?php if( $reviewer->review_confirm == -1  ){?>
 							<span class="ui grey label">確認中</span>
 							<?php }else{?>
-							<?php echo $this->submit->sub_status($reviewer->review_status,true)?>
+							<?php echo $this->reviewer->review_status($reviewer->review_status)?>
 							<?php }?>
 						</td>
 						<td class="text-center">
@@ -178,10 +179,15 @@
 						</td>
 						<td class="text-center">
 							<?php
-								if( in_array($reviewer->review_status, array(-2,2,0,4)) ){
+								if( $reviewer->review_time > 0 ){
 									echo date('Y/m/d H:i', $reviewer->review_time);	
+								}else{
+									echo "-";
 								}
 							?>
+						</td>
+						<td class="text-center">
+							<?php echo $reviewer->review_score?>
 						</td>
 						<td>
 							<?php echo $reviewer->review_comment?>

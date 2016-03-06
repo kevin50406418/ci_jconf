@@ -3,6 +3,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 /* index */
 $lang['update_profile'] = "Update";
+$lang['update_profile_success'] = "Update Profile Success";
+$lang['update_email_exists'] = "E-mail is already registered to use";
 
 /* login */
 $lang['regist_hint'] = "Not Create Account ?";
@@ -88,6 +90,9 @@ $lang['lostpwd_submit'] = "Submit";
 
 /* review_confirm */
 $lang['user_review_confirm'] = "Confirm Review";
+
+/* reset */
+$lang['invalid_password_reset_key'] = "Invalid password reset key";
 
 /* alert */
 $lang['alert_signup_success'] = "Signup Success";

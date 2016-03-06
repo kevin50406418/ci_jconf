@@ -6,8 +6,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @copyright	Copyright (c) 2015 - 2016, Jingxun Lai, Inc. (https://jconf.tw/)
  * @license	http://opensource.org/licenses/MIT	MIT License
  * @link	https://jconf.tw
- * @since	Version 1.0.0
- * @date	2016/2/20 
+ * @since	Version 1.1.0
+ * @date	2016/3/5
  */
 class Reviewer extends MY_Conference {
 	public $conf_config;
@@ -15,7 +15,7 @@ class Reviewer extends MY_Conference {
 		parent::__construct();
 		$this->cinfo['show_confinfo'] = true;
 
-		$this->user_sysop=$this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
+		$this->user_sysop  = $this->user->is_sysop()?$this->session->userdata('user_sysop'):0;
 		$this->is_sysop    = $this->user_sysop;
 		$this->is_conf     = $this->user->is_conf($this->conf_id);
 		$this->is_topic    = $this->is_topic;
@@ -57,6 +57,7 @@ class Reviewer extends MY_Conference {
 				array_push($this->data['paper_author'],$pa->sub_id);
 			}
 		}
+		$this->assets->set_title(lang('reviewer_paper'));
 		$this->load->view('common/header',$this->data);
 		$this->load->view('common/nav',$this->data);
 		$this->load->view('conf/conf_nav',$this->data);
@@ -79,6 +80,7 @@ class Reviewer extends MY_Conference {
 				array_push($paper_array,$pa->sub_id);
 			}
 		}
+		$this->assets->set_title(lang('reviewer_paper'));
 		$this->data['paper_id'] = $paper_id;
 		$this->load->view('common/header',$this->data);
 		$this->load->view('common/nav',$this->data);
@@ -93,38 +95,52 @@ class Reviewer extends MY_Conference {
 				$this->data['reviewers']  = $this->reviewer->get_reviewer($paper_id);
 				$user_reviewer=$this->reviewer->get_paper_reviewer($paper_id,$this->user_login);
 			}
-			
+			$review_forms    = $this->conf->get_review_forms($this->conf_id);
+			$form_elements   = $this->conf->get_review_form_elements($this->conf_id);
+			$recommend_forms = $this->conf->get_recommend_forms($this->conf_id);
+			$this->data["review_forms"]    = $review_forms;
+			$this->data["form_elements"]   = $form_elements;
+			$this->data["recommend_forms"] = $recommend_forms;
 			$paper_is_review = $this->reviewer->is_review($paper_id,$this->user_login);
 			if( !is_null($paper_is_review) ){
 				$this->load->view('reviewer/detail',$this->data);
 
 				if( $this->data['paper']->sub_status == 3 ){
 					$this->data['review']  = $paper_is_review;
-					$this->form_validation->set_rules('review_status', '審查狀態', 'required');
-				    $this->form_validation->set_rules('review_comment', '審查建議', 'required');
-				    if ( $this->form_validation->run() ){
-						$review_status  = $this->input->post('review_status', TRUE);
-						$review_comment = $this->input->post('review_comment', TRUE);
-						if( in_array($review_status,array(-2,0,2,4)) ){
-							if( $this->reviewer->update_review($this->conf_id,$paper_id,$this->user_login,$review_status,$review_comment) ){
-								if( $paper_is_review->review_status == 3 ){
-									$this->alert->js("成功送出審查意見");
-								}else{
-									$this->alert->js("成功更新審查意見");
-								}
-							}else{
-								if( $paper_is_review->review_status == 3 ){
-									$this->alert->js("審查意見送出失敗");
-								}else{
-									$this->alert->js("審查意見更新失敗");
-								}
-							}
-						}else{
-							$this->alert->js("請選擇正確審查狀態");
+					if( !$paper_is_review->review_status ){ // 未審查表單
+						foreach ($review_forms as $key => $form) {
+							$this->form_validation->set_rules($form->review_form_name, $form->review_form_title, 'required|is_natural');
 						}
-						$this->alert->refresh(2);
-				    }
-					$this->load->view('reviewer/reviewer',$this->data);
+						foreach ($recommend_forms as $key => $recommend) {
+							$this->form_validation->set_rules($recommend->recommend_form_name, $recommend->recommend_form_title, 'required|is_natural');
+						}
+
+						if ( $this->form_validation->run() ){
+							$element_value = array();
+							$recommend_value = array();
+							$review_score = 0;
+							foreach ($review_forms as $key => $form) {
+								$element_value[$form->review_form_name] = $this->input->post($form->review_form_name);
+								$review_score += $this->input->post($form->review_form_name);
+							}
+							foreach ($recommend_forms as $key => $recommend) {
+								$recommend_value[$recommend->recommend_form_name] = $this->input->post($recommend->recommend_form_name);
+							}
+							$review_comment = $this->input->post('review_comment');
+							
+							if( $this->reviewer->add_review_responses($this->conf_id,$paper_id,$user_reviewer->review_id,$element_value,$recommend_value) ){
+								$this->reviewer->update_review($this->conf_id,$paper_id,$this->user_login,$review_comment,$review_score);
+								$this->alert->js("成功送出審查表單，感謝您的審查");
+							}else{
+								$this->alert->js("審查表單送出失敗");
+							}
+						}
+						$this->load->view('reviewer/reviewer',$this->data);
+					}else{
+						$this->data["review_responses"] = $this->reviewer->get_reviewform($user_reviewer->review_id,$paper_id,$this->conf_id);
+						$this->data["review_recommends"] = $this->reviewer->get_recommendform($user_reviewer->review_id,$paper_id,$this->conf_id);
+						$this->load->view('reviewer/review_forms',$this->data);
+					}
 				}
 			}else{
 				$this->alert->js("您無法審查本篇稿件",get_url("reviewer",$this->conf_id,"index"));
