@@ -10,7 +10,7 @@
 	<div class="col-sm-offset-2 col-sm-10">
 		<div class="radio">
 			<label>
-				<input name="main_contact" type="radio" required id="main_contact" value="1">通訊作者</label>
+				<input name="main_contact[]" type="checkbox" id="main_contact" value="{{row-count-placeholder}}">通訊作者</label>
 		</div>
 	</div>
 </div>
@@ -35,7 +35,7 @@
 <div class="form-group">
 	<label class="col-sm-2 control-label">所屬機構 <span class="text-danger">*</span></label>
 	<div class="col-sm-10">
-		<textarea name="user_org[]" maxlength="40" required class="form-control" id="user_org"></textarea>
+		<textarea name="user_org[]" required class="form-control" id="user_org"></textarea>
 	</div>
 </div>
 <div class="form-group">

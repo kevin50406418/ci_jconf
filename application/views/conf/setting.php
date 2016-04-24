@@ -7,6 +7,8 @@
 			<li> <a href="#tab_style" data-toggle="tab"> <i class="fa fa-magic fa-lg"></i> <?php echo lang('conf_style')?> </a> </li>
 			<li> <a href="#tab_function" data-toggle="tab"> <i class="fa fa-cog fa-lg"></i> <?php echo lang('conf_function')?> </a> </li>
 			<li> <a href="#tab_schedule" data-toggle="tab"> <i class="fa fa-calendar fa-lg"></i> <?php echo lang('schedule')?> </a> </li>
+			<li> <a href="#tab_agree" data-toggle="tab"> <i class="fa fa-check-circle-o fa-lg"></i> 稿件同意表單 </a> </li>
+			<li> <a href="#tab_signup" data-toggle="tab"> <i class="fa fa-sign-in fa-lg"></i> 註冊資訊 </a> </li>
 			<?php echo form_open(get_url("dashboard",$conf_id,"setting"),array("class"=>"pull-right"))?>
 			<?php echo form_hidden('do', 'status');?>
 			<?php if( $conf_config['conf_staus']==0 ){?>
@@ -127,6 +129,12 @@
 				<?php echo form_open(get_url("dashboard",$conf_id,"setting"),array("class"=>"form-horizontal"))?>
 				<?php echo form_hidden('do', 'func');?>
 				<div class="form-group">
+					<label class="control-label col-sm-2">研討會報名</label>
+					<div class="col-sm-10">
+						<textarea name="signup_info" class="ckeditor form-control"><?php echo $conf_config['signup_info']?></textarea>
+					</div>
+				</div>
+				<div class="form-group">
 					<label for="conf_address" class="col-sm-2 control-label"><?php echo lang('home_layout')?></label>
 					<div class="col-sm-1 text-center">
 						<img src="<?php echo asset_url()?>img/col/col-1c.png" class="img-thumbnail">
@@ -187,6 +195,17 @@
 										<input type="radio" name="topic_assign" id="topic_assign2" autocomplete="off" value="0"<?php if($conf_config['topic_assign'] == 0 ){?> checked<?php }?>>
 									</td>
 								</tr>
+								<tr>
+									<th>
+										<label for="topic_edit" class="control-label">主編編輯稿件</label>
+									</th>
+									<td class="text-center<?php if($conf_config['topic_edit'] == 1 ){?> success<?php }?>">
+										<input type="radio" name="topic_edit" id="topic_edit" autocomplete="off" value="1"<?php if($conf_config['topic_edit'] == 1 ){?> checked<?php }?>> 
+									</td>
+									<td class="text-center<?php if($conf_config['topic_edit'] == 0 ){?> danger<?php }?>">
+										<input type="radio" name="topic_edit" id="topic_assign2" autocomplete="off" value="0"<?php if($conf_config['topic_edit'] == 0 ){?> checked<?php }?>>
+									</td>
+								</tr>
 							</tbody>
 						</table>
 					</div>
@@ -201,18 +220,19 @@
 			<div class="tab-pane container-fluid" id="tab_schedule">
 				<h2><i class="fa fa-calendar fa-lg"></i> <?php echo lang('schedule')?></h2>
 				<?php echo validation_errors('<div class="ui negative message">', '</div>');?>
-				<?php echo form_open(get_url("dashboard",$conf_id,"setting"),array("class"=>"form-horizontal"))?>
+				<?php echo form_open(get_url("dashboard",$conf_id,"setting"))?>
 				<?php echo form_hidden('do', 'schedule');?>
-				<div class="table-responsive repeat">
+				<div class="table-responsive">
+				<div class="repeat">
 				<table class="table table-bordered table-hover" id="dates">
 					<thead>
 						<tr>
-							<th class="text-center" style="width: 5%">移動</th>
-							<th class="text-center" style="width: 15%">項目</th>
-							<th class="text-center" style="width: 25%">中文名稱</th>
-							<th class="text-center" style="width: 25%">英文名稱</th>
-							<th class="text-center" style="width: 20%">日期</th>
-							<th class="text-center" style="width: 10%">顯示方式</th>
+							<th class="text-center col-md-1">移動</th>
+							<th class="text-center col-md-2">項目</th>
+							<th class="text-center col-md-3">中文名稱</th>
+							<th class="text-center col-md-3">英文名稱</th>
+							<th class="text-center col-md-4">日期</th>
+							<th class="text-center col-md-2">顯示方式</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -225,10 +245,10 @@
 								<?php echo lang('schedule_'.$key)?>
 							</td>
 							<td class="text-center">
-								<input type="text" name="sc[<?php echo $key?>][date_title_zhtw]" value="<?php echo set_value('sc['.$key.'][date_title_zhtw]', $schedule['date_title_zhtw']); ?>">
+								<input type="text" name="sc[<?php echo $key?>][date_title_zhtw]" value="<?php echo set_value('sc['.$key.'][date_title_zhtw]', $schedule['date_title_zhtw']); ?>" class="col-xs-12">
 							</td>
 							<td class="text-center">
-								<input type="text" name="sc[<?php echo $key?>][date_title_en]" value="<?php echo set_value('sc['.$key.'][date_title_en]', $schedule['date_title_en']); ?>">
+								<input type="text" name="sc[<?php echo $key?>][date_title_en]" value="<?php echo set_value('sc['.$key.'][date_title_en]', $schedule['date_title_en']); ?>" class="col-xs-12">
 							</td>
 							<td class="text-center">
 								<div class="input-daterange input-group" id="datepicker">
@@ -250,9 +270,110 @@
 					</tbody>
 				</table>
 				</div>
+				</div>
 				
 				<div class="form-group">
 					<input type="submit" name="submit_1" value="<?php echo lang('conf_edit')?>" class="ui button blue">
+				</div>
+				<?php echo form_close()?>
+			</div>
+			<div class="tab-pane container-fluid" id="tab_agree">
+				<h2><i class="fa fa-check-circle-o fa-lg"></i> 稿件同意表單</h2>
+				<?php echo validation_errors('<div class="ui negative message">', '</div>');?>
+				<?php echo form_open(get_url("dashboard",$conf_id,"setting"))?>
+				<?php echo form_hidden('do', 'update_agree');?>
+				<div class="table-responsive">
+				<div class="agree_repeat">
+				<table class="table table-bordered table-hover" id="agrees">
+					<thead>
+						<tr>
+							<th class="text-center col-md-9">項目</th>
+							<th class="text-center col-md-1">同意文字</th>
+							<th class="text-center col-md-1">不同意文字</th>
+							<th class="text-center col-md-1">操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach ($agrees as $key => $agree) {?>
+						<tr>
+							<td>
+								<input class="form-control" name="agree_content[<?php echo $agree->agree_token?>]" type="text" value="<?php echo $agree->agree_content?>">
+							</td>
+							<td>
+								<input class="form-control" name="agree_true[<?php echo $agree->agree_token?>]" type="text" value="<?php echo $agree->agree_true?>">
+							</td>
+							<td>
+								<input class="form-control" name="agree_false[<?php echo $agree->agree_token?>]" type="text" value="<?php echo $agree->agree_false?>">
+							</td>
+							<td class="text-center">
+								<span class="move ui black button">
+									<i class="fa fa-arrows-alt"></i>
+								</span>
+								<span class="ui red button">
+									<i class="fa fa-trash"></i>
+								</span>
+							</td>
+						</tr>
+						<?php }?>
+					</tbody>
+				</table>
+				</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" name="submit_1" class="ui button teal"><?php echo lang('conf_edit')?></button>
+				</div>
+				<?php echo form_close()?>
+
+				<?php echo form_open(get_url("dashboard",$conf_id,"setting"))?>
+				<?php echo form_hidden('do', 'add_agree');?>
+				<div class="table-responsive">
+				<div class="add_agree_repeat">
+				<table class="table table-bordered table-hover" id="add_agrees">
+					<thead>
+						<tr>
+							<td colspan="5"><span class="add btn btn-success">新增元素</span></td>
+						</tr>
+						<tr>
+							<th class="text-center col-md-9">項目</th>
+							<th class="text-center col-md-1">同意文字</th>
+							<th class="text-center col-md-1">不同意文字</th>
+							<th class="text-center col-md-1">操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="template">
+							<td>
+								<input class="form-control" name="agree_content[]" type="text" value="">
+							</td>
+							<td>
+								<input class="form-control" name="agree_true[]" type="text" value="">
+							</td>
+							<td>
+								<input class="form-control" name="agree_false[]" type="text" value="">
+							</td>
+							<td class="text-center">
+								<span class="move ui black button">
+									<i class="fa fa-arrows-alt"></i>
+								</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				</div>
+				</div>
+				<div class="text-center">
+					<button type="submit" class="ui button blue huge">新增</button>
+				</div>
+				<?php echo form_close()?>
+			</div>
+			<div class="tab-pane container-fluid" id="tab_signup">
+				<h2><i class="fa fa-sign-in fa-lg"></i> 註冊資訊</h2>
+				<?php echo form_open(get_url("dashboard",$conf_id,"setting"))?>
+				<?php echo form_hidden('do', 'signup');?>
+				<textarea name="signup_info" class="ckeditor"><?php echo $conf_config['signup_info'];?></textarea>
+				<br>
+				<div class="text-center">
+					<button type="submit" class="ui button teal">修改</button>
 				</div>
 				<?php echo form_close()?>
 			</div>
@@ -278,6 +399,22 @@ $(function() {
 	$(".repeat").each(function() {
 		$(this).repeatable_fields({
 			wrapper: '#dates',
+			container: 'tbody',
+			row: 'tr',
+			cell: 'td',
+		});
+	});
+	$(".agree_repeat").each(function() {
+		$(this).repeatable_fields({
+			wrapper: '#agrees',
+			container: 'tbody',
+			row: 'tr',
+			cell: 'td',
+		});
+	});
+	$(".add_agree_repeat").each(function() {
+		$(this).repeatable_fields({
+			wrapper: '#add_agrees',
 			container: 'tbody',
 			row: 'tr',
 			cell: 'td',

@@ -22,7 +22,7 @@ class Topic extends MY_Topic {
 
 		$this->is_sysop    = $this->user_sysop;
 		$this->is_conf     = $this->user->is_conf($this->conf_id);
-		$this->is_topic    = $this->is_topic;
+		$this->is_topic    = $this->user->is_topic($this->conf_id);
 		$this->is_reviewer = $this->user->is_reviewer($this->conf_id);
 		$this->conf_config = $this->conf->conf_config($this->conf_id,$this->is_conf);
 		
@@ -46,6 +46,12 @@ class Topic extends MY_Topic {
 	}
 
 	public function index($conf_id=''){
+		$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
+		$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
+		$this->assets->add_js(asset_url().'js/dataTables.bootstrap.js',true);
+		$this->assets->add_js(asset_url().'js/dataTables.buttons.min.js',true);
+		$this->assets->add_js(asset_url().'js/jszip.min.js',true);
+		$this->assets->add_js(asset_url().'js/buttons.html5.min.js',true);
 		if( !$this->conf->conf_hastopic($this->conf_id) ){
 			$this->alert->js("尚未建立研討會主題，請洽研討會會議管理人員",get_url("main",$this->conf_id));
 			$this->load->view('common/footer',$this->data);
@@ -87,11 +93,11 @@ class Topic extends MY_Topic {
 
 		$paper_author=$this->submit->show_mypaper($this->user_login,$this->conf_id);
 		$this->data['paper_author'] = array();
-		if(is_array($paper_author)){
-			foreach ($paper_author as $key => $pa) {
-				array_push($this->data['paper_author'],$pa->sub_id);
-			}
-		}
+		// if(is_array($paper_author)){
+		// 	foreach ($paper_author as $key => $pa) {
+		// 		array_push($this->data['paper_author'],$pa->sub_id);
+		// 	}
+		// }
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$this->data);
 		$this->load->view('conf/conf_nav',$this->data);
@@ -112,14 +118,25 @@ class Topic extends MY_Topic {
 		$this->assets->add_css(asset_url().'style/bootstrap-datetimepicker.min.css');
 		$this->assets->add_js('//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.js"');
 		$this->assets->add_js(asset_url().'js/bootstrap-datetimepicker.min.js');
+		$this->assets->add_js(base_url('ckeditor/ckeditor.js'));
 
+		$user = $this->user->get_user_info($this->user_login);
 		$paper_author = $this->submit->show_mypaper($this->user_login,$this->conf_id);
 		$paper_array  = array();
-		if(is_array($paper_author)){
-			foreach ($paper_author as $key => $pa) {
-				array_push($paper_array,$pa->sub_id);
-			}
-		}
+		// if(is_array($paper_author)){
+		// 	foreach ($paper_author as $key => $pa) {
+		// 		array_push($paper_array,$pa->sub_id);
+		// 	}
+		// }
+		
+		$this->data['template'] = $this->conf->get_mail_template($this->conf_id,"confirm_review",$this->_lang);
+		$search = array("{user_name}","{user_email}");
+			$replace = array($user->user_last_name." ".$user->user_first_name,$user->user_email);
+		$this->data['template']->email_subject_zhtw = str_replace($search,$replace,$this->data['template']->email_subject_zhtw);
+		$this->data['template']->email_subject_eng  = str_replace($search,$replace,$this->data['template']->email_subject_eng);
+		$this->data['template']->email_body_zhtw    = str_replace($search,$replace,$this->data['template']->email_body_zhtw);
+		$this->data['template']->email_body_eng     = str_replace($search,$replace,$this->data['template']->email_body_eng);
+
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$this->data);
 		$this->load->view('conf/conf_nav',$this->data);
@@ -132,6 +149,16 @@ class Topic extends MY_Topic {
 				$this->data['authors']    = $this->submit->get_author($paper_id);
 				$this->data['otherfile']  = $this->submit->get_otherfile($paper_id);
 				$this->data['otherfiles'] = $this->submit->get_otherfiles($paper_id);
+				$agrees       = $this->conf->get_agrees($this->conf_id);
+				$this->data['agrees']       = $agrees;
+				
+				$agree_value_array = $this->submit->get_agree($this->conf_id,$paper_id);
+				$agree_value = array();
+				foreach ($agree_value_array as $key => $value) {
+					$agree_value[$value->agree_token] = $value->agree_value;
+				}
+				$this->data['agree_value'] = $agree_value;
+				
 
 				if( $this->data['paper']->sub_status == 1 ){
 					$pedding_reviewers = $this->topic->get_reviewer_pedding($this->conf_id,$paper_id);
@@ -160,16 +187,20 @@ class Topic extends MY_Topic {
 							$this->user_logins = $this->input->post('user_login');
 						}
 						if( $type == "add" ){
-							$this->form_validation->set_rules('review_timeout', '審查期限', 'required');
-							$review_timeout = $this->input->post('review_timeout');
-							$review_timeout = strtotime($review_timeout);
+							// $this->form_validation->set_rules('review_timeout', '審查期限', 'required');
+							// $review_timeout = $this->input->post('review_timeout');
+							// $review_timeout = strtotime($review_timeout);
+						}
+						if( $type == "confirm" ){
+							$this->form_validation->set_rules('subject', '主旨', 'required');
+							$this->form_validation->set_rules('message', '信件內容', 'required');
 						}
 						if ($this->form_validation->run()){
 							switch($type){
 								case "time":
 									foreach ($review_timeout as $this->user_login => $timeout) {
-										if( $this->topic->update_reviewer_pedding_timeout($paper_id,$this->user_login,$this->conf_id,strtotime($timeout)) ){
-											$this->alert->show("s","成功更新使用者 <strong>".$this->user_login."</strong>審查期限為:".$timeout);
+										if( $this->topic->update_reviewer_pedding_timeout($paper_id,$this->user_login,$this->conf_id,$review_timeout) ){
+											$this->alert->show("s","成功更新使用者 <strong>".$this->user_login."</strong>審查期限為:".date("Y-m-d",$review_timeout));
 										}else{
 											$this->alert->show("d","更新使用者 <strong>".$this->user_login."</strong> 審查期限失敗");
 										}
@@ -177,6 +208,7 @@ class Topic extends MY_Topic {
 									$this->alert->refresh(2);
 								break;
 								case "add":
+									$review_timeout = strtotime("+1 week");
 									if( $this->data['pedding_count']+count($this->user_logins)<=5 ){
 										foreach ($this->user_logins as $key => $this->user_login) {
 											if( !in_array($this->user_login, $this->data['not_reviewers']) ){
@@ -195,6 +227,8 @@ class Topic extends MY_Topic {
 									$this->alert->refresh(2);
 								break;
 								case "confirm":
+									$subject =$this->input->post('subject');
+									$message =$this->input->post('message',false);
 									if($this->data['pedding_count']<=5){
 										if( $this->data['pedding_count']%2 == 1 ){
 											$review_timeout = array();
@@ -210,7 +244,7 @@ class Topic extends MY_Topic {
 												}
 											}
 											foreach ($is_pedding as $key => $this->user_login) {
-												if( $this->topic->assign_reviewer($paper_id,$this->user_login,$this->conf_id,$review_timeout[$this->user_login]) ){
+												if( $this->topic->assign_reviewer($paper_id,$this->user_login,$this->conf_id,$review_timeout[$this->user_login],$subject,$message,$user->user_last_name." ".$user->user_first_name,$user->user_email) ){
 													$this->submit->paper_to_reviewing($this->conf_id,$paper_id);
 													$this->alert->show("s","成功將使用者 <strong>".$this->user_login."</strong> 加入本篇稿件審查");
 												}else{
@@ -245,6 +279,7 @@ class Topic extends MY_Topic {
 				if( $this->data['paper']->sub_status >= 3 || $this->data['paper']->sub_status == -2 || $this->data['paper']->sub_status == 0){
 					$reviewers = $this->topic->get_reviewer($paper_id);
 					$this->data['reviewers'] = $reviewers;
+
 					if( $this->data['paper']->sub_status == 3){
 						$do = $this->input->post("do");
 						switch($do){
@@ -281,10 +316,26 @@ class Topic extends MY_Topic {
 									$this->alert->refresh(2);
 								}
 							break;
+							case "timeout":
+								$this->form_validation->set_rules('review_timeout[]', '審查期限', 'required');
+								if ( $this->form_validation->run() ){
+									$review_timeout = $this->input->post("review_timeout");
+									if( $this->topic->uptate_review_timeout($review_timeout,$paper_id) ){
+										$this->alert->show("s","更新審查時間成功");
+									}else{
+										$this->alert->show("d","更新審查時間失敗");
+									}
+									$this->alert->refresh(2);
+								}
+							break;
+							case "cancel":
+							break;
 						}
 					}
 				}
 				$this->load->view('topic/detail',$this->data);
+			}else{
+				$this->alert->js("查不到本篇稿件!",get_url("topic",$this->conf_id,"index"));
 			}
 		}else{
 			$this->alert->js("由於您為本篇稿件作者之一，無法分派本篇稿件",get_url("topic",$this->conf_id,"index"));
@@ -387,7 +438,7 @@ class Topic extends MY_Topic {
 		$this->data['users']     = $this->user->get_all_users(10);
 		$this->data['confs']     = $this->user->get_conf_array($this->conf_id);
 		$this->data['reviewers'] = $this->user->get_reviewer_array($this->conf_id);
-		
+		$this->data['topics']    = $this->user->get_topic_array($this->conf_id);
 		if( $this->conf_config["topic_assign"] ){
 			$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
 			$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
@@ -442,6 +493,243 @@ class Topic extends MY_Topic {
 			$this->load->view('common/footer',$this->data);
 		}
 		
+	}
+
+	public function edit($conf_id='',$paper_id=''){
+		$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
+		$this->assets->add_js(asset_url().'js/repeatable.js',true);
+		$this->assets->add_js(asset_url().'js/chosen.jquery.js',true);
+
+		$this->load->view('common/header');
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_topic',$this->data);
+		if( $this->conf_config['topic_edit'] ){
+			$paper = $this->conf->get_paper($this->conf_id,$paper_id);
+			$this->data['paper'] = $paper;
+			if(!empty($paper)){
+				$this->data['paper_id']   = $paper_id;
+				$this->data['authors']    = $this->submit->get_author($paper_id);
+				$this->data['otherfile']  = $this->submit->get_otherfile($paper_id);
+				$this->data['otherfiles'] = $this->submit->get_otherfiles($paper_id);
+				$this->data['reviewers']  = $this->topic->get_reviewer($paper_id);
+				$this->data['finishfile'] = $this->submit->get_finishfile($paper_id);
+				$this->data['finishother'] = $this->submit->get_finishother($paper_id);
+
+				$this->data['topics'] = $this->conf->get_topic($this->conf_id);
+				$this->data['paper']->sub_summary = str_replace("<br>",PHP_EOL,$this->data['paper']->sub_summary);
+				$agrees = $this->conf->get_agrees($this->conf_id);
+				$this->data['agrees'] = $agrees;
+				$agree_value_array = $this->submit->get_agree($this->conf_id,$paper_id);
+				$agree_value = array();
+				foreach ($agree_value_array as $key => $value) {
+					$agree_value[$value->agree_token] = $value->agree_value;
+				}
+				$this->data['agree_value'] = $agree_value;
+						
+				$country_list = config_item('country_list');
+				$this->data['country_list'] = $country_list[$this->_lang];
+				$update = $this->input->post("update");
+				switch ($update) {
+					case "info":
+						$this->form_validation->set_rules('sub_title', '題目', 'required');
+						$this->form_validation->set_rules('sub_summary', '摘要', 'required');
+						$this->form_validation->set_rules('sub_lang', '語言', 'required');
+						$this->form_validation->set_rules('sub_keywords', '關鍵字', 'trim|required|min_length[1]',array('required'   => '您必須填寫%s.','min_length' => '至少輸入一組%s'));
+						
+						if ($this->form_validation->run()){
+							$sub_title    = $this->input->post('sub_title');
+							$sub_summary  = str_replace(PHP_EOL,"<br>",$this->input->post('sub_summary'));
+							$sub_keyword  = $this->input->post('sub_keywords');
+							$sub_topic    = in_array($paper->sub_status,array(-1,1))?$this->input->post('sub_topic'):$paper->topic_id;
+							$sub_lang     = $this->input->post('sub_lang');
+							$sub_sponsor  = $this->input->post('sub_sponsor');
+							if( $this->submit->update_paper($paper_id,$this->conf_id,$sub_title,$sub_summary,$sub_keyword,$sub_topic,$sub_lang,$sub_sponsor) ){
+								$this->alert->show("s","稿件資訊更新成功");
+							}else{
+								$this->alert->show("d","稿件資訊更新失敗");
+							}
+							$this->alert->refresh(2);
+						}
+					break;
+					case "author":
+						$this->form_validation->set_rules('user_fname[]', '名字', 'required');
+						$this->form_validation->set_rules('user_lname[]', '姓氏', 'required');
+						$this->form_validation->set_rules('user_email[]', '電子信箱', 'required|valid_email');
+						$this->form_validation->set_rules('user_org[]', '所屬機構', 'required');
+						$this->form_validation->set_rules('user_country[]', '國別', 'required');
+						if ($this->form_validation->run()){
+							$main_contact = $this->input->post('main_contact');
+							$user_fname   = $this->input->post('user_fname');
+							$user_mname   = $this->input->post('user_mname');
+							$user_lname   = $this->input->post('user_lname');
+							$user_email   = $this->input->post('user_email');
+							$user_org     = $this->input->post('user_org');
+							$user_country = $this->input->post('user_country');
+
+							if( $this->submit->add_authors($paper_id,$user_fname,$user_mname,$user_lname,$user_email,$user_org,$user_country,$main_contact) ){
+								$this->alert->show("s","作者資訊更新成功");
+							}else{
+								$this->alert->show("s","更新作者失敗");
+							}
+							$this->alert->refresh(2);
+						}
+					break;
+					case "delfile":
+						$this->form_validation->set_rules('del_file[]', '檔案', 'required');
+						if ($this->form_validation->run()){
+							$del_files = $this->input->post('del_file');
+							if(is_array($del_files)){
+								$files = array();
+								foreach ($this->data['otherfiles'] as $key => $otherfile) {
+									array_push($files,$otherfile->fid);
+								}
+								foreach ($del_files as $key => $del_file) {
+									if( in_array($del_file,$files) ){
+										if( $this->submit->del_file($this->conf_id,$paper_id,$del_file) ){
+											$this->alert->show("s","成功刪除檔案");
+										}else{
+											$this->alert->show("d","刪除檔案失敗");
+										}
+									}else{
+										$this->alert->show("s","無法刪除檔案編號 ".$del_file."(非本篇稿件檔案)");
+									}
+								}
+								$this->alert->refresh(2);
+							}
+						}
+					break;
+					case "file":
+						$config['upload_path']= $this->conf->get_paperdir($this->conf_id);
+		                $config['allowed_types']= 'pdf';
+		                $config['encrypt_name']= true;
+
+		                $this->load->library('upload', $config);
+		                
+		                if ( $this->upload->do_upload('paper_file')){
+		                    $upload_data = $this->upload->data();
+		                    $this->data['upload_data'] = $upload_data;
+		                    $arrayLevel = arrayLevel($upload_data);
+		                    if( $arrayLevel >1 ){
+		                    	$this->alert->js("投稿檔案僅限一份");
+		                    }
+		                    if(empty($this->data['otherfile'])){
+		                   		if( $this->submit->add_file($this->conf_id,$paper_id,$upload_data['client_name'],$upload_data['file_name'],"F") ){
+		                   			$this->alert->show("s","上傳投稿檔案成功");
+		                   		}else{
+		                   			$this->alert->show("d","上傳投稿檔案失敗");
+		                   		}
+		                	}else{
+		                		delete_files($this->conf->get_paperdir($this->conf_id).$this->data['otherfile']->file_system);
+		                		if( $this->submit->update_file($this->conf_id,$paper_id,$this->data['otherfile']->fid,$upload_data['client_name'],$upload_data['file_name']) ){
+		                			$this->alert->show("s","更新投稿檔案成功");
+		                		}else{
+		                			$this->alert->show("d","更新投稿檔案失敗");
+		                		}
+		                	}
+		                }else{
+		                	$this->alert->js("投稿檔案上傳失敗");
+		                }
+		                $this->alert->refresh(2);
+					break;
+					case "otherfile":
+						$config['upload_path']= $this->conf->get_paperdir($this->conf_id);
+		                $config['allowed_types']= 'pdf';
+		                $config['encrypt_name']= true;
+
+		                $this->load->library('upload', $config);
+		                if ( $this->upload->do_upload('paper_file')){
+		                    $upload_datas = $this->upload->data();
+		                    $arrayLevel = arrayLevel($upload_datas);
+		                    if( $arrayLevel ==1 ){
+		                       	if( $this->submit->add_file($this->conf_id,$paper_id,$upload_datas['client_name'],$upload_datas['file_name'],"O") ){
+		                       		$this->alert->show("s","成功新增補充資料：".$upload_datas['client_name']);
+		                       	}else{
+		                       		$this->alert->show("d","新增補充資料失敗：".$upload_datas['client_name']);
+		                       	}
+		                    }else if($arrayLevel == 2){
+		                    	foreach ($upload_datas as $key => $upload_data) {
+		                       		if( $this->submit->add_file($this->conf_id,$paper_id,$upload_data['client_name'],$upload_data['file_name'],"O") ){
+		                       			$this->alert->show("s","成功新增補充資料：".$upload_data['client_name']);
+		                       		}else{
+		                       			$this->alert->show("d","新增補充資料失敗：".$upload_data['client_name']);
+		                       		}
+		                        }
+		                    }
+		                    $this->alert->refresh(2);
+		                }
+					break;
+				}
+				$this->load->view('topic/edit',$this->data);
+			}else{
+				$this->alert->js("查無本篇稿件",get_url("topic",$this->conf_id));
+			}
+		}else{
+			$this->alert->show("d","本研討會尚未啟用這功能，請洽會議管理者",get_url("topic",$this->conf_id));
+		}
+		$this->load->view('common/footer',$this->data);
+	}
+
+	public function email($conf_id='',$paper_id=''){
+		if( empty($paper_id) ){
+			$this->alert->js("稿件不存在",get_url("topic",$this->conf_id,"index"));
+			$this->load->view('common/footer',$this->data);
+			$this->output->_display();
+			exit;
+		}
+		$this->data['paper_id'] = $paper_id;
+		$this->assets->set_title(lang('topic_assign'));
+		$this->assets->add_js(base_url('ckeditor/ckeditor.js'));
+
+		$paper_author = $this->submit->show_mypaper($this->user_login,$this->conf_id);
+		$paper_array  = array();
+		if(is_array($paper_author)){
+			foreach ($paper_author as $key => $pa) {
+				array_push($paper_array,$pa->sub_id);
+			}
+		}
+
+		$this->load->view('common/header');
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_topic',$this->data);
+		if( !in_array($paper_id,$paper_array) ){
+			$paper = $this->topic->get_paperinfo($paper_id,$this->conf_id);
+			$this->data['paper'] = $paper;
+			if(!empty($paper)){
+				$this->data['authors']    = $this->submit->get_author($paper_id);
+				$authors = $this->data['authors'];
+			}
+			$this->form_validation->set_rules('subject', '主旨', 'required');
+			$this->form_validation->set_rules('message', '內容', 'required');
+			if ( $this->form_validation->run() ){
+				$author_emails = array();
+				if(!empty($authors)){
+					foreach ($authors as $key => $author) {
+						if( $author->main_contract ){
+							array_push($author_emails,$author->user_email);
+						}
+					}
+				}
+				$subject = $this->input->post("subject");
+				$message = $this->input->post("message",false);
+				$message.= "<br><br>".$this->conf_config['conf_name'].'<br><a href="'.get_url($conf_id).'">'.get_url($conf_id).'</a>';
+				if( $this->conf->sendmail($this->conf_id,$author_emails,$subject,$message,$this->user_login) ){
+					$this->alert->js("寄送信件成功");
+				}else{
+					$this->alert->js("寄送信件失敗");
+				}
+				
+			}
+			$this->load->view('topic/email',$this->data);
+		}else{
+			$this->alert->js("由於您為本篇稿件作者之一，無法使用連絡作者功能",get_url("topic",$this->conf_id,"index"));
+		}
+		$this->load->view('common/footer',$this->data);
+	}
+
+	public function emails($conf_id=''){
+		//連絡多篇連絡人
 	}
 
 	public function _tmp($conf_id=''){

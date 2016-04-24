@@ -332,6 +332,10 @@ class Conf_model extends CI_Model {
 		return './upload/files/'.$conf_id.'/';
 	}
 
+	function lget_filesdir($conf_id){
+		return site_url().'upload/files/'.$conf_id.'/';
+	}
+
 	function mkconf_dir($conf_id){
 		$return = array(
 			"status" => false,
@@ -467,6 +471,7 @@ class Conf_model extends CI_Model {
 	        array('conf_id' => $conf_id,'date_type' => 'early_bird','start_value' => $now,'end_value' => $now),
 	        array('conf_id' => $conf_id,'date_type' => 'register','start_value' => $now,'end_value' => $now),
 	        array('conf_id' => $conf_id,'date_type' => 'finish','start_value' => $now,'end_value' => $now),
+	        array('conf_id' => $conf_id,'date_type' => 'accept_notice','start_value' => $now,'end_value' => $now),
 	        array('conf_id' => $conf_id,'date_type' => 'most','start_value' => $now,'end_value' => $now)
 		);
 		return $this->db->insert_batch('conf_date',$date);
@@ -937,6 +942,21 @@ class Conf_model extends CI_Model {
 		return false;
 	}
 
+	function update_paper_submit($conf_id,$paper_submit){
+		$conffun = array(
+			"paper_submit" => $paper_submit
+		);
+		$this->db->where('conf_id', $conf_id);
+		if( $this->db->update('conf', $conffun) ){
+			$this->add_log("conf","conf_paper_submit",$conf_id,$conffun);
+			return true;
+		}
+		return false;
+	}
+
+	function update_conffun(){
+	}
+
 	function update_schedule($conf_id,$date_type,$date){
 		$this->db->where('conf_id', $conf_id);
 		$this->db->where('date_type', $date_type);
@@ -1305,14 +1325,18 @@ class Conf_model extends CI_Model {
 		return $status_text;
 	}
 
-	function addmail($to,$subject,$message,$user_login,$conf_id=NULL){
+	function addmail($to,$subject,$message,$user_login,$conf_id=NULL,$fromuser=NULL){
+		if( empty($user_login) ){
+			$user_login = NULL;
+		}
 		$mail = array(
-			"user_login"    => $user_login,
-			"conf_id"       => $conf_id,
-			"email_subject" => $subject,
-			"email_content" => $message,
-			"email_to"      => $to,
-			"email_time"    => time()
+			"user_login"     => $user_login,
+			"conf_id"        => $conf_id,
+			"email_subject"  => $subject,
+			"email_content"  => $message,
+			"email_to"       => $to,
+			"email_time"     => time(),
+			"email_fromuser" => $fromuser
 		);
 		return $this->db->insert('email_backup', $mail);
 	}
@@ -1526,40 +1550,178 @@ class Conf_model extends CI_Model {
 		return $query->result();
 	}
 
+	function remove_file($conf_id,$file){
+		$filesdir = $this->get_filesdir($conf_id);
+		$file = sanitize_filename(base64_decode($file));
+		
+		if( file_exists($filesdir.$file) ){
+			return unlink($filesdir.$file);
+		}else{
+			return false;
+		}
+	}
+
+	function get_agrees($conf_id,$is_finish=0){
+		$this->db->from("conf_agree");
+		$this->db->where("conf_id",$conf_id);
+		$this->db->where("is_finish",$is_finish);
+		$this->db->order_by("agree_sort","asc");
+		return $this->db->get()->result();
+	}
+
+	function update_agrees($conf_id,$agree_content,$agree_true,$agree_false){
+		$i=0;
+		foreach ($agree_content as $key => $content) {
+			$agree = array(
+				"agree_content" => $content,
+				"agree_true"    => $agree_true[$key],
+				"agree_false"   => $agree_false[$key],
+				"agree_sort"    => ++$i
+			);
+			$this->db->where("agree_token",$key);
+			$this->db->where("conf_id",$conf_id);
+			if( !$this->db->update('conf_agree', $agree) ){
+				return false;
+			}
+		}
+		return true;
+	}
+
+	function add_agrees($conf_id,$agree_content,$agree_true,$agree_false){
+		$this->load->helper('string');
+		$agrees = array();
+		foreach ($agree_content as $key => $content) {
+			$agree = array(
+				"agree_token"   => random_string('alnum', 10),
+				"conf_id"       => $conf_id,
+				"agree_content" => $content,
+				"agree_true"    => $agree_true[$key],
+				"agree_false"   => $agree_false[$key],
+				"agree_sort"    => 0
+			);
+			array_push($agrees,$agree);
+		}
+		return $this->db->insert_batch("conf_agree", $agrees);
+	}
+
+	function sendmail($conf_id,$to,$subject,$message,$formuser=NULL){
+		if( is_null($formuser) ){
+			$site_name = $this->config->item('site_name');
+			$this->email->from('ccs@asia.edu.tw', $site_name);
+		}else{
+			$user = $this->user->get_user_info($formuser);
+			$this->email->from($user->user_email, $user->user_first_name.$user->user_last_name);
+		}
+		
+		$this->email->to($to);
+		$this->email->subject($subject);
+		$this->email->message($message);
+		if( is_array($to) ){
+			foreach ($to as $key => $val) {
+				$this->conf->addmail($val,$subject,$message,NULL,$conf_id,$formuser);
+			}
+		}else{
+			$this->conf->addmail($to,$subject,$message,NULL,$conf_id,$formuser);
+		}
+		
+		return $this->email->send();
+	}
+
+	function get_signups($conf_id){
+		$this->db->from('conf_signup');
+		$this->db->join("signup_type","conf_signup.price_type = signup_type.type_id");
+		$this->db->where('conf_signup.conf_id', $conf_id);
+		return $this->db->get()->result();
+	}
+
+	function get_signup($conf_id,$signup_id){
+		$this->db->from('conf_signup');
+		$this->db->join("signup_type","conf_signup.price_type = signup_type.type_id");
+		$this->db->where('conf_signup.conf_id', $conf_id);
+		$this->db->where('conf_signup.signup_id', $signup_id);
+		return $this->db->get()->row();
+	}
+
+	function update_signup_info($conf_id,$signup_info){
+		$signup_info = array(
+			"signup_info" => $signup_info
+		);
+		$this->db->where('conf_id', $conf_id);
+		if( $this->db->update('conf',$signup_info) ){
+			$this->add_log("conf","update_signup_info",$conf_id,array("signup_info"=> $signup_info));
+			return true;
+		}
+		return false;
+	}
+
+	function update_signup_file($conf_id,$signup_id,$filename){
+		$signup = array(
+			"signup_filename" => $filename,
+			"signup_filetime" => time(),
+			"signup_status"   => 1
+		);
+		$this->db->where('signup_id', $signup_id);
+		$this->db->where('signup_status', 0);
+		$this->db->where('conf_id', $conf_id);
+		return $this->db->update('conf_signup', $signup);
+	}
+
+	function get_topic_report($conf_id){
+		$report = array();
+		$this->db->select("sub_topic,sub_status,count(*) as cnt");
+		$this->db->from("paper");
+		$this->db->where("conf_id",$conf_id);
+		$this->db->group_by(array("sub_topic","sub_status"));
+		$tmp_report = $this->db->get()->result();
+		foreach ($tmp_report as $key => $val) {
+			$report[$val->sub_topic][$val->sub_status] = $val->cnt;
+		}
+		return $report;
+	}
+
 	function loglang($log_to,$lang_template,$log_act){
 		$search = array();
 		$replace = array();
-		foreach ($log_to as $key => $to) {
-			array_push($search, "{".$key."}");
-			switch($key){
-				case "sub_status":
-				case "paper_status":
-				case "old_status":
-					$to = $this->submit->sub_status($to,true,true);
-				break;
-				case "start_value":
-				case "end_value":
-				case "review_timeout":
-					if(is_numeric($to)) $to = date("Y-m-d",$to);
-				break;
-				case "review_time":
-					if(is_numeric($to)) $to = date("Y-m-d H:i:s",$to);
-				break;
-				case "conf_staus":
-				if( $to ){$to='<label class="ui label green">顯示</label>';}else{$to='<label class="ui label red">隱藏</label>';}
-				break;
-				case "conf_col":
-					$to='<img src="'.asset_url().'img/col/col-'.$to.'.png" class="img-thumbnail">';
-				break;
-				case "topic_assign":
-				case "conf_most":
-				if( $to ){$to='<label class="ui label green">開啟</label>';}else{$to='<label class="ui label red">關閉</label>';}
-				break;
+		$data = array();
+		if( !empty($log_to) ){
+			foreach ($log_to as $key => $to) {
+				array_push($search, "{".$key."}");
+				switch($key){
+					case "sub_status":
+					case "paper_status":
+					case "old_status":
+						$to = $this->submit->sub_status($to,true,true);
+					break;
+					case "start_value":
+					case "end_value":
+					case "review_timeout":
+						if(is_numeric($to)) $to = date("Y-m-d",$to);
+					break;
+					case "review_time":
+						if(is_numeric($to)) $to = date("Y-m-d H:i:s",$to);
+					break;
+					case "conf_staus":
+						if( $to ){$to='<label class="ui label green">顯示</label>';}else{$to='<label class="ui label red">隱藏</label>';}
+					break;
+					case "conf_col":
+						$to='<img src="'.asset_url().'img/col/col-'.$to.'.png" class="img-thumbnail">';
+					break;
+					case "topic_assign":
+					case "conf_most":
+						if( $to ){$to='<label class="ui label green">開啟</label>';}else{$to='<label class="ui label red">關閉</label>';}
+					break;
+				}
+				$data[$key] = $to;
+				array_push($replace, $to);
 			}
-			array_push($replace, $to);
 		}
+		// sp($data);
+		// return $lang_template;
 		switch($log_act){
 			case "update_mail_template":
+				return $lang_template;
+			break;
+			case "update_sort_topic":
 				return $lang_template;
 			break;
 			default:

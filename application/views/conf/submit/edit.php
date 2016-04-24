@@ -69,6 +69,33 @@
 						</td>
 					</tr>
 				</table>
+				<?php if( is_array($agrees) ){?>
+				<table class="table table-bordered table-hover">
+					<thead>
+						<tr>
+							<th class="text-center col-md-10">項目</th>
+							<th class="text-center col-md-2">選項</th>
+						</tr>
+					</thead>
+					<?php foreach ($agrees as $key => $agree) {?>
+					<tr>
+						<td>
+							<?php echo $agree->agree_content?> <span class="text-danger">*</span>
+						</td>
+						<td class="text-center">
+							<label class="radio-inline" for="agree_true<?php echo $key?>">
+								<input id="agree_true<?php echo $key?>" type="radio" name="<?php echo $agree->agree_token?>" value="1"<?php if( element($agree->agree_token, $agree_value ) == 1){?> checked<?php }?>>
+								<?php echo $agree->agree_true?>
+							</label>
+							<label class="radio-inline" for="agree_false<?php echo $key?>">
+								<input id="agree_false<?php echo $key?>" type="radio" name="<?php echo $agree->agree_token?>" value="0"<?php if( element($agree->agree_token, $agree_value ) == 0){?> checked<?php }?>>
+								<?php echo $agree->agree_false?>
+							</label>
+						</td>
+					</tr>
+					<?php }?>
+				</table>
+				<?php }?>
 				<div class="text-center">
 					<button type="submit" class="ui button orange">更新</button>
 				</div>
@@ -76,75 +103,108 @@
 			</div>
 			<div class="tab-pane container-fluid" id="tab_author">
 				<h3>作者資訊</h3>
-				<div class="table-responsive repeat">
-				<?php echo form_open(get_url("dashboard",$conf_id,"submit","edit",$paper->sub_id))?>
+				<?php echo form_open(get_url("dashboard",$conf_id,"submit","edit",$paper->sub_id),array("class"=>"form-horizontal"))?>
 				<?php echo form_hidden('update', 'author');?>
-				<table class="table table-bordered author">
-					<thead>
-						<tr>
-							<td colspan="6"><span class="add ui green button"><i class="fa fa-plus"></i></span></td>
-						</tr>
-						<tr>
-							<th>主要 <span class="text-danger">*</span></th>
-							<th>姓名 <span class="text-danger">*</span></th>
-							<th>電子信箱 <span class="text-danger">*</span></th>
-							<th>所屬機構 <span class="text-danger">*</span></th>
-							<th>國別 <span class="text-danger">*</span></th>
-							<th>操作</th>
-						</tr>
-					</thead>
-
-					<tbody>
-						<tr class="template trow">
-							<td class="text-center">
-								<label>
-								<input name="main_contact" type="radio" required id="main_contact" value="{{row-count-placeholder}}">
-								</label>
-							</td>
-							<td>
-								<input name="user_fname[]" type="text" required class="form-control" id="user_fname" value="">
-								<input name="user_lname[]" type="text" required class="form-control" id="user_lname" value="">
-							</td>
-							<td>
-								<input name="user_email[]" type="email" required class="form-control" id="user_email" value="">
-							</td>
-							<td>
-								<textarea name="user_org[]" maxlength="40" required class="form-control" id="user_org"></textarea>
-							</td>
-							<td><?php echo form_dropdown('user_country[]', $country_list, "TW", 'class="form-control chosen-select" data-placeholder="請選擇國家..."');?></td>
-							<td class="text-center">
-								<span class="move ui teal button"><i class="fa fa-arrows"></i></span>
-								<span class="remove ui red button"><i class="fa fa-trash-o"></i></span>
-							</td>
-						</tr>
+				<div class="repeat">
+					<div class="author">
+					<div id="container">
+						<span class="add ui green button"><i class="fa fa-plus"></i> 新增作者</span>
+						<div class="ui vertical segment template trow">
+							<div class="form-group pull-right">
+								<span class="move ui teal button"><i class="fa fa-arrows"></i> 排序位置</span>
+								<span class="remove ui red button"><i class="fa fa-trash-o"></i> 刪除作者資訊</span>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label"><input name="main_contact[]" type="checkbox" id="main_contact" value="{{row-count-placeholder}}"> 通訊作者</label>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">名字 <span class="text-danger">*</span></label>
+								<div class="col-sm-10">
+									<input name="user_fname[]" type="text" required class="form-control" id="user_fname" value="">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">中間名 </label>
+								<div class="col-sm-10">
+									<input name="user_mname[]" type="text" class="form-control" id="user_mname" value="">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">姓氏 <span class="text-danger">*</span></label>
+								<div class="col-sm-10">
+									<input name="user_lname[]" type="text" required class="form-control" id="user_lname" value="">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">電子信箱 <span class="text-danger">*</span></label>
+								<div class="col-sm-10">
+									<input name="user_email[]" type="email" required class="form-control" id="user_email" value="">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">所屬機構 <span class="text-danger">*</span></label>
+								<div class="col-sm-10">
+									<textarea name="user_org[]" required class="form-control" id="user_org"></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">國別 <span class="text-danger">*</span></label>
+								<div class="col-sm-10">
+									<?php echo form_dropdown('user_country[]', $country_list, "TW", 'class="form-control chosen-select" data-placeholder="請選擇國家..."');?>
+								</div>
+							</div>
+						</div>
 						<?php if(!empty($authors)){?>
 						<?php foreach ($authors as $key => $author) {?>
-						<tr class="trow">
-							<td class="text-center">
-								<label>
-								<input name="main_contact" type="radio" required id="main_contact" value="<?php echo $key?>"<?php if($author->main_contract == 1){?> checked<?php }?>>
-								</label>
-							</td>
-							<td>
-								<input name="user_fname[]" type="text" required class="form-control" id="user_fname" value="<?php echo $author->user_first_name?>">
-								<input name="user_lname[]" type="text" required class="form-control" id="user_lname" value="<?php echo $author->user_last_name?>">
-							</td>
-							<td>
-								<input name="user_email[]" type="email" required class="form-control" id="user_email" value="<?php echo $author->user_email?>">
-							</td>
-							<td>
-								<textarea name="user_org[]" maxlength="40" required class="form-control" id="user_org"><?php echo $author->user_org?></textarea>
-							</td>
-							<td><?php echo form_dropdown('user_country[]', $country_list, $author->user_country, 'class="form-control chosen-select" data-placeholder="請選擇國家..."');?></td>
-							<td class="text-center">
-								<span class="move ui teal button"><i class="fa fa-arrows"></i></span>
-								<span class="remove ui red button"><i class="fa fa-trash-o"></i></span>
-							</td>
-						</tr>
+						<div class="ui vertical segment trow">
+							<div class="form-group pull-right">
+								<span class="move ui teal button"><i class="fa fa-arrows"></i> 排序位置</span>
+								<span class="remove ui red button"><i class="fa fa-trash-o"></i> 刪除作者資訊</span>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label"><input name="main_contact[]" type="checkbox" id="main_contact" value="<?php echo $key?>"<?php if($author->main_contract == 1){?> checked<?php }?>> 主要聯絡人</label>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">名字 <span class="text-danger">*</span></label>
+								<div class="col-sm-10">
+									<input name="user_fname[]" type="text" required class="form-control" id="user_fname" value="<?php echo $author->user_first_name?>">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">中間名 </label>
+								<div class="col-sm-10">
+									<input name="user_mname[]" type="text" class="form-control" id="user_mname" value="<?php echo $author->user_middle_name?>">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">姓氏 <span class="text-danger">*</span></label>
+								<div class="col-sm-10">
+									<input name="user_lname[]" type="text" required class="form-control" id="user_lname" value="<?php echo $author->user_last_name?>">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">電子信箱 <span class="text-danger">*</span></label>
+								<div class="col-sm-10">
+									<input name="user_email[]" type="email" required class="form-control" id="user_email" value="<?php echo $author->user_email?>">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">所屬機構 <span class="text-danger">*</span></label>
+								<div class="col-sm-10">
+									<textarea name="user_org[]" required class="form-control" id="user_org"><?php echo $author->user_org?></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">國別 <span class="text-danger">*</span></label>
+								<div class="col-sm-10">
+									<?php echo form_dropdown('user_country[]', $country_list, $author->user_country, 'class="form-control chosen-select" data-placeholder="請選擇國家..."');?>
+								</div>
+							</div>
+						</div>
 						<?php }?>
 						<?php }?>
-					</tbody>
-				</table>
+					</div>
+					</div>
 				</div>
 				<div class="text-center">
 					<button type="submit" class="ui button orange">更新</button>
@@ -307,7 +367,7 @@ $(function() {
 	$(".repeat").each(function() {
 		$(this).repeatable_fields({
 			wrapper: ".author",
-			container: "tbody",
+			container: "#container",
 			row: ".trow",
 			cell: "td",
 			row_count_placeholder: "{{row-count-placeholder}}",

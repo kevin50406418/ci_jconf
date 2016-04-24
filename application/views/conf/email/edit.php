@@ -44,3 +44,7 @@
 	</div>
 	<?php echo form_close();?>
 </div>
+<script>
+CKEDITOR.replace( 'body_zhtw');
+CKEDITOR.replace( 'body_eng');
+</script>

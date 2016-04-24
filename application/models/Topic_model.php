@@ -11,7 +11,8 @@ class Topic_model extends CI_Model {
 		$this->db->where('user_login', $user_login);
 		$this->db->where('auth_topic.conf_id', $conf_id);
 		if( is_null($sub_status) ){
-			$this->db->where('sub_status !=', -1);
+			$filter = array(-1, -3);
+			$this->db->where_not_in('sub_status', $filter);
 		}else{
 			$this->db->where('sub_status', $sub_status);
 		}
@@ -43,10 +44,13 @@ class Topic_model extends CI_Model {
     }
 
     function get_paperinfo($paper_id, $conf_id){
+    	$filter = array(-1, -3);
+    	
         $this->db->from('paper');
         $this->db->join('topic', 'paper.sub_topic = topic.topic_id');
         $this->db->where('paper.conf_id', $conf_id);
         $this->db->where("sub_id",$paper_id);
+		$this->db->where_not_in('sub_status', $filter);
         $query = $this->db->get();
         return $query->row();
     }
@@ -123,7 +127,7 @@ class Topic_model extends CI_Model {
 		}
 	}
 
-	function assign_reviewer($paper_id,$user_login,$conf_id,$review_timeout){
+	function assign_reviewer($paper_id,$user_login,$conf_id,$review_timeout,$subject,$message,$user_name,$user_email){
 		$review_token = hash('sha1',uniqid(rand(),true));
 		$reviewer = array(
 			"paper_id"       => $paper_id,
@@ -132,19 +136,29 @@ class Topic_model extends CI_Model {
 			"review_confirm" => -1,
 			"review_token"   => $review_token
 		);
-		
 		if( $this->db->insert('paper_review', $reviewer) ){
 			$this->conf->add_log("topic","assign_reviewer",$conf_id,$reviewer);
-			$this->sendmail_notice_reviewer($paper_id,$user_login,$conf_id,$review_timeout,$review_token);
+			$this->sendmail_notice_reviewer($paper_id,$user_login,$conf_id,$review_timeout,$review_token,$subject,$message,$user_name,$user_email);
 			return true;
 		}else{
 			return false;
 		}
 	}
 
-	function sendmail_notice_reviewer($paper_id,$user_login,$conf_id,$review_timeout,$review_token){
+	function mail_get_paper($conf_id,$paper_id){
+		$this->db->from('paper');
+		$this->db->join('topic', 'paper.sub_topic = topic.topic_id');
+		$this->db->join('paper_author', 'paper.sub_id = paper_author.paper_id');
+		$this->db->join('conf', 'paper.conf_id = conf.conf_id');
+		$this->db->where('main_contract', 1);
+		$this->db->where("sub_id",$paper_id);
+		$this->db->where("paper.conf_id",$conf_id);
+		return $this->db->get()->row();
+	}
+
+	function sendmail_notice_reviewer($paper_id,$user_login,$conf_id,$review_timeout,$review_token,$subject,$message,$user_name,$user_email){
 		$user_info = $this->user->get_user_info($user_login);
-		$paper     = $this->submit->mail_get_paper($conf_id,$paper_id);
+		$paper     = $this->mail_get_paper($conf_id,$paper_id);
 
 		$reviewer_email    = $user_info->user_email;
 		$reviewer_name     = preg_match("/[\x{4e00}-\x{9fa5}]/u", $user_info->user_last_name)?$user_info->user_last_name.$user_info->user_first_name:$user_info->user_first_name." ".$user_info->user_last_name;
@@ -157,23 +171,22 @@ class Topic_model extends CI_Model {
 		$review_reject     = site_url("review_confirm/reject/".$review_token);
 		$review_deadline   = date("Y-m-d H:i:s",$review_timeout);
 		$password_reseturl = site_url("user/lostpwd");
-		$review_url        = get_url("reviewer",$conf_id,"index");
+		$review_url        = get_url("reviewer",$conf_id,"detail",$paper_id);
 		$conf_email        = $paper->conf_email;
 
-		$search = array("{reviewer_name}","{reviewer}","{paper_title}","{paper_summary}","{conf_name}","{conf_link}","{review_accept}","{review_reject}","{review_deadline}","{password_reseturl}","{review_url}");
-        $replace = array($reviewer_name,$reviewer,$paper_title,$paper_summary,$conf_name,$conf_link,$review_accept,$review_reject,$review_deadline,$password_reseturl,$review_url);
-		/* TODO: Need to fix 2 lang system */
-		$mail_template = $this->conf->mail_get_template($conf_id,"confirm_review");
-        $mail_subject = str_replace($search,$replace,$mail_template->email_subject_zhtw);
-        $mail_content = str_replace($search,$replace,$mail_template->email_body_zhtw);
+		$search = array("{reviewer_name}","{reviewer}","{paper_title}","{paper_summary}","{conf_name}","{conf_link}","{review_accept}","{review_reject}","{review_deadline}","{password_reseturl}","{review_url}","{user_name}","{user_email}");
+        $replace = array($reviewer_name,$reviewer,$paper_title,$paper_summary,$conf_name,$conf_link,$review_accept,$review_reject,$review_deadline,$password_reseturl,$review_url,$user_name,$user_email);
+		
+        $mail_subject = str_replace($search,$replace,$subject);
+        $mail_content = str_replace($search,$replace,$message);
 
         $subject = $mail_subject;
 		$to      = $reviewer_email;
 		$message = $mail_content;
 
-		$this->email->from('ccs@asia.edu.tw', $site_name);
+		$this->email->from($conf_email, $conf_name);
+		$this->email->reply_to($user_email, $user_name);
 		$this->email->to($to);
-		$this->email->reply_to('help@jconf.tw', 'Adminstritor');
 		$this->email->subject($subject);
 		$this->email->message($message);
 		
@@ -244,21 +257,75 @@ class Topic_model extends CI_Model {
 	}
 
 	function topic_review($conf_id,$paper_id,$sub_status){
-		$status = array(-3,-2,0,2,4);
+		//send result mail
+		$status = array(-2,0,2,4);
 		if( in_array($sub_status,$status) ){
 			$paper = array(
-            	"sub_status"=> $sub_status
+            	"sub_status" => $sub_status
 	        );
 	        $this->db->where("conf_id",$conf_id);
 	        $this->db->where("sub_id",$paper_id);
 	        if( $this->db->update('paper', $paper) ){
 	        	$this->finish_review($paper_id);
+	        	$this->submit->add_status_history($paper_id,$sub_status);
 	        	$this->conf->add_log("topic","topic_review",$conf_id,$paper);
+	        	$template_name = "";
+	        	switch($sub_status){
+	        		case 4:
+	        			$template_name = "review_result_accept";
+	        		break;
+	        		case 0:
+	        			$template_name = "review_result_edit";
+	        		break;
+	        		case 2:
+	        			$template_name = "review_result_pending";
+	        		break;
+	        		case -2:
+	        			$template_name = "review_result_reject";
+	        		break;
+	        	}
+	        	$this->notice_author($conf_id,$paper_id,$template_name);
 				return true;
 	        }
 		}
 		return false;
 		
+	}
+
+	function notice_author($conf_id,$paper_id,$template_name){
+		$mail_template = $this->conf->mail_get_template($conf_id,$template_name);
+		$authors = $this->submit->get_contactauthor($conf_id,$paper_id);
+		$conf = $this->conf->get_conf($conf_id);
+		foreach ($authors as $key => $author) {
+			$author_name_zhtw = $author->user_last_name.$author->user_first_name;
+			$author_name_en   = $author->user_first_name." ".$author->user_middle_name." ".$author->user_last_name;
+			$paper_title      = $author->sub_title;
+			$paper_summary    = $author->sub_summary;
+			$conf_email       = $conf->conf_email;
+			$conf_name        = $conf->conf_name;
+			$conf_link        = site_url($conf_id);
+			$paper_link       = get_url("submit",$conf_id,"detail",$paper_id);
+			$user_login       = $author->sub_user;
+			$search = array("{author_name}","{paper_title}","{paper_summary}","{conf_name}","{conf_link}","{paper_link}");
+			$replace_zhtw = array($author_name_zhtw,$paper_title,$paper_summary,$conf_name,$conf_link,$paper_link);
+			$replace_en   = array($author_name_en,$paper_title,$paper_summary,$conf_name,$conf_link,$paper_link);
+
+			$mail_subject_zhtw = str_replace($search,$replace_zhtw,$mail_template->email_subject_zhtw);
+			$mail_subject_en   = str_replace($search,$replace_en,$mail_template->email_subject_eng);
+			$mail_content_zhtw = str_replace($search,$replace_zhtw,$mail_template->email_body_zhtw);
+			$mail_content_en   = str_replace($search,$replace_en,$mail_template->email_body_eng);
+
+			$subject = $mail_subject_zhtw." ".$mail_subject_en;
+			$to      = $author->user_email;
+			$message = $mail_content_zhtw."<br><br><hr>".$mail_content_en;
+
+			$this->email->from($conf_email, $conf_name);
+			$this->email->to($to);
+			$this->email->subject($subject);
+			$this->email->message($message);
+			$this->conf->addmail($to,$subject,$message,$user_login,$conf_id);
+			return $this->email->send();
+		}
 	}
 
 	function finish_review($paper_id){
@@ -323,11 +390,9 @@ class Topic_model extends CI_Model {
 			$subject = $mail_subject_zhtw." ".$mail_subject_en;
 			$to      = $user_email;
 			$message = $mail_content_zhtw."<br><br><hr>".$mail_content_en;
-
+			
 			$this->email->from($conf_email, $conf_name);
 			$this->email->to($to);
-			$this->email->bcc('sysop@jconf.tw');
-			$this->email->reply_to('help@jconf.tw', 'Adminstritor');
 			$this->email->subject($subject);
 			$this->email->message($message);
 			
@@ -337,7 +402,8 @@ class Topic_model extends CI_Model {
 	}
 
 	function get_check_review($review_token){
-		$this->db->from('paper_review');
+		$this->db->from('paper');
+		$this->db->join('paper_review',"paper.sub_id = paper_review.paper_id");
         $this->db->where("review_token",$review_token);
         $this->db->where("review_confirm",-1);
         $query = $this->db->get();
@@ -368,5 +434,23 @@ class Topic_model extends CI_Model {
 			}
 		}
 		return count($pedding_review);
+	}
+
+	function uptate_review_timeout($review_timeout,$paper_id){
+		$cnt = 0;
+		foreach ($review_timeout as $user_login => $timeout) {
+			$review = array(
+				"review_timeout" => strtotime($timeout)
+			);
+			
+			$this->db->where('user_login', $user_login);
+			$this->db->where('review_status', 0);
+			$this->db->where('topic_review', 0);
+			$this->db->where('paper_id', $paper_id);
+			if( $this->db->update('paper_review', $review) ){
+				$cnt++;
+			}
+		}
+		return $cnt>0;
 	}
 }

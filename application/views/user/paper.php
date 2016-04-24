@@ -19,7 +19,7 @@
 					<?php echo $paper->sub_title?>
 				</td>
 				<td>
-					<?php echo $this->Submit->sub_status($paper->sub_status,true)?>
+					<?php echo $this->submit->sub_status($paper->sub_status,true)?>
 				</td>
 			</tr>
 		<?php }?>

@@ -25,7 +25,7 @@
 		<div class="form-group">
 			<label for="econtent" class="col-sm-2 control-label">網頁內容</label>
 			<div class="col-sm-10">
-				<textarea name="page_content" rows="50" class="form-control tinymce" id="page_content"><?php echo $content->page_content?></textarea>
+				<textarea name="page_content" rows="50" class="form-control ckeditor" id="page_content"><?php echo $content->page_content?></textarea>
 			</div>
 		</div>
 		<?php }?>
@@ -36,3 +36,9 @@
 </div>
 
 <?php echo form_close()?>
+<script>
+CKEDITOR.replace( 'page_content', {
+	filebrowserBrowseUrl: '<?php echo site_url($this->conf_id."/file/")?>',
+	filebrowserImageBrowseUrl: '<?php echo site_url($this->conf_id."/file/image")?>'
+});
+</script>

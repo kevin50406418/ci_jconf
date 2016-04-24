@@ -17,8 +17,8 @@ $pg_id = $this->uri->segment(2);
 <?php echo link_tag(get_url("rss",$conf_id), 'alternate', 'application/rss+xml', $conf_config['conf_name'].' RSS Feed')?>
 <?php echo $this->assets->show_title()?>
 <?php echo $this->assets->show_meta()?>
-<?php echo link_tag(template_url('amazeui','amazeui.min.css'));?>
-<?php echo link_tag(template_url('amazeui','style.css'));?>
+<?php echo link_tag(template_url('cisc2016','amazeui.min.css'));?>
+<?php echo link_tag(template_url('cisc2016','style.css'));?>
 <?php echo link_tag(asset_url().'style/font-awesome.min.css');?>
 <!--[if (gte IE 9)|!(IE)]><!-->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
@@ -26,7 +26,7 @@ $pg_id = $this->uri->segment(2);
 <script src="<?php echo template_url('amazeui','amazeui.min.js')?>" type="text/javascript"></script>
 <!--[if lt IE 9]>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="//css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>
 <![endif]-->
 </head>
@@ -48,6 +48,7 @@ $pg_id = $this->uri->segment(2);
 			<?php }?>
 		</ul>
 		<div class="am-topbar-right">
+			<a href="<?php echo get_url("signup",$conf_config['conf_id']);?>" class="am-btn am-btn-default am-topbar-btn am-btn-sm am-radius">研討會註冊</a>
 			<a href="#" class="am-btn am-btn-danger am-topbar-btn am-btn-sm am-round" data-am-modal="{target: '#schedule', closeViaDimmer: 0, width: 400, height: 225}"><i class="fa fa-calendar"></i> 重要日期</a>
 			<?php if( is_login() ){?>
 			<div class="am-dropdown" data-am-dropdown="{boundary: '.am-topbar'}">
@@ -61,11 +62,13 @@ $pg_id = $this->uri->segment(2);
 				</ul>
 			</div>
 			<?php }else{?>
-			<a href="<?php echo site_url("user/login")?>" class="am-btn am-btn-success am-topbar-btn am-btn-sm">登入</a>
+			<a href="<?php echo site_url("user/signup")?>" class="am-btn am-btn-success am-topbar-btn am-btn-sm">註冊</a>
+			<a href="<?php echo site_url("user/login")?>" class="am-btn am-btn-warning am-topbar-btn am-btn-sm">登入</a>
 			<?php }?>
 		</div>
 	</div>
 </header>
+<div class="container" id="logo">
 <div class="get">
 	<div class="am-g">
 		<div class="am-u-lg-12">
@@ -81,8 +84,8 @@ $pg_id = $this->uri->segment(2);
 		</div>
 	</div>
 </div>
-<div class="header-logo">
 </div>
-<div class="container">
+<div class="header-logo"></div>
+<div class="container" id="content">
 	<div class="am-g">
 

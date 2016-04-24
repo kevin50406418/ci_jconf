@@ -6,6 +6,7 @@
 		<ul class="nav nav-tabs nav-tabs-center">
 			<li class="active"> <a href="#tab_paperlist" data-toggle="tab"> 投稿清單 </a> </li>
 			<li> <a href="#tab_papers" data-toggle="tab"> 投稿匯出 </a> </li>
+			<li> <a href="#tab_signup" data-toggle="tab"> 註冊列表匯出 </a> </li>
 		</ul>
 		<div class="tab-content">
 			<div class="tab-pane active container-fluid" id="tab_paperlist">
@@ -75,7 +76,7 @@
 						<th>匯出格式</th>
 						<td>
 							<label class="radio-inline">
-								<input type="radio" name="format" value="pdf" required> <i class="fa fa-file-pdf-o fa-lg"></i> PDF
+								<input type="radio" name="format" value="pdf" required disabled> <i class="fa fa-file-pdf-o fa-lg"></i> PDF
 							</label>
 							<label class="radio-inline">
 								<input type="radio" name="format" value="xls" required> <i class="fa fa-file-excel-o fa-lg"></i> Excel
@@ -125,6 +126,43 @@
 				<br>
 				<div id="preview_papers"></div>
 			</div>
+			<div class="tab-pane container-fluid" id="tab_signup">
+				<?php echo form_open(get_url("dashboard",$conf_id,"export_download"),array("target"=>"_blank"))?>
+				<table class="table table-bordered">
+					<tr>
+						<th>匯出格式</th>
+						<td>
+							<label class="radio-inline">
+								<input type="radio" name="format" value="pdf" required disabled> <i class="fa fa-file-pdf-o fa-lg"></i> PDF
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="format" value="xls" required> <i class="fa fa-file-excel-o fa-lg"></i> Excel
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="format" value="csv" required> <i class="fa fa-file-excel-o fa-lg"></i> CSV
+							</label>
+						</td>
+					</tr>
+					<tr>
+						<th class="col-md-2">匯出檔名</th>
+						<td class="col-md-10">
+							<div class="input-group">
+								<input type="text" class="form-control" name="filename">
+								<span class="input-group-addon">.xls</span>
+							</div>
+							<span class="help-block">不用填寫副檔名</span>
+						</td>
+					</tr>
+				</table>
+				<?php echo form_hidden('type', 'signup');?>
+				<div class="text-center">
+					<button id="submit_signup" type="submit" class="ui button blue">匯出</button>
+					<button id="btn_preview_signup" type="button" class="ui button green">預覽</button>
+				</div>
+				<?php echo form_close()?>
+				<br>
+				<div id="preview_signup"></div>
+			</div>
 		</div><!-- .tab-content -->
 	</div>
 </div>
@@ -159,6 +197,11 @@ $(function(){
 	$("#btn_preview_papers").click(function(){
 		$.post('<?php echo site_url("ajax/finishpapers/".$this->conf_id);?>', $( "#tab_papers form" ).serialize(), function(data) {
 			$("#preview_papers").html(data);
+		});
+	});
+	$("#btn_preview_signup").click(function(){
+		$.post('<?php echo site_url("ajax/signuplist/".$this->conf_id);?>', $( "#tab_signup form" ).serialize(), function(data) {
+			$("#preview_signup").html(data);
 		});
 	});
 });

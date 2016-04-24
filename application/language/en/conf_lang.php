@@ -8,6 +8,7 @@ $lang['schedule_early_bird'] = "Early Bird Registration";
 $lang['schedule_register']   = "Registration Deadline";
 $lang['schedule_finish']     = "Camera-Ready Upload Deadline";
 $lang['schedule_most']       = "MOST results published";
+$lang['schedule_accept_notice']       = "Notice Accept Date";
 
 /* nav */
 $lang['hello_user'] = "Hello,";

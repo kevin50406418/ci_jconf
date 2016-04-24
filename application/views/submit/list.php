@@ -22,7 +22,7 @@
 			<td data-order="0">
 				<a href="<?php echo get_url("submit",$conf_id,"detail",$list->sub_id)?>" class="ui blue button">查看</a>
 				<?php if( $list->sub_status==-1 || $list->sub_status== 0){?>
-				<a href="<?php echo get_url("submit",$conf_id,"edit",$list->sub_id)?>" class="ui teal button">編輯</a>
+				<a href="<?php echo get_url("submit",$conf_id,"edit",$list->sub_id)?>?step=2" class="ui teal button">編輯</a>
                 <?php }elseif($list->sub_status==4){?>
 				<a href="<?php echo get_url("submit",$conf_id,"finish",$list->sub_id)?>" class="ui green compact labeled icon button"><i class="fa fa-upload icon"></i> 完稿上傳</a>
                 <?php }elseif($list->sub_status==5){?>

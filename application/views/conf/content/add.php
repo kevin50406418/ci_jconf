@@ -27,7 +27,7 @@
 		<div class="form-group">
 			<label for="econtent" class="col-sm-2 control-label">網頁內容</label>
 			<div class="col-sm-10">
-				<textarea name="page_content[zhtw]" rows="10" class="form-control tinymce" id="page_content"><div></div></textarea>
+				<textarea name="page_content[zhtw]" rows="10" class="form-control" id="page_content_zhtw"><div></div></textarea>
 			</div>
 		</div>
 	</div>
@@ -47,7 +47,7 @@
 		<div class="form-group">
 			<label for="econtent" class="col-sm-2 control-label">網頁內容</label>
 			<div class="col-sm-10">
-				<textarea name="page_content[en]" rows="10" class="form-control tinymce" id="page_content"><div></div></textarea>
+				<textarea name="page_content[en]" rows="10" class="form-control" id="page_content_en"><div></div></textarea>
 			</div>
 		</div>
 	</div>
@@ -58,3 +58,13 @@
 </div>
 
 <?php echo form_close()?>
+<script>
+CKEDITOR.replace( 'page_content_zhtw', {
+	filebrowserBrowseUrl: '<?php echo site_url($this->conf_id."/file/")?>',
+	filebrowserImageBrowseUrl: '<?php echo site_url($this->conf_id."/file/image")?>'
+});
+CKEDITOR.replace( 'page_content_en', {
+	filebrowserBrowseUrl: '<?php echo site_url($this->conf_id."/file/")?>',
+	filebrowserImageBrowseUrl: '<?php echo site_url($this->conf_id."/file/image")?>'
+});
+</script>

@@ -32,7 +32,12 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'colors' },
 		{ name: 'about' }
 	];
-
+	/*var base_url = window.location.origin;
+	config.filebrowserBrowseUrl = base_url+'/ckfinder/ckfinder.html';
+	config.filebrowserImageBrowseUrl = base_url+'/ckfinder/ckfinder.html?Type=Images';
+	config.filebrowserUploadUrl = base_url+'/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files'; //可上傳一般檔案
+	config.filebrowserImageUploadUrl = base_url+'/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images';//可上傳圖檔
+*/
 	// Remove some buttons provided by the standard plugins, which are
 	// not needed in the Standard(s) toolbar.
 	config.removeButtons = 'Underline,Subscript,Superscript';

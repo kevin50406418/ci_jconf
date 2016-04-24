@@ -7,7 +7,7 @@
 			<li> <a href="#tab_author" data-toggle="tab"> 作者資訊 </a> </li>
 			<li> <a href="#tab_file" data-toggle="tab"> 稿件檔案 </a> </li>
 			<?php if( $paper->sub_status >= 3){?><li> <a href="#tab_review" data-toggle="tab"> 審查資料 </a> </li><?php }?>
-			<?php if( $paper->sub_status == -1){?><a href="<?php echo get_url("submit",$conf_id,"edit",$paper->sub_id)?>" class="ui teal button pull-right">編輯稿件</a><?php }?>
+			<a href="#" class="ui orange button pull-right">聯絡主編</a>
 		</ul>
 		<div class="tab-content">
 			<div class="tab-pane active container-fluid" id="tab_info">

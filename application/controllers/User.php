@@ -6,7 +6,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @copyright	Copyright (c) 2015 - 2016, Jingxun Lai, Inc. (https://jconf.tw/)
  * @license	http://opensource.org/licenses/MIT	MIT License
  * @link	https://jconf.tw
- * @since	Version 1.0.3
+ * @since	Version 1.1.0
  * @date	2016/3/2 
  */
 class User extends MY_Controller {
@@ -37,30 +37,30 @@ class User extends MY_Controller {
 			$this->load->view('common/nav',$this->data);
 			$this->user->updateuser_valid();
 			if ($this->form_validation->run()){
-		    	$user_email = $this->input->post('user_email');
-		    	$user_title = $this->input->post('user_title');
-		    	$user_firstname = $this->input->post('user_firstname');
-		    	$user_lastname = $this->input->post('user_lastname');
-		    	$user_gender = $this->input->post('user_gender');
-		    	$user_org = $this->input->post('user_org');
-		    	$user_phoneO_1 = $this->input->post('user_phoneO_1');
-		    	$user_phoneO_2 = $this->input->post('user_phoneO_2');
-		    	$user_phoneO_3 = $this->input->post('user_phoneO_3');
-		    	$user_phoneO_3 = $this->input->post('user_phoneO_3');
-		    	$user_cellphone = $this->input->post('user_cellphone');
-		    	$user_fax = $this->input->post('user_fax');
-		    	$user_postcode = $this->input->post('user_postcode');
-		    	$user_addcounty = $this->input->post('user_addcounty');
-		    	$user_area = $this->input->post('user_area');
-		    	$user_postaddr = $this->input->post('user_postadd');
-		    	$user_country = $this->input->post('user_country');
-		    	$user_lang = $this->input->post('user_lang');
-		    	$user_research = $this->input->post('user_research');
+				$old_email       = $this->data['user']->user_email;
+				$user_email      = $this->input->post('user_email');
+				$user_firstname  = $this->input->post('user_firstname');
+				$user_middlename = $this->input->post('user_middlename');
+				$user_lastname   = $this->input->post('user_lastname');
+				$user_gender     = $this->input->post('user_gender');
+				$user_org        = $this->input->post('user_org');
+				$user_title      = $this->input->post('user_title');
+				$user_phoneO     = $this->input->post('user_phoneO');
+				$user_phoneext   = $this->input->post('user_phoneext');
+				$user_postcode   = $this->input->post('user_postcode');
+				$user_addcounty  = $this->input->post('user_addcounty');
+				$user_area       = $this->input->post('user_area');
+				$user_postaddr   = $this->input->post('user_postadd');
+				$user_country    = $this->input->post('user_country');
+				$user_research   = $this->input->post('user_research');
+				$user_cellphone  = $this->input->post('user_cellphone');
+				$user_fax        = $this->input->post('user_fax');
+				$user_lang       = $this->_lang;
 
-		    	$user_phone_o = $user_phoneO_1.",".$user_phoneO_2.",".$user_phoneO_3;
+		    	$user_phone_o = $user_phoneO.",".$user_phoneext;
 		    	$user_postaddr = $user_addcounty."|".$user_area."|".$user_postaddr;
 
-				$res = $this->user->updateuser($this->user_login,$user_title,$user_email,$user_firstname,$user_lastname,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research);
+				$res = $this->user->updateuser($this->user_login,$user_email,$user_firstname,$user_middlename,$user_lastname,$user_gender,$user_org,$user_title,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research,$old_email);
 		    	if( $res['status'] ){
 		    		$this->alert->show("s",lang('update_profile_success'),site_url("user/index"));
 		    		$this->alert->refresh(2);
@@ -88,7 +88,7 @@ class User extends MY_Controller {
 				$redirect   = $this->input->post('redirect');
 		    	$result = $this->user->login($user_login, $user_pwd);
 		    	if($result){
-		    		if( preg_match('/(favicon|clang|assets|upload|tinymce|rss|piwik)/i',$redirect) ){
+		    		if( preg_match('/(favicon|clang|assets|upload|tinymce|rss|piwik|ajax)/i',$redirect) ){
 						$redirect = "";
 					}
 					redirect(site_url($redirect), 'location', 301);
@@ -236,31 +236,30 @@ class User extends MY_Controller {
 			$this->user->user_valid();
 
 		    if ( $this->form_validation->run() ){
-				$user_login     = $this->input->post('user_id');
-				$user_pass      = $this->input->post('user_pw');
-				$user_email     = $this->input->post('user_email');
-				$user_title     = $this->input->post('user_title');
-				$user_firstname = $this->input->post('user_firstname');
-				$user_lastname  = $this->input->post('user_lastname');
-				$user_gender    = $this->input->post('user_gender');
-				$user_org       = $this->input->post('user_org');
-				$user_phoneO_1  = $this->input->post('user_phoneO_1');
-				$user_phoneO_2  = $this->input->post('user_phoneO_2');
-				$user_phoneO_3  = $this->input->post('user_phoneO_3');
-				$user_phoneO_3  = $this->input->post('user_phoneO_3');
-				$user_cellphone = $this->input->post('user_cellphone');
-				$user_fax       = $this->input->post('user_fax');
-				$user_postcode  = $this->input->post('user_postcode');
-				$user_addcounty = $this->input->post('user_addcounty');
-				$user_area      = $this->input->post('user_area');
-				$user_postaddr  = $this->input->post('user_postadd');
-				$user_country   = $this->input->post('user_country');
-				$user_lang      = $this->input->post('user_lang');
-				$user_research  = $this->input->post('user_research');
+				$user_login      = $this->input->post('user_id');
+				$user_pass       = $this->input->post('user_pw');
+				$user_email      = $this->input->post('user_email');
+				$user_firstname  = $this->input->post('user_firstname');
+				$user_middlename = $this->input->post('user_middlename');
+				$user_lastname   = $this->input->post('user_lastname');
+				$user_gender     = $this->input->post('user_gender');
+				$user_org        = $this->input->post('user_org');
+				$user_title      = $this->input->post('user_title');
+				$user_phoneO     = $this->input->post('user_phoneO');
+				$user_phoneext   = $this->input->post('user_phoneext');
+				$user_cellphone  = $this->input->post('user_cellphone');
+				$user_fax        = $this->input->post('user_fax');
+				$user_postcode   = $this->input->post('user_postcode');
+				$user_addcounty  = $this->input->post('user_addcounty');
+				$user_area       = $this->input->post('user_area');
+				$user_postaddr   = $this->input->post('user_postadd');
+				$user_country    = $this->input->post('user_country');
+				$user_lang       = $this->_lang;
+				$user_research   = $this->input->post('user_research');
 
-		    	$user_phone_o = $user_phoneO_1.",".$user_phoneO_2.",".$user_phoneO_3;
+		    	$user_phone_o = $user_phoneO.",".$user_phoneext;
 		    	$user_postaddr = $user_addcounty."|".$user_area."|".$user_postaddr;
-		    	$res = $this->user->adduser($user_login,$user_pass,$user_title,$user_email,$user_firstname,$user_lastname,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research);
+		    	$res = $this->user->adduser($user_login,$user_pass,$user_email,$user_firstname,$user_middlename,$user_lastname,$user_gender,$user_title,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research);
 		    	if( $res['status'] ){
 		    		$this->user->send_sigup_mail($user_firstname,$user_lastname,$user_login,$user_email,$user_pass);
 		    		$this->alert->show("s",lang('alert_signup_success'),site_url("user/login"));
@@ -398,7 +397,7 @@ class User extends MY_Controller {
 				switch( $type ){
 					case "accept":
 						if( $this->topic->review_confirm($review_token,1) ){
-							$this->alert->show("s","感謝協助審查",site_url());
+							$this->alert->show("s","感謝協助審查，系統將導向審查網址",get_url("reviewer",$check_review->conf_id,"detail",$check_review->sub_id));
 						}
 					break;
 					case "reject":

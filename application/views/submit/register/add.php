@@ -9,7 +9,7 @@
 	<?php echo form_open(get_url("submit",$conf_id,"register","add"),array("class"=>"form-horizontal"));?>
 		<table class="table table-bordered">
 			<tr>
-				<th class="col-sm-2 control-label">註冊人姓名</th>
+				<th class="col-sm-2 control-label">姓名</th>
 				<td class="col-sm-10">
 					<input name="user_name" type="text" class="form-control" id="user_name" value="<?php echo $user->user_last_name; ?><?php echo $user->user_first_name; ?>">
 					<p class="help-block">一次限填一人，若多人報名或同一作者註冊多篇論文者，請分開填寫。</p>
@@ -64,7 +64,7 @@
 				</td>
 			</tr>
 			<tr>
-				<th class="col-sm-2 control-label">餐券類型</th>
+				<th class="col-sm-2 control-label">飲食習慣</th>
 				<td class="col-sm-10">
 					<label class="checkbox-inline"><input name="meal_type" type="radio" value="2" <?php echo set_radio("meal_type", "2"); ?>>素</label>
 					<label class="checkbox-inline"><input name="meal_type" type="radio" value="1" <?php echo set_radio("meal_type", "1"); ?>>葷</label>

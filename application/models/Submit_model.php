@@ -16,6 +16,16 @@ class Submit_model extends CI_Model {
 		return $query->result();
 	}
 
+	function paper_list($user_login,$conf_id){
+		$this->db->from('paper');
+		$this->db->join('topic', 'paper.sub_topic = topic.topic_id');
+		$this->db->where('paper.sub_user ', $user_login);
+		$this->db->where('paper.conf_id', $conf_id);
+		$this->db->order_by('paper.sub_id', 'DESC');
+		$query = $this->db->get();
+		return $query->result();
+	}
+
 	function get_mypapers($user_login){
 		$this->db->select('distinct(paper.sub_id),sub_title,topic_info,topic_name,sub_status,conf.conf_name');
 		$this->db->from('paper');
@@ -28,7 +38,7 @@ class Submit_model extends CI_Model {
 		return $query->result();
 	}
 
-	function sub_status($submit_staus,$style=false,$is_topic = false){
+	function sub_status($submit_staus,$style=false,$is_topic = false,$class=""){
 		$html_class="";
 		$staus_text="";
 		$desc="";
@@ -59,9 +69,9 @@ class Submit_model extends CI_Model {
 				$desc="稿件目前尚在編輯中";
 			break;
 			case 0:
-				$staus_text="編輯後審查";
+				$staus_text="修改後通過";
 				$html_class="teal";
-				$desc="稿件進入審查";
+				$desc="稿件修改後通過";
 			break;
 			case 1:
 				if( $is_topic ){
@@ -101,6 +111,9 @@ class Submit_model extends CI_Model {
 			break;
 		}
 
+		if(!empty($class)){
+			$html_class = $html_class." ".$class;
+		}
 		if($style){
 			return '<span class="ui label '.$html_class.'" data-toggle="tooltip" data-placement="top" title="'.$desc.'">'.$staus_text.'</span>';
 		}else{
@@ -171,10 +184,37 @@ class Submit_model extends CI_Model {
 		return $this->db->insert('paper_author', $author);
 	}
 
+	function add_authors($paper_id,$user_fname,$user_mname,$user_lname,$user_email,$user_org,$user_country,$main_contact){
+		$this->del_author($paper_id);
+		$authors = array();
+		foreach ($user_fname as $key => $value) {
+			$author = array();
+			$user_login = NULL;
+			$user_info = $this->user->email_find($user_email[$key]);
+			if( is_array($user_info) ){
+				$user_login = $user_info['user_login'];
+			}
+			$author = array(
+				"paper_id"         => $paper_id,
+				"user_login"       => $user_login,
+				"user_first_name"  => $user_fname[$key],
+				"user_middle_name" => $user_mname[$key],
+				"user_last_name"   => $user_lname[$key],
+				"user_email"       => $user_email[$key],
+				"user_org"         => $user_org[$key],
+				"user_country"     => $user_country[$key],
+				"main_contract"    => isset($main_contact[$key])?1:0,
+				"author_order"     => $key+1,
+				"author_time"      => time()
+			);
+			array_push($authors,$author);
+		}
+		return $this->db->insert_batch('paper_author', $authors);
+	}
+
 	function del_author($paper_id){
 		$this->db->where('paper_id', $paper_id);
 		if( $this->db->delete('paper_author') ){
-			//$this->conf->add_log("submit","del_author",$conf_id,array("paper_id"=>$paper_id));
 			return true;
 		}
 		return false;
@@ -190,8 +230,7 @@ class Submit_model extends CI_Model {
 	function is_author($paper_id, $user_login){
 		$this->db->from('paper');
 		$this->db->join('topic', 'paper.sub_topic = topic_id');
-		$this->db->join('paper_author', 'paper.sub_id = paper_author.paper_id');
-		$this->db->where('user_login', $user_login);
+		$this->db->where('paper.sub_user', $user_login);
 		$this->db->where("sub_id",$paper_id);
 		return ( $this->db->count_all_results() >= 1 );
 	}
@@ -199,8 +238,7 @@ class Submit_model extends CI_Model {
 	function get_paperinfo($conf_id,$paper_id,$user_login){
 		$this->db->from('paper');
 		$this->db->join('topic', 'paper.sub_topic = topic.topic_id');
-		$this->db->join('paper_author', 'paper.sub_id = paper_author.paper_id');
-		$this->db->where('user_login', $user_login);
+		$this->db->where('sub_user', $user_login);
 		$this->db->where("sub_id",$paper_id);
 		$this->db->where("paper.conf_id",$conf_id);
 		$query = $this->db->get();
@@ -350,6 +388,15 @@ class Submit_model extends CI_Model {
 		return $return;
 	}
 
+	function add_status_history($paper_id,$paper_status){
+		$status_history  = array(
+			"paper_id"     => $paper_id,
+			"paper_status" => $paper_status,
+			"history_time" => time()
+		);
+		return $this->db->insert('paper_status_history', $status_history);
+	}
+
 	function paper_to_review($conf_id,$paper_id){
 		$paper = array(
 			"sub_status" => 1,
@@ -358,6 +405,7 @@ class Submit_model extends CI_Model {
 		$this->db->where("conf_id",$conf_id);
 		$this->db->where("sub_id",$paper_id);
 		if( $this->db->update('paper', $paper) ){
+			$this->add_status_history($paper_id,1);
 			$this->sendmail_submit_success($paper_id,$conf_id);
 			$this->topic->notice_editor($conf_id,$paper_id);
 			// $this->conf->add_log("submit","paper_to_review",$conf_id,$paper);
@@ -375,6 +423,7 @@ class Submit_model extends CI_Model {
 		$this->db->where("sub_id",$paper_id);
 		
 		if( $this->db->update('paper', $paper) ){
+			$this->add_status_history($paper_id,3);
 			$this->conf->add_log("submit","paper_to_reviewing",$conf_id,$paper);
 			// $this->session->unset_userdata($conf_id.'_insert_id');
 			return true;
@@ -385,16 +434,10 @@ class Submit_model extends CI_Model {
 
 	function is_editable($paper_id, $user_login){
 		$this->db->from('paper');
-		$this->db->join('topic', 'paper.sub_topic = topic_id');
-		$this->db->join('paper_author', 'paper.sub_id = paper_author.paper_id');
-		$this->db->where('user_login', $user_login);
+		$this->db->where('sub_user', $user_login);
 		$this->db->where("sub_id",$paper_id);
 		$this->db->where_in("sub_status", array(-1,0));
-		if( $this->db->count_all_results() ==1 ){
-			return false;
-		}else{
-			return true;
-		}
+		return ($this->db->count_all_results() > 0);
 	}
 
 	function get_allpaper($conf_id,$topic_id=null,$sub_status=null){
@@ -830,45 +873,49 @@ class Submit_model extends CI_Model {
 		$this->db->where("sub_id",$paper_id);
 		$this->db->where("paper.conf_id",$conf_id);
 		$query = $this->db->get();
-		return $query->row();
+		return $query->result();
 	}
 
 	function sendmail_submit_success($paper_id,$conf_id){
-		$paper = $this->mail_get_paper($conf_id,$paper_id);
-		$author_name_zhtw = $paper->user_last_name.$paper->user_first_name;
-		$author_name_en   = $paper->user_first_name." ".$paper->user_last_name;
-		$author           = is_null($paper->user_login)?'<a href="'.site_url("user/signup").'">未註冊帳號,前往註冊帳號 / Unregistered Account,Go To Signup Account</a> )':$paper->user_login;
-		$paper_title      = $paper->sub_title;
-		$paper_summary    = $paper->sub_summary;
-		$conf_name        = $paper->conf_name;
-		$conf_link        = site_url($conf_id);
-		$submit_link      = get_url("submit",$conf_id);
-		$user_email       = $paper->user_email;
-		$conf_email       = $paper->conf_email;
+		$papers = $this->mail_get_paper($conf_id,$paper_id);
+		$send = 0;
+		foreach ($papers as $key => $paper) {
+			$author_name_zhtw = $paper->user_last_name.$paper->user_last_name.$paper->user_first_name;
+			$author_name_en   = $paper->user_first_name." ".$paper->user_last_name;
+			$author           = is_null($paper->user_login)?'<a href="'.site_url("user/signup").'">未註冊帳號,前往註冊帳號 / Unregistered Account,Go To Signup Account</a> )':$paper->user_login;
+			$paper_title      = $paper->sub_title;
+			$paper_summary    = $paper->sub_summary;
+			$conf_name        = $paper->conf_name;
+			$conf_link        = site_url($conf_id);
+			$submit_link      = get_url("submit",$conf_id);
+			$user_email       = $paper->user_email;
+			$conf_email       = $paper->conf_email;
 
-		$search = array("{author_name}","{author}","{paper_title}","{paper_summary}","{conf_name}","{conf_link}","{submit_link}");
-		$replace_zhtw = array($author_name_zhtw,$author,$paper_title,$paper_summary,$conf_name,$conf_link,$submit_link);
-		$replace_en = array($author_name_en,$author,$paper_title,$paper_summary,$conf_name,$conf_link,$submit_link);
+			$search = array("{author_name}","{author}","{paper_title}","{paper_summary}","{conf_name}","{conf_link}","{submit_link}");
+			$replace_zhtw = array($author_name_zhtw,$author,$paper_title,$paper_summary,$conf_name,$conf_link,$submit_link);
+			$replace_en = array($author_name_en,$author,$paper_title,$paper_summary,$conf_name,$conf_link,$submit_link);
 
-		$mail_template     = $this->conf->mail_get_template($conf_id,"thank_submit");
-		$mail_subject_zhtw = str_replace($search,$replace_zhtw,$mail_template->email_subject_zhtw);
-		$mail_subject_en   = str_replace($search,$replace_en,$mail_template->email_subject_eng);
-		$mail_content_zhtw = str_replace($search,$replace_zhtw,$mail_template->email_body_zhtw);
-		$mail_content_en   = str_replace($search,$replace_en,$mail_template->email_body_eng);
-		
-		$subject = $mail_subject_zhtw." ".$mail_subject_en;
-		$message = $mail_content_zhtw."<br><br><hr>".$mail_content_en;
-		$to      = $user_email;
-		$user_login = $author;
-		$this->email->from($conf_email, $conf_name);
-		$this->email->to($to);
-		$this->email->bcc('sysop@jconf.tw');
-		$this->email->reply_to('help@jconf.tw', 'Adminstritor');
-		$this->email->subject($subject);
-		$this->email->message($message);
-		
-		$this->conf->addmail($to,$subject,$message,$user_login,$conf_id);
-		return $this->email->send();
+			$mail_template     = $this->conf->mail_get_template($conf_id,"thank_submit");
+			$mail_subject_zhtw = str_replace($search,$replace_zhtw,$mail_template->email_subject_zhtw);
+			$mail_subject_en   = str_replace($search,$replace_en,$mail_template->email_subject_eng);
+			$mail_content_zhtw = str_replace($search,$replace_zhtw,$mail_template->email_body_zhtw);
+			$mail_content_en   = str_replace($search,$replace_en,$mail_template->email_body_eng);
+			
+			$subject = $mail_subject_zhtw." ".$mail_subject_en;
+			$message = $mail_content_zhtw."<br><br><hr>".$mail_content_en;
+			$to      = $user_email;
+			$user_login = $author;
+			$this->email->from($conf_email, $conf_name);
+			$this->email->to($to);
+			$this->email->subject($subject);
+			$this->email->message($message);
+			
+			$this->conf->addmail($to,$subject,$message,$paper->user_login,$conf_id);
+			if( $this->email->send() ){
+				$send++;
+			}
+		}
+		return ($send>0);
 	}
 
 
@@ -888,6 +935,30 @@ class Submit_model extends CI_Model {
 		return $query->result();
 	}
 
+	function get_finishcopyright($paper_id){
+		$this->db->from('paper_file');
+		$this->db->where('file_type', "FC");
+		$this->db->where('paper_id', $paper_id);
+		$query = $this->db->get();
+		return $query->row();
+	}
+
+	function get_finishabstract($paper_id){
+		$this->db->from('paper_file');
+		$this->db->where('file_type', "FA");
+		$this->db->where('paper_id', $paper_id);
+		$query = $this->db->get();
+		return $query->row();
+	}
+
+	function get_finish($paper_id){
+		$this->db->from('paper_file');
+		$this->db->where_in('file_type', array("FF","FO","FC","FA"));
+		$this->db->where('paper_id', $paper_id);
+		$query = $this->db->get();
+		return $query->result();
+	}
+
 	function del_finishfile($conf_id,$paper_id,$fid){ // $fid array
 		$this->db->from('paper_file');
 		$this->db->where("paper_id",$paper_id);
@@ -899,7 +970,7 @@ class Submit_model extends CI_Model {
 			delete_files($this->conf->get_paperdir($conf_id).$file->file_system);
 		}
 		$this->db->where_in("fid",$fid);
-		$this->db->where_in("file_type",array("FF","FO"));
+		$this->db->where_in("file_type",array("FF","FO","FC","FA"));
 		if( $this->db->delete('paper_file') ){
 			return true;
 		}
@@ -914,6 +985,7 @@ class Submit_model extends CI_Model {
 		$this->db->where("conf_id",$conf_id);
 		$this->db->where("sub_id",$paper_id);
 		if( $this->db->update('paper', $paper) ){
+			$this->add_status_history($paper_id,5);
 			// $this->sendmail_submit_success($paper_id,$conf_id);
 			// $this->topic->notice_editor($conf_id,$paper_id);
 			// $this->conf->add_log("submit","paper_to_review",$conf_id,$paper);
@@ -951,6 +1023,7 @@ class Submit_model extends CI_Model {
 		$this->db->where("conf_id",$conf_id);
 		$this->db->where("sub_id",$paper_id);
 		if( $this->db->update('paper', $paper) ){
+			$this->add_status_history($paper_id,-5);
 			$this->conf->add_log("conf","remove_paper",$conf_id,array("paper_id"=>$paper_id,"sub_status" => -5,"old_status"=>$old_status));
 			return true;
 		}else{
@@ -972,16 +1045,72 @@ class Submit_model extends CI_Model {
 	function change_paper_status($old_status,$paper_status,$conf_id,$paper_id){
 		if( in_array($paper_status,array(-3,-2,-1,1,2)) ) {
 			$paper = array(
-				"sub_status" => $paper_status,
+				"sub_status" => $paper_status
 			);
 			$this->db->where("conf_id",$conf_id);
 			$this->db->where("sub_id",$paper_id);
 			if( $this->db->update('paper', $paper) ){
+				$this->add_status_history($paper_id,$paper_status);
 				$this->conf->add_log("submit","change_paper_status",$conf_id,array("old_status"=>$old_status,"paper_status"=>$paper_status,"paper_id"=>$paper_id));
 				return true;
 			}else{
 				return false;
 			}
 		}
+	}
+
+	function add_agree($paper_id,$agree_value,$conf_id,$is_finish=0){
+		$agree = array();
+		$time  = time();
+		foreach ($agree_value as $agree_token => $value) {
+			$tmp_agree = array(
+				"paper_id"    => $paper_id,
+				"agree_token" => $agree_token,
+				"agree_value" => $value,
+				"conf_id"     => $conf_id,
+				"agree_time"  => $time,
+				"is_finish"   => $is_finish
+			);
+			array_push($agree,$tmp_agree);
+		}
+		return $this->db->insert_batch('paper_agree', $agree);
+	}
+
+	function update_agree($conf_id,$paper_id,$agree_value,$is_finish=0){
+		$this->delete_agree($conf_id,$paper_id,$is_finish=0);
+		return $this->add_agree($paper_id,$agree_value,$conf_id,$is_finish);
+	}
+
+	function delete_agree($conf_id,$paper_id,$is_finish=0){
+		// $this->db->where('conf_id', $conf_id);
+		// $this->db->where('paper_id', $paper_id);
+		// return $this->db->delete('paper_agree');
+
+		$paper_agree = array(
+			"agree_valid" => 0
+		);
+
+		$this->db->where('paper_id', $paper_id);
+		$this->db->where('conf_id', $conf_id);
+		$this->db->where('is_finish', $is_finish);
+		return $this->db->update('paper_agree', $paper_agree);
+	}
+
+	function get_agree($conf_id,$paper_id,$is_finish=0){
+		$this->db->from("paper_agree");
+		$this->db->where("conf_id",$conf_id);
+		$this->db->where("paper_id",$paper_id);
+		$this->db->where("agree_valid",1);
+		$this->db->where("is_finish",$is_finish);
+		return $this->db->get()->result();
+	}
+
+	function get_contactauthor($conf_id,$paper_id){
+		$this->db->from("paper");
+		$this->db->join("paper_author","paper.sub_id = paper_author.paper_id");
+		$this->db->where("paper.conf_id",$conf_id);
+		$this->db->where("paper.sub_id",$paper_id);
+		$this->db->where("paper_author.main_contract",1);
+		return $this->db->get()->result();
 	}
 }

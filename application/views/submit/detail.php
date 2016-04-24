@@ -33,10 +33,12 @@
 						<th>最後更新時間</th>
 						<td><?php echo date("Y-m-d H:i:s",$paper->sub_lastupdate)?></td>
 					</tr>
+					<?php if( $paper->sub_review > 0){?>
 					<tr>
 						<th>送審時間</th>
 						<td><?php echo date("Y-m-d H:i:s",$paper->sub_review)?></td>
 					</tr>
+					<?php }?>
 					<tr>
 						<th>語言</th>
 						<td>
@@ -51,6 +53,50 @@
 						<th>計畫編號</th>
 						<td><?php echo $paper->sub_sponsor?></td>
 					</tr>
+				</table>
+				<table class="table table-bordered table-hover">
+					<thead>
+						<tr>
+							<th class="text-center col-md-10">項目</th>
+							<th class="text-center col-md-2">選項</th>
+						</tr>
+					</thead>
+					<?php foreach ($agrees as $key => $agree) {?>
+					<tr>
+						<td>
+							<?php echo $agree->agree_content?> <span class="text-danger">*</span>
+						</td>
+						<td class="text-center">
+							<label class="radio-inline">
+								<input disabled type="radio" value="1"<?php if( element($agree->agree_token, $agree_value ) == 1){?> checked<?php }?>>
+								<?php echo $agree->agree_true?>
+							</label>
+							<label class="radio-inline">
+								<input disabled type="radio" value="0"<?php if( element($agree->agree_token, $agree_value ) == 0){?> checked<?php }?>>
+								<?php echo $agree->agree_false?>
+							</label>
+						</td>
+					</tr>
+					<?php }?>
+					<?php if( in_array($paper->sub_status,array(4,5)) ){?>
+					<?php foreach ($finish_agrees as $key => $agree) {?>
+					<tr>
+						<td>
+							<?php echo $agree->agree_content?> <span class="text-danger">*</span>
+						</td>
+						<td class="text-center">
+							<label class="radio-inline">
+								<input disabled type="radio" value="1"<?php if( element($agree->agree_token, $agree_value ) == 1){?> checked<?php }?>>
+								<?php echo $agree->agree_true?>
+							</label>
+							<label class="radio-inline">
+								<input disabled type="radio" value="0"<?php if( element($agree->agree_token, $agree_value ) == 0){?> checked<?php }?>>
+								<?php echo $agree->agree_false?>
+							</label>
+						</td>
+					</tr>
+					<?php }?>
+					<?php }?>
 				</table>
 			</div>
 			<div class="tab-pane container-fluid" id="tab_author">
@@ -97,21 +143,14 @@
 						</tr>
 					</thead>
 					<tbody>
-						<?php if(!empty($finishfile)){?>
+						<?php foreach ($finishes as $key => $finish) {?>
 						<tr>
-							<td class="text-center"><span class="ui blue basic label">完稿投稿資料</span></td>
-							<td><?php echo $finishfile->file_name?></td>
-							<td><?php echo date("Y-m-d H:i:s",$finishfile->file_time)?></td>
 							<td class="text-center">
-								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$finishfile->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
-								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$finishfile->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
+								<?php echo file_type($finish->file_type)?>
 							</td>
-						</tr>
-						<?php }?>
-						<?php foreach ($finishother as $key => $finish) {?>
-						<tr>
-							<td class="text-center"><span class="ui teal basic label">完稿補充資料</span></td>
-							<td><?php echo $finish->file_name?></td>
+							<td>
+								<?php echo $finish->file_name?>
+							</td>
 							<td><?php echo date("Y-m-d H:i:s",$finish->file_time)?></td>
 							<td class="text-center">
 								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$finish->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
@@ -122,7 +161,7 @@
 					</tbody>
 				</table>
 				<?php }?>
-				<?php if( $paper->sub_status <= 4){?>
+				
 				<h3>稿件檔案</h3>
 				<table class="table table-bordered">
 					<thead>
@@ -168,7 +207,7 @@
 					<?php }?>
 					<?php }?>
 				</table>
-				<?php }?>
+				
 			</div>
 
 			<?php if( $paper->sub_status >= 3 || $paper->sub_status == 1){?>
@@ -179,7 +218,6 @@
 					<thead>
 						<tr>
 							<th class="text-center" style="width:10%">審查人</th>
-							<th class="text-center" style="width:10%">審查分數</th>
 							<th class="text-center" style="width:10%">審查時間</th>
 							<th class="text-center" style="width:70%">審查建議</th>
 						</tr>
@@ -190,9 +228,6 @@
 					<tr>
 						<td class="text-center">
 							審查人 <?php echo array_search($reviewer->user_login, $review_array)+1?>
-						</td>
-						<td class="text-center">
-							<?php echo $reviewer->review_score;?>
 						</td>
 						<td class="text-center">
 							<?php echo date('Y/m/d H:i', $reviewer->review_time);?>

@@ -42,7 +42,7 @@ class Reviewer extends MY_Conference {
 			$this->data['topic_pedding'] = $this->topic->count_pedding_paper($this->conf_id,$this->user_login);
 		}
 
-		if( !$this->is_reviewer || !$this->user_sysop ){
+		if( !$this->is_reviewer && !$this->user_sysop ){
 			$this->conf->show_permission_deny($this->data);
 		}
 	}
@@ -75,11 +75,11 @@ class Reviewer extends MY_Conference {
 		}
 		$paper_author = $this->submit->show_mypaper($this->user_login,$this->conf_id);
 		$paper_array  = array();
-		if(is_array($paper_author)){
-			foreach ($paper_author as $key => $pa) {
-				array_push($paper_array,$pa->sub_id);
-			}
-		}
+		// if(is_array($paper_author)){
+		// 	foreach ($paper_author as $key => $pa) {
+		// 		array_push($paper_array,$pa->sub_id);
+		// 	}
+		// }
 		$this->assets->set_title(lang('reviewer_paper'));
 		$this->data['paper_id'] = $paper_id;
 		$this->load->view('common/header',$this->data);
@@ -103,8 +103,6 @@ class Reviewer extends MY_Conference {
 			$this->data["recommend_forms"] = $recommend_forms;
 			$paper_is_review = $this->reviewer->is_review($paper_id,$this->user_login);
 			if( !is_null($paper_is_review) ){
-				$this->load->view('reviewer/detail',$this->data);
-
 				if( $this->data['paper']->sub_status == 3 ){
 					$this->data['review']  = $paper_is_review;
 					if( !$paper_is_review->review_status ){ // 未審查表單
@@ -131,6 +129,7 @@ class Reviewer extends MY_Conference {
 							if( $this->reviewer->add_review_responses($this->conf_id,$paper_id,$user_reviewer->review_id,$element_value,$recommend_value) ){
 								$this->reviewer->update_review($this->conf_id,$paper_id,$this->user_login,$review_comment,$review_score);
 								$this->alert->js("成功送出審查表單，感謝您的審查");
+								$this->output->set_header('refresh:0');
 							}else{
 								$this->alert->js("審查表單送出失敗");
 							}
@@ -141,6 +140,7 @@ class Reviewer extends MY_Conference {
 						$this->data["review_recommends"] = $this->reviewer->get_recommendform($user_reviewer->review_id,$paper_id,$this->conf_id);
 						$this->load->view('reviewer/review_forms',$this->data);
 					}
+					$this->load->view('reviewer/detail',$this->data);
 				}
 			}else{
 				$this->alert->js("您無法審查本篇稿件",get_url("reviewer",$this->conf_id,"index"));

@@ -23,6 +23,7 @@ class Sysop extends MY_Sysop {
 		$this->body_class ="container-fluid";
 		$fetch_method = $this->router->fetch_method();
 		$no_redirect = array("login","logout");
+		$this->output->set_header('refresh:900');
 		if( !in_array($fetch_method,$no_redirect) ){
 			if( !$this->sysop->is_sysop_login() ){
 				$this->session->set_tempdata('user_back', current_url(), 300);
@@ -280,28 +281,28 @@ class Sysop extends MY_Sysop {
 					$this->load->view('sysop/nav',$this->data);
 					$this->user->users_valid();
 				    if ($this->form_validation->run()){
-				    	$user_login = $this->input->post('user_id');
-				    	$user_email = $this->input->post('user_email');
-				    	$user_title = $this->input->post('user_title');
-				    	$user_firstname = $this->input->post('user_firstname');
-				    	$user_lastname = $this->input->post('user_lastname');
-				    	$user_gender = $this->input->post('user_gender');
-				    	$user_org = $this->input->post('user_org');
-				    	$user_phoneO_1 = $this->input->post('user_phoneO_1');
-				    	$user_phoneO_2 = $this->input->post('user_phoneO_2');
-				    	$user_phoneO_3 = $this->input->post('user_phoneO_3');
-				    	$user_phoneO_3 = $this->input->post('user_phoneO_3');
-				    	$user_postcode = $this->input->post('user_postcode');
-				    	$user_addcounty = $this->input->post('user_addcounty');
-				    	$user_area = $this->input->post('user_area');
-				    	$user_postaddr = $this->input->post('user_postadd');
-				    	$user_country = $this->input->post('user_country');
-				    	$user_research = $this->input->post('user_research');
+						$user_login      = $this->input->post('user_id');
+						$user_email      = $this->input->post('user_email');
+						$user_firstname  = $this->input->post('user_firstname');
+						$user_middlename = $this->input->post('user_middlename');
+						$user_lastname   = $this->input->post('user_lastname');
+						$user_gender     = $this->input->post('user_gender');
+						$user_org        = $this->input->post('user_org');
+						$user_title      = $this->input->post('user_title');
+						$user_phoneO     = $this->input->post('user_phoneO');
+						$user_phoneext   = $this->input->post('user_phoneext');
+						$user_postcode   = $this->input->post('user_postcode');
+						$user_addcounty  = $this->input->post('user_addcounty');
+						$user_area       = $this->input->post('user_area');
+						$user_postaddr   = $this->input->post('user_postadd');
+						$user_country    = $this->input->post('user_country');
+						$user_research   = $this->input->post('user_research');
+
 						foreach ($user_login as $key => $login) {
-							$user_phone_o = $user_phoneO_1[$key].",".$user_phoneO_2[$key].",".$user_phoneO_3[$key];
+							$user_phone_o = $user_phoneO[$key].",".$user_phoneext[$key];
 				    		$user_postaddr = $user_addcounty[$key]."|".$user_area[$key]."|".$user_postaddr[$key];
 				    		$user_pass = $this->user->generator_password(8);
-				    		$res = $this->user->adduser($user_login[$key],$user_pass,$user_title[$key],$user_email[$key],$user_firstname[$key],$user_lastname[$key],$user_gender[$key],$user_org[$key],$user_phone_o,"","",$user_postcode[$key],$user_postaddr,$user_country[$key],"zhtw",$user_research[$key]);
+				    		$res = $this->user->adduser($user_login[$key],$user_pass,$user_email[$key],$user_firstname[$key],$user_middlename[$key],$user_lastname[$key],$user_gender[$key],$user_title[$key],$user_org[$key],$user_phone_o,"","",$user_postcode[$key],$user_postaddr,$user_country[$key],"zhtw",$user_research[$key]);
 				    		if( $res['status'] ){
 					    		$this->alert->show("s","成功建立帳號:".$login."密碼為:".$user_pass);
 					    		if( $this->user->send_pwd_mail($user_firstname[$key],$user_lastname[$key],$user_login[$key],$user_email[$key],$user_pass) ){
@@ -312,7 +313,7 @@ class Sysop extends MY_Sysop {
 					    	}else{
 					    		$this->alert->show("d","建立帳號:".$login."失敗，原因:".$res['error']);
 					    	}
-						}				    	
+						}						    	
 				    }
 					$this->load->view('sysop/user/add',$this->data);
 				break;
@@ -405,37 +406,38 @@ class Sysop extends MY_Sysop {
 						$this->load->view('common/nav',$this->data);
 						$this->load->view('sysop/nav',$this->data);
 
-					    $this->user->user_valid();
+					    $this->user->updateuser_valid();
 						if ($this->form_validation->run()){
-					    	$user_email = $this->input->post('user_email', TRUE);
-					    	$user_title = $this->input->post('user_title', TRUE);
-					    	$user_firstname = $this->input->post('user_firstname', TRUE);
-					    	$user_lastname = $this->input->post('user_lastname', TRUE);
-					    	$user_gender = $this->input->post('user_gender', TRUE);
-					    	$user_org = $this->input->post('user_org', TRUE);
-					    	$user_phoneO_1 = $this->input->post('user_phoneO_1', TRUE);
-					    	$user_phoneO_2 = $this->input->post('user_phoneO_2', TRUE);
-					    	$user_phoneO_3 = $this->input->post('user_phoneO_3', TRUE);
-					    	$user_phoneO_3 = $this->input->post('user_phoneO_3', TRUE);
-					    	$user_cellphone = $this->input->post('user_cellphone', TRUE);
-					    	$user_fax = $this->input->post('user_fax', TRUE);
-					    	$user_postcode = $this->input->post('user_postcode', TRUE);
-					    	$user_addcounty = $this->input->post('user_addcounty', TRUE);
-					    	$user_area = $this->input->post('user_area', TRUE);
-					    	$user_postaddr = $this->input->post('user_postadd', TRUE);
-					    	$user_country = $this->input->post('user_country', TRUE);
-					    	$user_lang = $this->input->post('user_lang', TRUE);
-					    	$user_research = $this->input->post('user_research', TRUE);
+					    	$old_email       = $this->data['user']->user_email;
+							$user_email      = $this->input->post('user_email');
+							$user_firstname  = $this->input->post('user_firstname');
+							$user_middlename = $this->input->post('user_middlename');
+							$user_lastname   = $this->input->post('user_lastname');
+							$user_gender     = $this->input->post('user_gender');
+							$user_org        = $this->input->post('user_org');
+							$user_title      = $this->input->post('user_title');
+							$user_phoneO     = $this->input->post('user_phoneO');
+							$user_phoneext   = $this->input->post('user_phoneext');
+							$user_postcode   = $this->input->post('user_postcode');
+							$user_addcounty  = $this->input->post('user_addcounty');
+							$user_area       = $this->input->post('user_area');
+							$user_postaddr   = $this->input->post('user_postadd');
+							$user_country    = $this->input->post('user_country');
+							$user_research   = $this->input->post('user_research');
+							$user_cellphone  = $this->input->post('user_cellphone');
+							$user_fax        = $this->input->post('user_fax');
+							$user_lang       = $this->_lang;
 
-					    	$user_phone_o = $user_phoneO_1.",".$user_phoneO_2.",".$user_phoneO_3;
+					    	$user_phone_o = $user_phoneO.",".$user_phoneext;
 					    	$user_postaddr = $user_addcounty."|".$user_area."|".$user_postaddr;
 
-							$res = $this->user->updateuser($user_login,$user_title,$user_email,$user_firstname,$user_lastname,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research);
+							$res = $this->user->updateuser($user_login,$user_email,$user_firstname,$user_middlename,$user_lastname,$user_gender,$user_org,$user_title,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research,$old_email);
 					    	if( $res['status'] ){
-					    		$this->alert->js("Edit Success",site_url("sysop/user/edit/".$user_login));
+					    		$this->alert->show("s",lang('update_profile_success'));
+					    		$this->alert->refresh(2);
 					    	}else{
 					    		$this->alert->js($res['error']);
-					    		$this->form_validation->set_message('signup_error', $res['error']);
+					    		$this->alert->show("d",$res['error']);
 					    	}
 					    }
 						$this->load->view('sysop/user/edit',$this->data);
@@ -469,6 +471,9 @@ class Sysop extends MY_Sysop {
 					    }
 						$this->load->view('sysop/user/reset',$this->data);
 						$this->load->view('common/footer',$this->data);
+					break;
+					case "switch":
+						$this->session->user_login = $user_login;
 					break;
 				}
 			}else{
@@ -521,11 +526,10 @@ class Sysop extends MY_Sysop {
 				$this->load->view('sysop/email/list',$this->data);
 			break;
 			case "add":
-				$this->assets->add_js(base_url().'tinymce/tinymce.min.js');
+				$this->assets->add_js(base_url().'ckeditor/ckeditor.js');
 				$this->load->view('common/header');
 				$this->load->view('common/nav',$this->data);
 				$this->load->view('sysop/nav',$this->data);
-				$this->load->view('common/tinymce',$this->data);
 
 				$this->form_validation->set_rules('email_key', '電子郵件識別碼', 'required');
 				$this->form_validation->set_rules('email_desc[]', '郵件樣版說明', 'required');
@@ -547,7 +551,7 @@ class Sysop extends MY_Sysop {
 				$this->load->view('sysop/email/add',$this->data);
 			break;
 			case "edit":
-				$this->assets->add_js(base_url().'tinymce/tinymce.min.js');
+				$this->assets->add_js(base_url().'ckeditor/ckeditor.js');
 
 				$this->load->view('common/header');
 				$this->load->view('common/nav',$this->data);
@@ -576,7 +580,6 @@ class Sysop extends MY_Sysop {
 							$this->alert->refresh(0);
 						}
 
-						$this->load->view('common/tinymce',$this->data);
 						$this->load->view('sysop/email/edit',$this->data);
 					}else{
 						$this->alert->js("找不到電子郵件樣版",site_url("sysop/email"));
@@ -643,5 +646,9 @@ class Sysop extends MY_Sysop {
 			$out["desc"] = "ERROR:最新版本為".$get->version;
 		}
 		echo json_encode($out);
+	}
+
+	function upgrade(){
+		
 	}
 }

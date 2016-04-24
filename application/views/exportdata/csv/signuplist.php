@@ -1,0 +1,5 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed');?>
+序號,姓名,性別,飲食習慣,服務單位,身分職稱,聯絡電話,收據抬頭,註冊信箱,論文編號,論文標題,備註,註冊類型,註冊身分,註冊費用,註冊狀態,填寫時間
+<?php foreach ($signups as $key => $signup) {?>
+"<?php echo $signup->signup_id?>","<?php echo $signup->user_name?>","<?php if( $signup->user_food == 0 ){?>女<?php }else{?>男<?php }?>","<?php if( $signup->user_food == 0 ){?>素<?php }else{?>葷<?php }?>","<?php echo $signup->user_org?>","<?php echo $signup->user_title?>","<?php echo $signup->user_phone?>","<?php echo $signup->receipt_header?>","<?php echo $signup->user_email?>","<?php echo $signup->paper_id?>","<?php echo $signup->paper_title?>","<?php echo $signup->user_note?>","<?php echo $this->signup->signup_type($signup->signup_type,true)?>","<?php echo $signup->type_name?>","<?php echo $signup->signup_price?>","<?php echo $this->signup->signup_status($signup->signup_status,true)?>","<?php echo date("Y-m-d H:i:s",$signup->signup_time)?>"
+<?php }?>

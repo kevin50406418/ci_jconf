@@ -42,18 +42,20 @@
 				<?php }?>
 			</td>
 			<td class="text-center">
-				<?php if($paper->sub_status == 3){?>
-					<?php if( $bool ){?>	
-						審查逾期
-					<?php }else{?>
-						<?php if( $paper->review_confirm == -1 ){?>
+				<?php if( $bool ){?>	
+					審查逾期
+				<?php }else{?>
+					<?php if( $paper->review_confirm == -1 ){?>
 						論文審查請求
 						<div class="btn-group btn-group-xs">
-						<a target="_blank" class="confirm btn btn-success" href="<?php echo site_url("review_confirm/accept/".$paper->review_token);?>">接受</a>
-						<a target="_blank" class="confirm btn btn-danger" href="<?php echo site_url("review_confirm/reject/".$paper->review_token);?>">不方便</a>
+							<a target="_blank" class="confirm btn btn-success" href="<?php echo site_url("review_confirm/accept/".$paper->review_token);?>">接受</a>
+							<a target="_blank" class="confirm btn btn-danger" href="<?php echo site_url("review_confirm/reject/".$paper->review_token);?>">不方便</a>
 						</div>
+					<?php }else{?>
+						<?php if( $paper->review_status ){?>
+							<a href="<?php echo get_url("reviewer",$conf_id,"detail",$paper->sub_id)?>" class="btn btn-sm btn-primary">查看稿件</a>
 						<?php }else{?>
-						<a href="<?php echo get_url("reviewer",$conf_id,"detail",$paper->sub_id)?>" class="ui blue button basic">進行審查</a>
+							<a href="<?php echo get_url("reviewer",$conf_id,"detail",$paper->sub_id)?>" class="ui blue button basic">進行審查</a>
 						<?php }?>
 					<?php }?>
 				<?php }?>
@@ -67,7 +69,7 @@
 <script>
 $(function(){
 	$(".confirm").click(function(e){
-		window.location.reload();
+		setTimeout(function(){location.reload();}, 1000);
 	});
 });
 </script>

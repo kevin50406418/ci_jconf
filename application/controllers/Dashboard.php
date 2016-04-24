@@ -6,8 +6,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @copyright	Copyright (c) 2015 - 2016, Jingxun Lai, Inc. (https://jconf.tw/)
  * @license	http://opensource.org/licenses/MIT	MIT License
  * @link	https://jconf.tw
- * @since	Version 1.1.0
- * @date	2016/3/4
+ * @since	Version 1.3.0
+ * @date	2016/3/16
  */
 
 class Dashboard extends MY_Conference {
@@ -54,12 +54,13 @@ class Dashboard extends MY_Conference {
 		$this->assets->add_js(asset_url().'js/bootstrap-datepicker.js');
 		$this->assets->add_js(asset_url().'js/locales/bootstrap-datepicker.zh-TW.js');
 		$this->assets->add_js(asset_url().'js/repeatable-fields.js');
+		$this->assets->add_js(base_url().'ckeditor/ckeditor.js');
 		$this->assets->set_title(lang('dashboard_setting'));
 
 		$schedule = $this->conf->get_schedules($this->conf_id);
 		$this->data['schedule'] = $schedule;
-		$this->data['styles'] = $this->conf->get_style();
-
+		$this->data['styles']   = $this->conf->get_style();
+		$this->data['agrees']   = $this->conf->get_agrees($this->conf_id);
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$this->data);
 		$this->load->view('conf/conf_nav',$this->data);
@@ -130,10 +131,12 @@ class Dashboard extends MY_Conference {
 					$this->form_validation->set_rules('conf_col', lang('home_layout'), 'required');
 					$this->form_validation->set_rules('conf_most', lang('conf_most'), 'required');
 					$this->form_validation->set_rules('topic_assign', "主編設置審查人", 'required');
+					// $this->form_validation->set_rules('paper_submit', "手動關閉投稿系統", 'required');
 					if ($this->form_validation->run()){
 						$conf_col     = $this->input->post('conf_col');
 						$conf_most    = $this->input->post('conf_most');
 						$topic_assign = $this->input->post('topic_assign');
+						// $paper_submit = $this->input->post('paper_submit');
 						if( $this->conf->update_confcol($this->conf_id,$conf_col) ){
 							$this->alert->show("s",lang('home_layout').lang('update_success'));
 						}else{
@@ -149,6 +152,11 @@ class Dashboard extends MY_Conference {
 						}else{
 							$this->alert->show("d",lang('conf_topic_assign').lang('update_fail'));
 						}
+						// if( $this->conf->update_paper_submit($this->conf_id,$paper_submit) ){
+						// 	$this->alert->show("s","手動關閉投稿系統".lang('update_success'));
+						// }else{
+						// 	$this->alert->show("d","手動關閉投稿系統".lang('update_fail'));
+						// }
 						$this->alert->refresh(1);
 					}
 				break;
@@ -162,6 +170,50 @@ class Dashboard extends MY_Conference {
 							$this->alert->js("更新失敗");
 						}
 						$this->alert->refresh(2);
+					}
+				break;
+				case "update_agree":
+					$this->form_validation->set_rules('agree_content[]', "項目", 'required');
+					$this->form_validation->set_rules('agree_true[]', "同意文字", 'required');
+					$this->form_validation->set_rules('agree_false[]', "不同意文字", 'required');
+					if ($this->form_validation->run()){
+						$agree_content = $this->input->post("agree_content");
+						$agree_true    = $this->input->post("agree_true");
+						$agree_false   = $this->input->post("agree_false");
+						if( $this->conf->update_agrees($this->conf_id,$agree_content,$agree_true,$agree_false) ){
+							$this->alert->show("s","稿件同意表單".lang('update_success'));
+							$this->alert->refresh(1);
+						}else{
+							$this->alert->show("d","稿件同意表單".lang('update_fail'));
+						}
+					}
+				break;
+				case "add_agree":
+					$this->form_validation->set_rules('agree_content[]', "項目", 'required');
+					$this->form_validation->set_rules('agree_true[]', "同意文字", 'required');
+					$this->form_validation->set_rules('agree_false[]', "不同意文字", 'required');
+					if ($this->form_validation->run()){
+						$agree_content = $this->input->post("agree_content");
+						$agree_true    = $this->input->post("agree_true");
+						$agree_false   = $this->input->post("agree_false");
+						if( $this->conf->add_agrees($this->conf_id,$agree_content,$agree_true,$agree_false) ){
+							$this->alert->show("s","稿件同意表單新增成功");
+							$this->alert->refresh(1);
+						}else{
+							$this->alert->show("d","稿件同意表單新增失敗");
+						}
+					}
+				break;
+				case "signup":
+					$this->form_validation->set_rules('signup_info', "註冊資訊", 'required');
+					if ($this->form_validation->run()){
+						$signup_info = $this->input->post("signup_info",false);
+						if( $this->conf->update_signup_info($this->conf_id,$signup_info) ){
+							$this->alert->show("s","更新註冊資訊成功");
+							$this->alert->refresh(1);
+						}else{
+							$this->alert->show("d","更新註冊資訊失敗");
+						}
 					}
 				break;
 			}
@@ -339,7 +391,7 @@ class Dashboard extends MY_Conference {
 		}
 
 		if( $do=="edit" || $do=="add" ){
-			$this->assets->add_js(base_url().'tinymce/tinymce.min.js');
+			$this->assets->add_js(base_url().'ckeditor/ckeditor.js');
 		}
 
 		$this->assets->set_title(lang('dashboard_website'));
@@ -433,7 +485,6 @@ class Dashboard extends MY_Conference {
 						}
 						$this->alert->refresh(2);
 					}
-					$this->load->view('common/tinymce',$this->data);
 					$this->load->view('conf/content/add',$this->data);
 				break;
 			}
@@ -459,7 +510,6 @@ class Dashboard extends MY_Conference {
 							$this->alert->refresh(2);
 						}
 					}
-					$this->load->view('common/tinymce',$this->data);
 					$this->load->view('conf/content/edit',$this->data);
 				break;
 				case "del":
@@ -583,28 +633,28 @@ class Dashboard extends MY_Conference {
 				case "add":
 					$this->user->users_valid();
 				    if ($this->form_validation->run()){
-				    	$user_login = $this->input->post('user_id');
-				    	$user_email = $this->input->post('user_email');
-				    	$user_title = $this->input->post('user_title');
-				    	$user_firstname = $this->input->post('user_firstname');
-				    	$user_lastname = $this->input->post('user_lastname');
-				    	$user_gender = $this->input->post('user_gender');
-				    	$user_org = $this->input->post('user_org');
-				    	$user_phoneO_1 = $this->input->post('user_phoneO_1');
-				    	$user_phoneO_2 = $this->input->post('user_phoneO_2');
-				    	$user_phoneO_3 = $this->input->post('user_phoneO_3');
-				    	$user_phoneO_3 = $this->input->post('user_phoneO_3');
-				    	$user_postcode = $this->input->post('user_postcode');
-				    	$user_addcounty = $this->input->post('user_addcounty');
-				    	$user_area = $this->input->post('user_area');
-				    	$user_postaddr = $this->input->post('user_postadd');
-				    	$user_country = $this->input->post('user_country');
-				    	$user_research = $this->input->post('user_research');
+						$user_login      = $this->input->post('user_id');
+						$user_email      = $this->input->post('user_email');
+						$user_firstname  = $this->input->post('user_firstname');
+						$user_middlename = $this->input->post('user_middlename');
+						$user_lastname   = $this->input->post('user_lastname');
+						$user_gender     = $this->input->post('user_gender');
+						$user_org        = $this->input->post('user_org');
+						$user_title      = $this->input->post('user_title');
+						$user_phoneO     = $this->input->post('user_phoneO');
+						$user_phoneext   = $this->input->post('user_phoneext');
+						$user_postcode   = $this->input->post('user_postcode');
+						$user_addcounty  = $this->input->post('user_addcounty');
+						$user_area       = $this->input->post('user_area');
+						$user_postaddr   = $this->input->post('user_postadd');
+						$user_country    = $this->input->post('user_country');
+						$user_research   = $this->input->post('user_research');
+
 						foreach ($user_login as $key => $login) {
-							$user_phone_o = $user_phoneO_1[$key].",".$user_phoneO_2[$key].",".$user_phoneO_3[$key];
+							$user_phone_o = $user_phoneO[$key].",".$user_phoneext[$key];
 				    		$user_postaddr = $user_addcounty[$key]."|".$user_area[$key]."|".$user_postaddr[$key];
 				    		$user_pass = $this->user->generator_password(8);
-				    		$res = $this->user->adduser($user_login[$key],$user_pass,$user_title[$key],$user_email[$key],$user_firstname[$key],$user_lastname[$key],$user_gender[$key],$user_org[$key],$user_phone_o,"","",$user_postcode[$key],$user_postaddr,$user_country[$key],"zhtw",$user_research[$key]);
+				    		$res = $this->user->adduser($user_login[$key],$user_pass,$user_email[$key],$user_firstname[$key],$user_middlename[$key],$user_lastname[$key],$user_gender[$key],$user_title[$key],$user_org[$key],$user_phone_o,"","",$user_postcode[$key],$user_postaddr,$user_country[$key],"zhtw",$user_research[$key]);
 				    		if( $res['status'] ){
 					    		$this->alert->show("s","成功建立帳號:".$login."密碼為:".$user_pass);
 					    		if( $this->user->send_pwd_mail($user_firstname[$key],$user_lastname[$key],$user_login[$key],$user_email[$key],$user_pass) ){
@@ -624,6 +674,7 @@ class Dashboard extends MY_Conference {
 					$this->data['users']=$this->user->get_all_users(10);
 					$this->data['confs']=$this->user->get_conf_array($this->conf_id);
 					$this->data['reviewers']=$this->user->get_reviewer_array($this->conf_id);
+					$this->data['topics']=$this->user->get_topic_array($this->conf_id);
 					
 					if( $this->input->is_ajax_request() ){
 						$this->form_validation->set_rules('type', '操作', 'required');
@@ -668,16 +719,6 @@ class Dashboard extends MY_Conference {
 					    				}
 					    			}
 					    		break;
-					    		case "add_topic":
-					    			$topic = $this->input->post('topic');
-					    			// foreach ($user_logins as $key => $user_login) {
-					    			// 	if( $this->user->del_reviewer($this->conf_id,$user_login) ){
-					    			// 		$this->alert->show("s","成功將使用者 <strong>".$user_login."</strong> 取消設為審查人");
-					    			// 	}else{
-					    			// 		$this->alert->show("d","將使用者 <strong>".$user_login."</strong> 取消審查人失敗");
-					    			// 	}
-					    			// }
-					    		break;
 					    	}
 					    	$this->alert->refresh(2);
 					    }
@@ -698,34 +739,36 @@ class Dashboard extends MY_Conference {
 					case "edit":
 						$this->user->updateuser_valid();
 						if ($this->form_validation->run()){
-					    	$user_email = $this->input->post('user_email');
-					    	$user_title = $this->input->post('user_title');
-					    	$user_firstname = $this->input->post('user_firstname');
-					    	$user_lastname = $this->input->post('user_lastname');
-					    	$user_gender = $this->input->post('user_gender');
-					    	$user_org = $this->input->post('user_org');
-					    	$user_phoneO_1 = $this->input->post('user_phoneO_1');
-					    	$user_phoneO_2 = $this->input->post('user_phoneO_2');
-					    	$user_phoneO_3 = $this->input->post('user_phoneO_3');
-					    	$user_phoneO_3 = $this->input->post('user_phoneO_3');
-					    	$user_cellphone = $this->input->post('user_cellphone');
-					    	$user_fax = $this->input->post('user_fax');
-					    	$user_postcode = $this->input->post('user_postcode');
-					    	$user_addcounty = $this->input->post('user_addcounty');
-					    	$user_area = $this->input->post('user_area');
-					    	$user_postaddr = $this->input->post('user_postadd');
-					    	$user_country = $this->input->post('user_country');
-					    	$user_lang = $this->input->post('user_lang');
-					    	$user_research = $this->input->post('user_research');
+					    	$old_email       = $this->data['user']->user_email;
+							$user_email      = $this->input->post('user_email');
+							$user_firstname  = $this->input->post('user_firstname');
+							$user_middlename = $this->input->post('user_middlename');
+							$user_lastname   = $this->input->post('user_lastname');
+							$user_gender     = $this->input->post('user_gender');
+							$user_org        = $this->input->post('user_org');
+							$user_title      = $this->input->post('user_title');
+							$user_phoneO     = $this->input->post('user_phoneO');
+							$user_phoneext   = $this->input->post('user_phoneext');
+							$user_postcode   = $this->input->post('user_postcode');
+							$user_addcounty  = $this->input->post('user_addcounty');
+							$user_area       = $this->input->post('user_area');
+							$user_postaddr   = $this->input->post('user_postadd');
+							$user_country    = $this->input->post('user_country');
+							$user_research   = $this->input->post('user_research');
+							$user_cellphone  = $this->input->post('user_cellphone');
+							$user_fax        = $this->input->post('user_fax');
+							$user_lang       = $this->_lang;
 
-					    	$user_phone_o = $user_phoneO_1.",".$user_phoneO_2.",".$user_phoneO_3;
+					    	$user_phone_o = $user_phoneO.",".$user_phoneext;
 					    	$user_postaddr = $user_addcounty."|".$user_area."|".$user_postaddr;
 
-							$res = $this->user->updateuser($user_login,$user_title,$user_email,$user_firstname,$user_lastname,$user_gender,$user_org,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research);
+							$res = $this->user->updateuser($user_login,$user_email,$user_firstname,$user_middlename,$user_lastname,$user_gender,$user_org,$user_title,$user_phone_o,$user_cellphone,$user_fax,$user_postcode,$user_postaddr,$user_country,$user_lang,$user_research,$old_email);
 					    	if( $res['status'] ){
-					    		$this->alert->js("Edit Success");
+					    		$this->alert->show("s",lang('update_profile_success'));
+					    		$this->alert->refresh(2);
 					    	}else{
 					    		$this->alert->js($res['error']);
+					    		$this->alert->show("d",$res['error']);
 					    	}
 					    }
 						$this->load->view('js/edit',$this->data);
@@ -827,7 +870,7 @@ class Dashboard extends MY_Conference {
 
 	public function email($conf_id='',$act='all'){
 		$this->assets->set_title(lang('dashboard_email'));
-		$this->assets->add_js(base_url().'tinymce/tinymce.min.js');
+		$this->assets->add_js(base_url('ckeditor/ckeditor.js'));
 		
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$this->data);
@@ -859,7 +902,7 @@ class Dashboard extends MY_Conference {
 						}
 						$this->alert->refresh(2);
 					}
-					$this->load->view('common/tinymce',$this->data);
+					//ckeditor
 					$this->load->view('conf/email/edit',$this->data);
 				}else{
 					$this->alert->js("找不到信件樣版",get_url("dashboard",$this->conf_id,"email"));
@@ -904,13 +947,31 @@ class Dashboard extends MY_Conference {
 			$paper = $this->conf->get_paper($this->conf_id,$paper_id);
 			$this->data['paper'] = $paper;
 			if(!empty($paper)){
-				$this->data['paper_id']   = $paper_id;
-				$this->data['authors']    = $this->submit->get_author($paper_id);
-				$this->data['otherfile']  = $this->submit->get_otherfile($paper_id);
-				$this->data['otherfiles'] = $this->submit->get_otherfiles($paper_id);
-				$this->data['reviewers']  = $this->topic->get_reviewer($paper_id);
-				$this->data['finishfile'] = $this->submit->get_finishfile($paper_id);
+				$this->data['paper_id']    = $paper_id;
+				$this->data['authors']     = $this->submit->get_author($paper_id);
+				$this->data['otherfile']   = $this->submit->get_otherfile($paper_id);
+				$this->data['otherfiles']  = $this->submit->get_otherfiles($paper_id);
+				$this->data['reviewers']   = $this->topic->get_reviewer($paper_id);
+				$this->data['finishfile']  = $this->submit->get_finishfile($paper_id);
 				$this->data['finishother'] = $this->submit->get_finishother($paper_id);
+				$this->data['finishes']    = $this->submit->get_finish($paper_id);
+				
+				$agrees = $this->conf->get_agrees($this->conf_id);
+				$this->data['agrees'] = $agrees;
+	
+				$agree_value_array = $this->submit->get_agree($this->conf_id,$paper_id);
+				$agree_value = array();
+				foreach ($agree_value_array as $key => $value) {
+					$agree_value[$value->agree_token] = $value->agree_value;
+				}
+				if( in_array($paper->sub_status,array(4,5)) ){
+					$this->data['finish_agrees'] = $this->conf->get_agrees($this->conf_id,1);
+					$agree_value_array = $this->submit->get_agree($this->conf_id,$paper_id,1);
+					foreach ($agree_value_array as $key => $value) {
+						$agree_value[$value->agree_token] = $value->agree_value;
+					}
+				}
+				$this->data['agree_value'] = $agree_value;
 				switch($act){
 					case "detail":
 					default:
@@ -937,6 +998,37 @@ class Dashboard extends MY_Conference {
 							}
 						}
 					break;
+					case "email":
+						$this->assets->add_js(base_url('ckeditor/ckeditor.js'),true);
+						$paper = $this->topic->get_paperinfo($paper_id,$this->conf_id);
+						$this->data['paper'] = $paper;
+						if(!empty($paper)){
+							$this->data['authors']    = $this->submit->get_author($paper_id);
+							$authors = $this->data['authors'];
+						}
+						$this->form_validation->set_rules('subject', '主旨', 'required');
+						$this->form_validation->set_rules('message', '內容', 'required');
+						if ( $this->form_validation->run() ){
+							$author_emails = array();
+							if(!empty($authors)){
+								foreach ($authors as $key => $author) {
+									if( $author->main_contract ){
+										array_push($author_emails,$author->user_email);
+									}
+								}
+							}
+							$subject = $this->input->post("subject");
+							$message = $this->input->post("message",false);
+							$message.= "<br><br>".$this->conf_config['conf_name'].'<br><a href="'.get_url($conf_id).'">'.get_url($conf_id).'</a>';
+							if( $this->conf->sendmail($this->conf_id,$author_emails,$subject,$message,$this->user_login) ){
+								$this->alert->js("寄送信件成功");
+							}else{
+								$this->alert->js("寄送信件失敗");
+							}
+						}
+						$this->load->view('conf/submit/email',$this->data);
+						$this->load->view('conf/submit/detail',$this->data);
+					break;
 					case "edit":
 						$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
 						$this->assets->add_js(asset_url().'js/repeatable.js',true);
@@ -945,6 +1037,7 @@ class Dashboard extends MY_Conference {
 						$this->data['paper']->sub_summary = str_replace("<br>",PHP_EOL,$this->data['paper']->sub_summary);
 						$country_list = config_item('country_list');
 						$this->data['country_list'] = $country_list[$this->_lang];
+						
 						$update = $this->input->post("update");
 						switch ($update) {
 							case "info":
@@ -952,7 +1045,9 @@ class Dashboard extends MY_Conference {
 								$this->form_validation->set_rules('sub_summary', '摘要', 'required');
 								$this->form_validation->set_rules('sub_lang', '語言', 'required');
 								$this->form_validation->set_rules('sub_keywords', '關鍵字', 'trim|required|min_length[1]',array('required'   => '您必須填寫%s.','min_length' => '至少輸入一組%s'));
-								
+								foreach ($agrees as $key => $agree) {
+									$this->form_validation->set_rules($agree->agree_token, $agree->agree_content, 'required');
+								}
 								if ($this->form_validation->run()){
 									$sub_title    = $this->input->post('sub_title');
 									$sub_summary  = str_replace(PHP_EOL,"<br>",$this->input->post('sub_summary'));
@@ -961,15 +1056,23 @@ class Dashboard extends MY_Conference {
 									$sub_lang     = $this->input->post('sub_lang');
 									$sub_sponsor  = $this->input->post('sub_sponsor');
 									if( $this->submit->update_paper($paper_id,$this->conf_id,$sub_title,$sub_summary,$sub_keyword,$sub_topic,$sub_lang,$sub_sponsor) ){
-										$this->alert->show("s",$sub_topic ."稿件資訊更新成功");
+										$this->alert->show("s","稿件資訊更新成功");
 									}else{
 										$this->alert->show("d","稿件資訊更新失敗");
+									}
+									$agree_value = array();
+									foreach ($agrees as $key => $agree) {
+										$agree_value[$agree->agree_token] = $this->input->post($agree->agree_token);
+									}
+									if( $this->submit->update_agree($this->conf_id,$paper_id,$agree_value) ){
+										$this->alert->show("s","同意表格更新成功");
+									}else{
+										$this->alert->show("d","同意表格更新失敗");
 									}
 									$this->alert->refresh(2);
 								}
 							break;
 							case "author":
-								$this->form_validation->set_rules('main_contact', '主要聯絡人', 'required');
 								$this->form_validation->set_rules('user_fname[]', '名字', 'required');
 								$this->form_validation->set_rules('user_lname[]', '姓氏', 'required');
 								$this->form_validation->set_rules('user_email[]', '電子信箱', 'required|valid_email');
@@ -978,28 +1081,17 @@ class Dashboard extends MY_Conference {
 								if ($this->form_validation->run()){
 									$main_contact = $this->input->post('main_contact');
 									$user_fname   = $this->input->post('user_fname');
+									$user_mname   = $this->input->post('user_mname');
 									$user_lname   = $this->input->post('user_lname');
 									$user_email   = $this->input->post('user_email');
 									$user_org     = $this->input->post('user_org');
 									$user_country = $this->input->post('user_country');
 
-									$this->submit->del_author($paper_id);
-									foreach ($user_fname as $key => $value) {
-			            				$contact_author = 0;
-			            				$user_login = NULL;
-			            				if($main_contact == $key){
-			            					$contact_author = 1;
-			            				}
-			            				$user_info = $this->user->email_find($user_email[$key]);
-			            				if( is_array($user_info) ){
-			            					$user_login = $user_info['user_login'];
-			            				}
-			            				if( $this->submit->add_author($paper_id,$user_login,$user_fname[$key],$user_lname[$key],$user_email[$key],$user_org[$key],$user_country[$key],$contact_author,$key+1) ){
-			            					$this->alert->show("s","更新作者 <strong>".$user_fname[$key]." ".$user_lname[$key]."</strong> 成功");
-			            				}else{
-											$this->alert->show("d","更新作者 <strong>".$user_fname[$key]." ".$user_lname[$key]."</strong> 失敗");
-										}
-			            			}
+									if( $this->submit->add_authors($paper_id,$user_fname,$user_mname,$user_lname,$user_email,$user_org,$user_country,$main_contact) ){
+										$this->alert->show("s","作者資訊更新成功");
+									}else{
+										$this->alert->show("s","更新作者失敗");
+									}
 									$this->alert->refresh(2);
 								}
 							break;
@@ -1097,97 +1189,320 @@ class Dashboard extends MY_Conference {
 		}
 		$this->load->view('common/footer',$this->data);
 	}
-
-	public function register($conf_id='',$act='',$do=''){
-		$this->assets->set_title(lang('dashboard_signup'));
+	public function price($conf_id='',$act=''){
+		$this->assets->set_title("繳費資訊");
+		$this->data['price_types'] = $this->signup->get_price_types($this->conf_id);
+		$this->data['prices']      = $this->signup->get_prices($this->conf_id);
 
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$this->data);
 		$this->load->view('conf/conf_nav',$this->data);
 		$this->load->view('conf/menu_conf',$this->data);
-		switch ($act) {
-			case "price": // 價格管理
-			break;
-			case "meal":
-				$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
-				$this->assets->add_js(asset_url().'js/repeatable-fields.js',true);
-				switch($do){
-					default:
-						$this->data['register_meals'] = $this->conf->get_register_meals($this->conf_id);
-						$opt = $this->input->post("opt");
-
-						if(!empty($this->input->get("id"))){
-							$id = $this->input->get("id");
-							$meal = $this->conf->get_register_meal($this->conf_id,$id);
-						}
-						switch($opt){
-							case "add":
-								$this->form_validation->set_rules('meal_name[]', '餐點名稱', 'required');
-								if ($this->form_validation->run()){
-									$meal_name = $this->input->post('meal_name');
-									foreach ($meal_name as $key => $name) {
-										if( $this->conf->add_register_meal($this->conf_id,$name) ){
-											$this->alert->show("s","成功新增：<strong>".$name."</strong>");
-										}else{
-											$this->alert->show("d","新增失敗：<strong>".$name."</strong>");
-										}
-									}
-									$this->alert->refresh(2);
-								}
-							break;
-							case "update":
-								if(!empty($meal)){
-									$this->form_validation->set_rules('meal_name', '餐點名稱', 'required');
-									if ($this->form_validation->run()){
-										$meal_name = $this->input->post('meal_name');
-										if( $this->conf->update_register_meal($this->conf_id,$id,$meal_name) ){
-											$this->alert->show("s","成功更新：<strong>".$meal_name."</strong>",get_url("dashboard",$this->conf_id,"register","meal"));
-										}else{
-											$this->alert->show("d","更新失敗：<strong>".$meal_name."</strong>",get_url("dashboard",$this->conf_id,"register","meal"));
-										}
-									}
-								}else{
-									$this->alert->show("d","更新失敗：查無此餐點",get_url("dashboard",$this->conf_id,"register","meal"));
-								}
-							break;
-							case "del":
-								$this->form_validation->set_rules('meal_id[]', '餐點', 'required');
-								if ($this->form_validation->run()){
-									$meal_ids = $this->input->post('meal_id');
-									foreach ($meal_ids as $key => $meal_id) {
-										if( $this->conf->del_register_meal($this->conf_id,$meal_id) ){
-											$this->alert->show("s","成功刪除：<strong>餐點#".$meal_id."</strong>");
-										}else{
-											$this->alert->show("d","刪除失敗：<strong>餐點#".$meal_id."</strong>");
-										}
-									}
-									$this->alert->refresh(2);
-								}
-							break;
-						}
-						$this->load->view('conf/register/meal_list',$this->data);
-						if(!empty($meal)){
-							$this->data['meal'] = $meal;
-							$this->load->view('conf/register/meal_edit',$this->data);
-						}
-						$this->load->view('conf/register/meal_add',$this->data);
-					break;
+		
+		$do = $this->input->post("do");
+		switch ($do) {
+			case "update_item":
+				$this->form_validation->set_rules("type_id[]", "分類", 'required');
+				$this->form_validation->set_rules("other_price[]", "一般人士", 'required');
+				$this->form_validation->set_rules("teacher_price[]", "教師", 'required');
+				$this->form_validation->set_rules("student_price[]", "學生", 'required');
+				$this->form_validation->set_rules("early_other[]", "[早鳥]一般人士", 'required');
+				$this->form_validation->set_rules("early_teacher[]", "[早鳥]教師", 'required');
+				$this->form_validation->set_rules("early_student[]", "[早鳥]學生", 'required');
+				if ($this->form_validation->run()){
+					$type_id       = $this->input->post("type_id");
+					$other_price   = $this->input->post("other_price");
+					$teacher_price = $this->input->post("teacher_price");
+					$student_price = $this->input->post("student_price");
+					$early_other   = $this->input->post("early_other");
+					$early_teacher = $this->input->post("early_teacher");
+					$early_student = $this->input->post("early_student");
+					if( $this->signup->update_signup_price($this->conf_id,$type_id,$other_price,$teacher_price,$student_price,$early_other,$early_teacher,$early_student) ){
+						$this->alert->show("s","更新成功");
+						$this->alert->refresh(2);
+					}else{
+						$this->alert->show("d","更新失敗");
+					}
 				}
 			break;
-			default:
-				$this->load->view('conf/register/list',$this->data);
+			case "add_item":
+				$this->form_validation->set_rules("type_id", "分類", 'required');
+				$this->form_validation->set_rules("other_price", "一般人士", 'required');
+				$this->form_validation->set_rules("teacher_price", "教師", 'required');
+				$this->form_validation->set_rules("student_price", "學生", 'required');
+				$this->form_validation->set_rules("early_other", "[早鳥]一般人士", 'required');
+				$this->form_validation->set_rules("early_teacher", "[早鳥]教師", 'required');
+				$this->form_validation->set_rules("early_student", "[早鳥]學生", 'required');
+				if ($this->form_validation->run()){
+					$type_id       = $this->input->post("type_id");
+					$other_price   = $this->input->post("other_price");
+					$teacher_price = $this->input->post("teacher_price");
+					$student_price = $this->input->post("student_price");
+					$early_other   = $this->input->post("early_other");
+					$early_teacher = $this->input->post("early_teacher");
+					$early_student = $this->input->post("early_student");
+					$signup = array(
+						"type_id"       => $type_id,
+						"other_price"   => $other_price,
+						"teacher_price" => $teacher_price,
+						"student_price" => $student_price,
+						"early_other"   => $early_other,
+						"early_teacher" => $early_teacher,
+						"early_student" => $early_student
+					);
+					if( $this->signup->add_signup_price($this->conf_id,$signup) ){
+						$this->alert->show("s","新增成功");
+						$this->alert->refresh(2);
+					}else{
+						$this->alert->show("d","新增失敗");
+					}
+				}
 			break;
+			case "update_type":
+				$this->form_validation->set_rules("type_name[]", "分類名稱", 'required');
+				if ($this->form_validation->run()){
+					$type_name = $this->input->post("type_name");
+					if( $this->signup->update_signup_type($conf_id,$type_name) ){
+						$this->alert->show("s","更新成功");
+						$this->alert->refresh(2);
+					}else{
+						$this->alert->show("d","更新失敗");
+					}
+				}
+			break;
+			case "add_type":
+				$this->form_validation->set_rules("type_name", "分類名稱", 'required');
+				if ($this->form_validation->run()){
+					$type_name = $this->input->post("type_name");
+					if( $this->signup->add_signup_type($conf_id,$type_name) ){
+						$this->alert->show("s","更新成功");
+						$this->alert->refresh(2);
+					}else{
+						$this->alert->show("d","更新失敗");
+					}
+				}
+			break;
+		}
+		$this->load->view('conf/price/index',$this->data);
+		$this->load->view('common/footer',$this->data);
+	}
+	public function signup($conf_id='',$act=''){
+		$this->assets->set_title(lang('dashboard_signup'));
+		$this->assets->add_css(asset_url().'style/jquery.dataTables.css');
+		$this->assets->add_js(asset_url().'js/jquery.dataTables.min.js',true);
+		$this->assets->add_js(asset_url().'js/dataTables.bootstrap.js',true);
+		$this->assets->add_js(asset_url().'js/dataTables.buttons.min.js',true);
+		$this->assets->add_js(asset_url().'js/jszip.min.js',true);
+		$this->assets->add_js(asset_url().'js/buttons.html5.min.js',true);
+
+		$this->data['signups'] = $this->conf->get_signups($this->conf_id);
+		$this->data['prices']  = $this->signup->get_prices($this->conf_id);
+		$this->data['early_bird'] = $this->conf->get_schedule($this->conf_id,"early_bird");
+		$this->load->view('common/header');
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_conf',$this->data);
+		$this->load->view('conf/signup/index',$this->data);
+
+		$signup_id = $this->input->get("id");
+		if( $signup_id ){
+			$signup = $this->conf->get_signup($this->conf_id,$signup_id);
+			if( !empty($signup)){
+				$this->data['signup'] = $signup;
+				switch ($act) {
+					case "edit":
+						$this->signup->update_signup_valid($this->data['prices']);
+						if ($this->form_validation->run()){
+							$user_name      = $this->input->post("user_name");
+							$user_gender    = $this->input->post("user_gender");
+							$user_food      = $this->input->post("user_food");
+							$user_org       = $this->input->post("user_org");
+							$user_title     = $this->input->post("user_title");
+							$user_phone     = $this->input->post("user_phone");
+							$user_email     = $this->input->post("user_email");
+							$receipt_header = $this->input->post("receipt_header");
+							$price_type     = $this->input->post("price_type");
+							$paper_id       = $this->input->post("paper_id");
+							$paper_title    = $this->input->post("paper_title");
+							$signup_price   = $this->input->post("signup_price");
+							$price_type = explode("|",$price_type);
+
+							$signup = array(
+								"user_name"      => $user_name,
+								"user_gender"    => $user_gender,
+								"user_food"      => $user_food,
+								"user_org"       => $user_org,
+								"user_title"     => $user_title,
+								"user_phone"     => $user_phone,
+								"user_email"     => $user_email,
+								"receipt_header" => $receipt_header,
+								"signup_type"    => $price_type[2],
+								"price_id"       => $price_type[1],
+								"price_type"     => $price_type[0],
+								"paper_title"    => $paper_title,
+								"paper_id"       => $paper_id,
+								"signup_price"   => $signup_price
+							);
+							if( $this->signup->update_signup($this->conf_id,$signup_id,$signup) ){
+								$this->alert->show("s","報名資料更新成功");
+								$this->alert->refresh(2);
+							}else{
+								$this->alert->show("d","報名資料更新失敗");
+							}
+						}
+						$this->load->view('conf/signup/edit',$this->data);
+					break;
+					case "passwd":
+						$this->form_validation->set_rules("user_pass", "密碼", 'required');
+						$this->form_validation->set_rules("user_pass2", "驗證密碼", 'required|matches[user_pass]');
+						if ($this->form_validation->run()){
+							$user_pass = $this->input->post("user_pass");
+							if( $this->signup->update_signup_passwd($this->conf_id,$signup_id,$user_pass) ){
+								$this->alert->show("s","報名資料更新成功");
+								$this->alert->refresh(2);
+							}else{
+								$this->alert->show("d","報名資料更新失敗");
+							}
+						}
+						$this->load->view('conf/signup/passwd',$this->data);
+						$this->load->view('conf/signup/view',$this->data);
+					break;
+					case "status":
+						$this->form_validation->set_rules("signup_status", "更改註冊狀態", 'required|in_list[0,1,2,3]',array('in_list' => '請填寫正確的註冊狀態'));
+						if ($this->form_validation->run()){
+							$signup_status = $this->input->post("signup_status");
+							if( $this->signup->update_signup_status($this->conf_id,$signup_id,$signup_status) ){
+								$this->alert->show("s","報名資料更新成功");
+								$this->alert->refresh(2);
+							}else{
+								$this->alert->show("d","報名資料更新失敗");
+							}
+						}
+						$this->load->view('conf/signup/status',$this->data);
+						$this->load->view('conf/signup/view',$this->data);
+					break;
+					case "upload":
+						$config['upload_path']= $this->conf->get_regdir($this->conf_id);
+						$config['allowed_types']= 'jpg|png|bmp|pdf';
+						$config['encrypt_name']= true;
+						$this->load->library('upload', $config);
+						if ( $this->upload->do_upload('file')){
+							if( $this->conf->update_signup_file($this->conf_id,$signup_id,$this->upload->data("file_name")) ){
+								$this->alert->show("s","上傳繳費紀錄成功");
+								$this->alert->refresh(2);
+							}else{
+								$this->alert->show("d","上傳繳費紀錄失敗");
+							}
+						}
+						$this->load->view('conf/signup/upload',$this->data);
+						$this->load->view('conf/signup/view',$this->data);
+					break;
+					default:
+					case "view":
+						$this->load->view('conf/signup/view',$this->data);
+					break;
+				}
+			}else{
+				$this->alert->show("d","找不到註冊紀錄");
+			}
 		}
 		$this->load->view('common/footer',$this->data);
 	}
 
+	// public function register($conf_id='',$act='',$do=''){
+	// 	$this->assets->set_title(lang('dashboard_signup'));
+
+	// 	$this->load->view('common/header');
+	// 	$this->load->view('common/nav',$this->data);
+	// 	$this->load->view('conf/conf_nav',$this->data);
+	// 	$this->load->view('conf/menu_conf',$this->data);
+	// 	switch ($act) {
+	// 		case "price": // 價格管理
+	// 		break;
+	// 		case "meal":
+	// 			$this->assets->add_js('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js',true);
+	// 			$this->assets->add_js(asset_url().'js/repeatable-fields.js',true);
+	// 			switch($do){
+	// 				default:
+	// 					$this->data['register_meals'] = $this->conf->get_register_meals($this->conf_id);
+	// 					$opt = $this->input->post("opt");
+
+	// 					if(!empty($this->input->get("id"))){
+	// 						$id = $this->input->get("id");
+	// 						$meal = $this->conf->get_register_meal($this->conf_id,$id);
+	// 					}
+	// 					switch($opt){
+	// 						case "add":
+	// 							$this->form_validation->set_rules('meal_name[]', '餐點名稱', 'required');
+	// 							if ($this->form_validation->run()){
+	// 								$meal_name = $this->input->post('meal_name');
+	// 								foreach ($meal_name as $key => $name) {
+	// 									if( $this->conf->add_register_meal($this->conf_id,$name) ){
+	// 										$this->alert->show("s","成功新增：<strong>".$name."</strong>");
+	// 									}else{
+	// 										$this->alert->show("d","新增失敗：<strong>".$name."</strong>");
+	// 									}
+	// 								}
+	// 								$this->alert->refresh(2);
+	// 							}
+	// 						break;
+	// 						case "update":
+	// 							if(!empty($meal)){
+	// 								$this->form_validation->set_rules('meal_name', '餐點名稱', 'required');
+	// 								if ($this->form_validation->run()){
+	// 									$meal_name = $this->input->post('meal_name');
+	// 									if( $this->conf->update_register_meal($this->conf_id,$id,$meal_name) ){
+	// 										$this->alert->show("s","成功更新：<strong>".$meal_name."</strong>",get_url("dashboard",$this->conf_id,"register","meal"));
+	// 									}else{
+	// 										$this->alert->show("d","更新失敗：<strong>".$meal_name."</strong>",get_url("dashboard",$this->conf_id,"register","meal"));
+	// 									}
+	// 								}
+	// 							}else{
+	// 								$this->alert->show("d","更新失敗：查無此餐點",get_url("dashboard",$this->conf_id,"register","meal"));
+	// 							}
+	// 						break;
+	// 						case "del":
+	// 							$this->form_validation->set_rules('meal_id[]', '餐點', 'required');
+	// 							if ($this->form_validation->run()){
+	// 								$meal_ids = $this->input->post('meal_id');
+	// 								foreach ($meal_ids as $key => $meal_id) {
+	// 									if( $this->conf->del_register_meal($this->conf_id,$meal_id) ){
+	// 										$this->alert->show("s","成功刪除：<strong>餐點#".$meal_id."</strong>");
+	// 									}else{
+	// 										$this->alert->show("d","刪除失敗：<strong>餐點#".$meal_id."</strong>");
+	// 									}
+	// 								}
+	// 								$this->alert->refresh(2);
+	// 							}
+	// 						break;
+	// 					}
+	// 					$this->load->view('conf/register/meal_list',$this->data);
+	// 					if(!empty($meal)){
+	// 						$this->data['meal'] = $meal;
+	// 						$this->load->view('conf/register/meal_edit',$this->data);
+	// 					}
+	// 					$this->load->view('conf/register/meal_add',$this->data);
+	// 				break;
+	// 			}
+	// 		break;
+	// 		default:
+	// 			$this->load->view('conf/register/list',$this->data);
+	// 		break;
+	// 	}
+	// 	$this->load->view('common/footer',$this->data);
+	// }
+
 	public function report($conf_id=''){
 		$this->assets->set_title(lang('dashboard_report'));
+		$this->assets->add_js("//www.gstatic.com/charts/loader.js");
 
+		$this->data['topics'] = $this->conf->get_topic($this->conf_id);
+		$this->data['report_topic'] = $this->conf->get_topic_report($this->conf_id);
 		$this->load->view('common/header');
 		$this->load->view('common/nav',$this->data);
 		$this->load->view('conf/conf_nav',$this->data);
 		$this->load->view('conf/menu_conf',$this->data);
+		$this->load->view('conf/report/index',$this->data);
 		$this->load->view('common/footer',$this->data);
 		
 	}
@@ -1436,6 +1751,11 @@ class Dashboard extends MY_Conference {
 					$filename = $this->input->post("filename");
 					$this->exportdata->finishfiles($conf_id,$filename);
 				break;
+				case "signup":
+					$format   = $this->input->post("format");
+					$filename = $this->input->post("filename");
+					$this->exportdata->signup($conf_id,$format,$filename);
+				break;
 			}
 		}
 	}
@@ -1595,6 +1915,70 @@ class Dashboard extends MY_Conference {
 				}
 			break;
 		}
+		$this->load->view('common/footer',$this->data);
+	}
+
+	public function file($conf_id=''){
+		$this->assets->set_title("");
+		$this->assets->add_js(asset_url().'js/fileinput/fileinput.min.js');
+		$this->assets->add_js(asset_url().'js/fileinput/fileinput_locale_zh-TW.js');
+		$this->assets->add_css(asset_url().'style/fileinput.min.css');
+
+		$this->load->helper('number');
+
+		$white_list = array("pdf","docx","doc","txt","xlsx","xls","gif","png","jpg","zip","rar","txt");
+		$white_liststr = implode(",*.",$white_list);
+		$this->data['accept_ext'] = implode(",.",$white_list);
+		$this->data['allowedPreviewTypes'] = implode('","',$white_list);
+
+		$config['upload_path']= $this->conf->get_filesdir($this->conf_id);
+		$config['allowed_types']= implode("|",$white_list);
+		$this->load->library('upload', $config);
+
+		$this->load->library('upload', $config);
+
+		$files = array();
+		$directory = $this->conf->get_filesdir($this->conf_id);
+		$maps = glob($directory. "{*.".$white_liststr."}", GLOB_BRACE);
+		
+		foreach ($maps as $key => $map) {
+			$file = get_file_info($map);
+			array_push($files, $file);
+		}
+		$this->data['files'] = $files;
+		$this->load->view('common/header');
+		$this->load->view('common/nav',$this->data);
+		$this->load->view('conf/conf_nav',$this->data);
+		$this->load->view('conf/menu_conf',$this->data);
+		$act = $this->input->post("act");
+		switch($act){
+			case "upload":
+				if ( $this->upload->do_upload('file')){
+					$upload_datas = $this->upload->data();
+					$arrayLevel = arrayLevel($upload_datas);
+					if( $arrayLevel ==1 ){
+						$this->alert->show("s","上傳檔案 <strong>".$upload_datas['client_name']."</strong> 成功");
+					}else if($arrayLevel == 2){
+						foreach ($upload_datas as $key => $upload_data) {
+							$this->alert->show("s","上傳檔案 <strong>".$upload_data['client_name']."</strong> 成功");
+						}
+					}
+				}
+			break;
+			case "remove":
+				$this->form_validation->set_rules('file', '國別', 'required');
+				if ($this->form_validation->run()){
+					$file = $this->input->post("file");
+					if( $this->conf->remove_file($this->conf_id,$file) ){
+						$this->alert->show("s","檔案刪除成功");
+						$this->alert->refresh(2);
+					}else{
+						$this->alert->show("d","檔案刪除失敗");
+					}
+				}
+			break;
+		}
+		$this->load->view('conf/file/index',$this->data);
 		$this->load->view('common/footer',$this->data);
 	}
 

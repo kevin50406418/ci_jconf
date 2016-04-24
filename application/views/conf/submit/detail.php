@@ -10,6 +10,7 @@
 			<?php if( $paper->sub_status != -5 ){?><a onclick="return confirm('確定是否刪除稿件? \n注意：本操作無法恢復');" href="<?php echo get_url("dashboard",$conf_id,"submit","remove",$paper->sub_id)?>" class="ui red button pull-right">刪除稿件</a>
 			<?php }?>
 			<a href="<?php echo get_url("dashboard",$conf_id,"submit","edit",$paper->sub_id)?>" class="ui teal button pull-right">編輯稿件</a>
+			<a href="<?php echo get_url("dashboard",$conf_id,"submit","email",$paper->sub_id)?>" class="ui orange button pull-right">連絡通訊作者</a>
 		</ul>
 		<div class="tab-content">
 			<div class="tab-pane active container-fluid" id="tab_info">
@@ -58,6 +59,50 @@
 						<td><?php echo $paper->sub_sponsor?></td>
 					</tr>
 				</table>
+				<table class="table table-bordered table-hover">
+					<thead>
+						<tr>
+							<th class="text-center col-md-10">項目</th>
+							<th class="text-center col-md-2">選項</th>
+						</tr>
+					</thead>
+					<?php foreach ($agrees as $key => $agree) {?>
+					<tr>
+						<td>
+							<?php echo $agree->agree_content?> <span class="text-danger">*</span>
+						</td>
+						<td class="text-center">
+							<label class="radio-inline">
+								<input disabled type="radio" value="1"<?php if( element($agree->agree_token, $agree_value ) == 1){?> checked<?php }?>>
+								<?php echo $agree->agree_true?>
+							</label>
+							<label class="radio-inline">
+								<input disabled type="radio" value="0"<?php if( element($agree->agree_token, $agree_value ) == 0){?> checked<?php }?>>
+								<?php echo $agree->agree_false?>
+							</label>
+						</td>
+					</tr>
+					<?php }?>
+					<?php if( in_array($paper->sub_status,array(4,5)) ){?>
+					<?php foreach ($finish_agrees as $key => $agree) {?>
+					<tr>
+						<td>
+							<?php echo $agree->agree_content?> <span class="text-danger">*</span>
+						</td>
+						<td class="text-center">
+							<label class="radio-inline">
+								<input disabled type="radio" value="1"<?php if( element($agree->agree_token, $agree_value ) == 1){?> checked<?php }?>>
+								<?php echo $agree->agree_true?>
+							</label>
+							<label class="radio-inline">
+								<input disabled type="radio" value="0"<?php if( element($agree->agree_token, $agree_value ) == 0){?> checked<?php }?>>
+								<?php echo $agree->agree_false?>
+							</label>
+						</td>
+					</tr>
+					<?php }?>
+					<?php }?>
+				</table>
 			</div>
 			<div class="tab-pane container-fluid" id="tab_author">
 				<h3>作者資訊</h3>
@@ -103,22 +148,15 @@
 						</tr>
 					</thead>
 					<tbody>
-						<?php if(!empty($finishfile)){?>
+						<?php foreach ($finishes as $key => $finish) {?>
 						<tr>
-							<td class="text-center"><span class="ui blue basic label">完稿投稿資料</span></td>
-							<td><?php echo $finishfile->file_name?></td>
-							<td><?php echo date("Y-m-d H:i:s",$finishfile->file_time)?></td>
 							<td class="text-center">
-								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$finishfile->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
-								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$finishfile->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
+								<?php echo file_type($finish->file_type)?>
 							</td>
-						</tr>
-						<?php }?>
-						<?php foreach ($finishother as $key => $finish) {?>
-						<tr>
-							<td class="text-center"><span class="ui teal basic label">完稿補充資料</span></td>
-							<td><?php echo $finish->file_name?></td>
-							<td><?php echo date("Y-m-d H:i:s",$finishfile->file_time)?></td>
+							<td>
+								<?php echo $finish->file_name?>
+							</td>
+							<td><?php echo date("Y-m-d H:i:s",$finish->file_time)?></td>
 							<td class="text-center">
 								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$finish->fid;?>" class="btn btn-xs btn-primary" target="_blank">查看</a>
 								<a href="<?php echo get_url("submit",$conf_id,"files")."/".$paper_id."?fid=".$finish->fid."&do=download";?>" class="btn btn-xs btn-warning" target="_blank">下載</a>
@@ -128,7 +166,7 @@
 					</tbody>
 				</table>
 				<?php }?>
-				<?php if( $paper->sub_status <= 4){?>
+				
 				<h3>稿件檔案</h3>
 				<table class="table table-bordered">
 					<thead>
@@ -172,7 +210,6 @@
 					<?php }?>
 					<?php }?>
 				</table>
-				<?php }?>
 			</div>
 			<?php if( $paper->sub_status >= 3 || $paper->sub_status == -2){?>
 			<div class="tab-pane container-fluid" id="tab_review">

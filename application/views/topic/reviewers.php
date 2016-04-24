@@ -13,16 +13,7 @@
 			</div>
 		</div>
 		<?php }?>
-		<table class="table table-bordered">
-			<tr>
-				<th width="10%">
-					審查期限
-				</th>
-				<td>
-					<input type="text" name="review_timeout" class="form-control datetimepicker_inline">
-				</td>
-			</tr>
-		</table>
+		<?php echo validation_errors();?>
 		<table class="table table-hover table-bordered">
 			<thead>
 				<tr>
@@ -55,7 +46,10 @@
 		</table>
 	</div>
 	<div class="text-center">
-		<button type="submit" class="ui button blue<?php if($pedding_count>=5){?> disabled<?php }?>">新增審查人</button>
+		<button type="submit" class="ui button blue huge<?php if($pedding_count>=5){?> disabled<?php }?>">指派審查人</button>
+		<?php if($conf_config['topic_assign']){?>
+			<a href="<?php echo get_url("topic",$conf_id,"users")?>" class="ui button green huge"><i class="fa fa-users"></i> <?php echo lang('topic_reviewer_assign')?></a>
+		<?php }?>
 	</div>
 <?php echo form_close()?>
 <script type="text/javascript">
@@ -64,8 +58,6 @@ $(function () {
     	format: 'YYYY/MM/DD hh:mm',
     	minDate: '<?php echo $schedule["submit"]["start"]?>',
     	maxDate: '<?php echo $schedule["hold"]["start"]?>',
-    	sideBySide: true,
-    	inline: true,
     	sideBySide: true,
     	locale: "zh-tw",
         icons: {

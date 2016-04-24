@@ -8,10 +8,18 @@
 		</div>
 		<div class="am-modal-bd">
 			<?php foreach ($schedule as $key => $v) {?>
+			<?php if($v['date_showmethod']>0){?>
 			<li>
-				<span class="text-bold"><?php echo lang('cisc2016_schedule_'.$key)?></span>：
-					<?php echo $v['end']?>
+				<span class="text-bold">
+				<?php if( empty( $v["date_title_".$this->_lang] ) ){?>
+					<?php echo lang('schedule_'.$key)?>
+				<?php }else{?>
+					<?php echo $v["date_title_".$this->_lang]?>
+				<?php }?>
+				</span>：
+				<?php echo date_showmethod($v['date_showmethod'],$v['start'],$v['end'])?>
 			</li>
+			<?php }?>
 			<?php }?>
 			<?php if( $this->user->is_conf($this->conf_id) ){?>
 				<a class="am-btn am-btn-primary am-btn-xs" href="<?php echo get_url("dashboard",$conf_id,"setting")?>">

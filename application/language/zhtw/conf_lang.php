@@ -8,6 +8,7 @@ $lang['schedule_early_bird'] = "早鳥繳費期限";
 $lang['schedule_register']   = "研討會註冊";
 $lang['schedule_finish']     = "完稿截稿日期";
 $lang['schedule_most']       = "科技部成果發表";
+$lang['schedule_accept_notice']       = "通知接受日期";
 
 /* nav */
 $lang['hello_user'] = "您好，";
@@ -42,4 +43,5 @@ $lang['cisc2016_schedule_submit']     = "論文截稿日期";
 $lang['cisc2016_schedule_early_bird'] = "早鳥繳費期限";
 $lang['cisc2016_schedule_register']   = "研討會註冊";
 $lang['cisc2016_schedule_finish']     = "完稿截稿日期";
+$lang['cisc2016_schedule_most']       = "科技部成果發表";
 $lang['cisc2016_schedule_most']       = "科技部成果發表";

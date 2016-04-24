@@ -13,7 +13,7 @@ if ( ! function_exists('schedule_dates')){
 	}
 }
 
-function sp($text){
+function sp($text=""){
 	echo '<pre>';
 	print_r($text);
 	echo '</pre>';
@@ -112,18 +112,18 @@ function new_alert($type='i',$text,$refresh=-1) {
 }
 
 function arrayLevel($arr){ 
-    $al = array(0); 
-    function aL($arr,&$al,$level=0){ 
-        if(is_array($arr)){ 
-            $level++; 
-            $al[] = $level; 
-            foreach($arr as $v){ 
-                aL($v,$al,$level); 
-            } 
-        } 
-    } 
-    aL($arr,$al); 
-    return max($al); 
+	$al = array(0); 
+	function aL($arr,&$al,$level=0){ 
+		if(is_array($arr)){ 
+			$level++; 
+			$al[] = $level; 
+			foreach($arr as $v){ 
+				aL($v,$al,$level); 
+			} 
+		} 
+	} 
+	aL($arr,$al); 
+	return max($al); 
 } 
 
 function active_confnav($now_page_id,$page_id,$active){
@@ -185,4 +185,148 @@ function langabbr2str($abbr){
 		default:
 			echo "-";
 	}
+}
+
+function get_fileicon($mime){
+	$return = "";
+	switch($mime){
+		case "application/pdf":
+			$return = "file-pdf-o";
+		break;
+		case 'application/vnd.ms-excel':
+		case 'application/msexcel':
+		case 'application/x-msexcel':
+		case 'application/x-ms-excel':
+		case 'application/x-excel':
+		case 'application/x-dos_ms_excel':
+		case 'application/xls':
+		case 'application/x-xls':
+		case 'application/excel':
+		case 'application/vnd.ms-office':
+		case 'application/vnd.ms-excel':
+		case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+			$return = "file-excel-o";
+		break;
+		case 'application/msword':
+		case 'application/vnd.ms-office':
+		case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+		case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+			$return = "file-word-o";
+		break;
+		case 'application/x-zip':
+		case 'application/zip':
+		case 'application/x-zip-compressed':
+		case 'application/s-compressed':
+		case 'multipart/x-zip':
+		case 'application/x-rar':
+		case 'application/rar':
+		case 'application/x-rar-compressed':
+		case 'application/x-compressed':
+		case 'application/x-zip-compressed':
+		case 'multipart/x-zip':
+			$return = "file-archive-o";
+		break;
+		case 'image/bmp':
+		case 'image/x-bmp':
+		case 'image/x-bitmap':
+		case 'image/x-xbitmap':
+		case 'image/x-win-bitmap':
+		case 'image/x-windows-bmp':
+		case 'image/ms-bmp':
+		case 'image/x-ms-bmp':
+		case 'application/bmp':
+		case 'application/x-bmp':
+		case 'application/x-win-bitmap':
+		case 'image/gif':
+		case 'image/jpeg':
+		case 'image/pjpeg':
+		case 'image/png':
+		case 'image/x-png':
+			$return = "file-image-o";
+		break;
+		case 'text/plain':
+		case 'text/x-log':
+			$return = "file-text-o";
+		break;
+		default:
+			$return = "file";
+	}
+	return $return;
+}
+
+define("EXCL", true);
+define("BEFORE", true);
+define("AFTER", false);    
+
+function get_basename($filename){
+	return preg_replace('/^.+[\\\\\\/]/', '', $filename);
+}
+
+function split_string($string, $delineator, $desired, $type){
+	$lc_str = strtolower($string);
+	$marker = strtolower($delineator);
+	
+	if($desired == BEFORE){
+		if($type == EXCL){
+			$split_here = strpos($lc_str, $marker);
+		}else{
+			$split_here = strpos($lc_str, $marker)+strlen($marker);
+		}
+		
+		$parsed_string = substr($string, 0, $split_here);
+	}else{
+		if($type==EXCL){
+			$split_here = strpos($lc_str, $marker) + strlen($marker);
+		}else{
+			$split_here = strpos($lc_str, $marker) ;
+		}
+		
+		$parsed_string =  substr($string, $split_here, strlen($string));
+   }
+	return $parsed_string;
+}
+
+function return_between($string, $start, $stop, $type=EXCL){
+	$temp = split_string($string, $start, AFTER, $type);
+	return split_string($temp, $stop, BEFORE, $type);
+}
+
+function parse_args( $args, $defaults = '' ) {
+	if ( is_object( $args ) ){
+		$r = get_object_vars( $args );
+	}elseif ( is_array( $args ) ){
+		$r =& $args;
+	}else{
+		parse_args( $args, $r );
+	}
+
+	if ( is_array( $defaults ) ){
+		return array_merge( $defaults, $r );
+	}
+	return $r;
+}
+
+function file_type($file_type){
+	$type_name = "";
+	switch($file_type){
+		case "FF":
+			$type_name = "論文完稿";
+		break;
+		case "FO":
+			$type_name = "完稿補充檔案";
+		break;
+		case "FC":
+			$type_name = "Copyright Form";
+		break;
+		case "FA":
+			$type_name = "論文摘要檔";
+		break;
+		case "F":
+			$type_name = "投稿資料";
+		break;
+		case "O":
+			$type_name = "補充資料";
+		break;
+	}
+	return $type_name;
 }

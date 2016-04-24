@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');?>
 <div class="ui segment">
+	<h2>審查表單</h2>
 	<table class="table table-bordered">
 		<tr>
 			<th class="col-md-2">論文編號</th>

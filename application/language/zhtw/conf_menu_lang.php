@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 $lang['submit_system'] = "投稿系統";
 $lang['submit_add'] = "投稿";
-$lang['submit_list'] = "投稿清單";
+$lang['submit_list'] = "投稿編輯/清單";
 $lang['submit_signup'] = "研討會註冊";
 $lang['submit_news'] = "最新公告";
 $lang['submit_edit'] = "編輯投稿資料";
@@ -27,7 +27,7 @@ $lang['dashboard_most'] = "科技部成果發表";
 
 $lang['topic_dashboard'] = "主編論文審查";
 $lang['topic_assign'] = "論文審查";
-$lang['topic_reviewer_assign'] = "審查人設置";
+$lang['topic_reviewer_assign'] = "新增審查人";
 
 $lang['reviewer_dashboard'] = "論文審查";
 $lang['reviewer_paper'] = "論文審查";

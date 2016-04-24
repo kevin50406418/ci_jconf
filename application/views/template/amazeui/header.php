@@ -24,6 +24,7 @@ $pg_id = $this->uri->segment(2);
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <!--<![endif]-->
 <script src="<?php echo template_url('amazeui','amazeui.min.js')?>" type="text/javascript"></script>
+<!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script> -->
 <!--[if lt IE 9]>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>

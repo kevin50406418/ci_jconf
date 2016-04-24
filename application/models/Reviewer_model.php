@@ -10,7 +10,7 @@ class Reviewer_model extends CI_Model {
 		$this->db->join('topic', 'paper.sub_topic = topic.topic_id');
 		$this->db->where('user_login', $user_login);
 		$this->db->where('paper.conf_id', $conf_id);
-		//$this->db->where('sub_status', 3);
+		$this->db->where('sub_status', 3);
 		$query = $this->db->get();
 		return $query->result();
 	}

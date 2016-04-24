@@ -36,15 +36,16 @@
 		<?php echo form_close()?>
 	</div>
 	<br>
+	<div class="table-responsive">
 	<table class="table table-bordered table-hover datatable">
 		<thead>
 			<tr>
-				<th style="width:5%" class="text-center">#</th>
-				<th style="width:45%" class="text-center">題目</th>
-				<th style="width:15%" class="text-center">主題</th>
-				<th style="width:10%" class="text-center">稿件狀態</th>
-				<th style="width:10%" class="text-center">審查狀態</th>
-				<th style="width:15%" class="text-center">操作</th>
+				<th class="col-md-1 text-center">#</th>
+				<th class="col-md-5 text-center">題目</th>
+				<th class="col-md-2 text-center">主題</th>
+				<th class="col-md-1 text-center">稿件狀態</th>
+				<th class="col-md-1 text-center">審查狀態</th>
+				<th class="col-md-2 text-center">操作</th>
 			</tr>
 		</thead>
 		<?php if(is_array($papers)){?>
@@ -92,33 +93,85 @@
 			<?php }?>
 			</td>
 			<td>
-				<div class="small icon ui buttons basic">
 				<?php if(!in_array($paper->sub_id,$paper_author)){?>
 					<?php if($had_count[$paper->sub_id] == $assign_count[$paper->sub_id] && $assign_count[$paper->sub_id] != 0){?>
 						<?php if($paper->sub_status == 3 ){?>
-							<a href="<?php echo get_url("topic",$conf_id,"detail",$paper->sub_id)?>" class="ui button basic green">主編審查</a>
+							<a href="<?php echo get_url("topic",$conf_id,"detail",$paper->sub_id)?>" class="btn btn-info btn-sm">主編審查</a>
 						<?php }elseif($paper->sub_status == 1){?>
-							<a href="<?php echo get_url("topic",$conf_id,"detail",$paper->sub_id)?>" class="ui teal button basic">分派審查</a>
+							<a href="<?php echo get_url("topic",$conf_id,"detail",$paper->sub_id)?>" class="btn btn-danger btn-sm">分派審查</a>
 						<?php }else{?>
-							<a href="<?php echo get_url("topic",$conf_id,"detail",$paper->sub_id)?>" class="ui button">查看稿件</a>
+							<a href="<?php echo get_url("topic",$conf_id,"detail",$paper->sub_id)?>" class="btn btn-deault btn-sm">查看稿件</a>
 						<?php }?>
+						<!-- 1 -->
 					<?php }else{?>
-						<a href="<?php echo get_url("topic",$conf_id,"detail",$paper->sub_id)?>" class="ui teal button basic">分派審查</a>
+						<?php if($paper->sub_status == 1 ){?>
+						<a href="<?php echo get_url("topic",$conf_id,"detail",$paper->sub_id)?>" class="btn btn-danger btn-sm">分派審查</a>
+						<?php }elseif($paper->sub_status == -3 ){?>
+						<?php }else{?>
+						<a href="<?php echo get_url("topic",$conf_id,"detail",$paper->sub_id)?>" class="btn btn-primary btn-sm">查看稿件</a>
+						<?php }?>
 					<?php }?>
 				<?php }else{?>
-					<a href="<?php echo get_url("submit",$conf_id,"detail",$paper->sub_id)?>" class="ui blue button basic">查看稿件</a>
+					<a href="<?php echo get_url("submit",$conf_id,"detail",$paper->sub_id)?>" class="btn btn-info btn-sm">查看稿件</a>
 				<?php }?>
+				<div class="btn-group">
+					<button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						操作 <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<?php if( $conf_config['topic_edit'] && !in_array($paper->sub_status,array(-3)) ){?>
+						<li><a href="<?php echo get_url("topic",$conf_id,"edit",$paper->sub_id)?>"><i class="fa fa-pencil-square-o"></i> 編輯稿件</a></li>
+						<?php }?>
+						<li><a href="<?php echo get_url("topic",$conf_id,"email",$paper->sub_id)?>"><i class="fa fa-envelope-o"></i> 連絡作者</a></li>
+					</ul>
 				</div>
 			</td>
 		</tr>
 		<?php }?>
 	<?php }?>
 	</table>
+	</div>
 </div>
 
 <script>
 $(function() {
 	$("#topic_id").change(function() {$("form#act").submit();});
 	$("#status").change(function() {$("form#act").submit();});
+	$('.datatable').dataTable( {
+		"order": [[ 0, "desc" ]],
+		columnDefs: [
+			{ orderable: false, "targets": -1 },
+		],
+		dom: 'Bfrtip',
+		buttons: [
+			{
+                extend: 'excelHtml5',
+                text: '匯出 excel 檔',
+                className: 'ui button green'
+            },
+            {
+                extend: 'csvHtml5',
+                text: '匯出 csv 檔',
+                className: 'ui button teal'
+            }
+        ],
+		stateSave: true,
+        "language": {
+            "lengthMenu": "每頁顯示 _MENU_ 筆資料",
+            "zeroRecords": "找不到論文",
+            "info": "第 _PAGE_ 頁，共 _PAGES_ 頁",
+            "infoEmpty": "目前尚無任何論文",
+            "infoFiltered": "(filtered from _MAX_ total records)",
+			"loadingRecords": "載入中...",
+			"processing":     "處理中...",
+			"search":         "論文資料搜尋：",
+			"paginate": {
+				"first":      "首頁",
+				"last":       "最後一頁",
+				"next":       "下一頁",
+				"previous":   "上一頁"
+			},
+        }
+    } );
 });
 </script>

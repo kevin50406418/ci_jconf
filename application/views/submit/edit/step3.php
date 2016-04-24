@@ -23,7 +23,7 @@ if(is_null($this->input->get("upload"))){
 <?php echo form_close()?>
 <br>
 <?php }?>
-<?php echo form_open_multipart(get_url("submit",$conf_id,"edit",$paper_id)."?step=3&upload",array("class"=>"form-horizontal"));?>
+<?php echo form_open_multipart(get_url("submit",$conf_id,"edit",$paper_id)."?step=3",array("class"=>"form-horizontal"));?>
 <div class="ui blue segment">
 	<h2>上傳投稿文件</h2>
 	<div class="form-group">
@@ -31,8 +31,10 @@ if(is_null($this->input->get("upload"))){
 			<input name="paper_file" type="file" required="required" id="paper_file" accept=".pdf">
 			<p class="help-block">只限PDF上傳投稿資料</p>
 		</div>
+		<div class="text-center">
+			<button id="check" type="submit" class="ui blue button huge">上傳</button>
+		</div>
 		<!--[if IE 8]>
-		<button id="check" type="submit" class="ui blue button">上傳</button>
 		<script>
 			$(function(){
 				$("#check").on("click",function(){

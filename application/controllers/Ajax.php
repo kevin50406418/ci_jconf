@@ -10,7 +10,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @date	2016/2/27
  */
 
-class Ajax extends MY_Conference {
+class Ajax extends MY_Controller {
 	public function __construct(){
 		parent::__construct();
 		if( !$this->input->is_ajax_request() ){
@@ -19,7 +19,10 @@ class Ajax extends MY_Conference {
 	}
 
 	public function paperlist($conf_id){
-		if( !$this->user->is_conf($this->conf_id) ){
+		if( !$this->conf->confid_exists($conf_id,$this->user->is_conf($conf_id)) ){
+			exit("permissions deny");
+		}
+		if( !$this->user->is_conf($conf_id) ){
 			exit("permissions deny");
 		}
 		$this->form_validation->set_rules('topic[]', '投稿主題', 'required');
@@ -37,11 +40,49 @@ class Ajax extends MY_Conference {
 	}
 
 	public function finishpapers($conf_id){
+		if( !$this->conf->confid_exists($conf_id,$this->user->is_conf($conf_id)) ){
+			exit("permissions deny");
+		}
 		if( !$this->user->is_conf($this->conf_id) ){
 			exit("permissions deny");
 		}
 		$this->data['papers'] = $this->exportdata->get_finishpapers($conf_id);
 		$this->data['files'] = $this->exportdata->get_finishfiles($conf_id);
 		$this->load->view('exportdata/preview/finishpapers',$this->data);
+	}
+
+	public function calsignup($conf_id){
+		if( !$this->conf->confid_exists($conf_id,$this->user->is_conf($conf_id)) ){
+			exit("permissions deny");
+		}
+		$price_type = $this->input->post("price_type");
+		$signup_price = $this->signup->cal_signup_price($conf_id,$price_type);
+		echo $signup_price;
+	}
+
+	public function conf_calsignup($conf_id,$signup_id){
+		if( !$this->conf->confid_exists($conf_id,$this->user->is_conf($conf_id)) ){
+			exit("permissions deny");
+		}
+		if( !$this->user->is_conf($this->conf_id) ){
+			exit("permissions deny");
+		}
+		$signup = $this->conf->get_signup($conf_id,$signup_id);
+		if( !empty($signup)){
+			$price_type = $this->input->post("price_type");
+			$signup_price = $this->signup->cal_signup_price($conf_id,$price_type,$signup);
+			echo $signup_price;
+		}
+	}
+
+	public function signuplist($conf_id){
+		if( !$this->conf->confid_exists($conf_id,$this->user->is_conf($conf_id)) ){
+			exit("permissions deny");
+		}
+		if( !$this->user->is_conf($this->conf_id) ){
+			exit("permissions deny");
+		}
+		$this->data['signups'] = $this->conf->get_signups($conf_id);
+		$this->load->view('exportdata/preview/signuplist',$this->data);
 	}
 }

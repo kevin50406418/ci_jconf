@@ -27,10 +27,13 @@
 				(<?php echo $user->user_first_name?> <?php echo $user->user_last_name?>)
 				<div class="pull-right">
 				<?php if( in_array($user->user_login,$confs) ){?>
-					<span class="ui teal label basic" title="研討會管理員">管</span>
+					<span class="ui teal label" title="研討會管理員">管</span>
+				<?php }?>
+				<?php if( in_array($user->user_login,$topics) ){?>
+					<span class="ui green mini label" title="主題主編">主</span>
 				<?php }?>
 				<?php if( in_array($user->user_login,$reviewers) ){?>
-					<span class="ui orange label basic" title="研討會審查人">審</span>
+					<span class="ui orange label" title="研討會審查人">審</span>
 				<?php }?>
 				<?php if($user->user_staus == 2){?>
 					<span class="ui grey label">驗證中</span>

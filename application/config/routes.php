@@ -65,8 +65,17 @@ $route['(:any)/index'] = function ($conf_id){
 };
 $route['(:any)/news'] = 'home/news/$1';
 $route['(:any)/rss'] = 'home/rss/$1';
+$route['(:any)/signup'] = function ($conf_id){
+	if( in_array($conf_id,array("user","sysop")) ){
+		return $conf_id."/signup/";
+	}else{
+		return 'home/signup/'.$conf_id;
+	}
+};
 $route['(:any)/main'] = 'home/main/$1';
 // $route['debug'] = 'home/debug';
+$route['(:any)/file'] = 'file/index/$1';
+$route['(:any)/file/(:any)'] = 'file/$2/$1';
 $route['(:any)/dashboard'] = 'dashboard/index/$1';
 $route['(:any)/dashboard/(:any)'] = 'dashboard/$2/$1';
 $route['(:any)/dashboard/(:any)/(:any)'] = 'dashboard/$2/$1/$3';

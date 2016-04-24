@@ -18,11 +18,11 @@ $lang['sysop_updateconf'] = "系統管理員更新研討會狀態";
 $lang['add_topic'] = "新增研討會主題";
 $lang['del_topic'] = "刪除研討會主題";
 $lang['update_topic'] = "更新研討會主題";
-$lang['add_assign_topic'] = "新增研討會主題主編";
-$lang['del_assign_topic'] = "刪除研討會主題主編";
-$lang['add_content'] = "新增研討會網頁";
-$lang['update_contents'] = "更新研討會網頁";
-$lang['update_content'] = "更新研討會網頁";
+$lang['add_assign_topic'] = "新增 {user_login} 為研討會主題 {topic_id} 主編";
+$lang['del_assign_topic'] = "取消 {user_login} 研討會主題 {topic_id} 主編";
+$lang['add_content'] = "新增研討會網頁 {page_title}";
+$lang['update_contents'] = "更新研討會網頁 {page_title}";
+$lang['update_content'] = "更新研討會網頁 {page_title}";
 $lang['del_contents'] = "刪除研討會網頁";
 $lang['update_confcol'] = "更新首頁排版 {conf_col}";
 $lang['update_confmost'] = "{conf_most} 科技部成果發表狀態";
@@ -37,10 +37,10 @@ $lang['update_mail_template'] = "更新電子郵件樣版";
 $lang['conf_topic_assign'] = "{topic_assign} 主編設置審查人設置";
 $lang['change_paper_status'] = '更改稿件 <a target="_blank" href="submit/detail/{paper_id}">#{paper_id}</a> 狀態為 {paper_status}，原狀態為 {old_status}';
 
-$lang['assign_reviewer_pedding'] = '指派 {user_login} 稿件<a target="_blank" href="submit/detail/{paper_id}">#{paper_id}</a>為暫定審查人(審查期限：{review_timeout})';
+$lang['assign_reviewer_pedding'] = '指派 {user_login} 為<a target="_blank" href="submit/detail/{paper_id}">#{paper_id}</a>稿件暫定審查人(審查期限：{review_timeout})';
 $lang['update_pedding_timeout'] = "更新暫定審查人審查期限";
-$lang['del_reviewer_pedding'] = "刪除暫定審查人";
-$lang['assign_reviewer'] = "指派審查人";
+$lang['del_reviewer_pedding'] = '取消 {user_login} 為 <a target="_blank" href="submit/detail/{paper_id}">#{paper_id}</a>稿件暫定審查人';
+$lang['assign_reviewer'] = '指派 {user_login} 為 <a target="_blank" href="submit/detail/{paper_id}">#{paper_id}</a>稿件審查人';
 $lang['notice_reviewer'] = "審查提醒";
 $lang['topic_review'] = "稿件審查：{sub_status}";
 
@@ -68,8 +68,14 @@ $lang['update_register_status'] = "更新研討會註冊狀態";
 
 $lang['add_conf_admin'] = "將使用者 {user_login} 設為研討會管理員身分";
 $lang['del_conf_admin'] = "取消使用者 {user_login} 研討會管理員身分";
-$lang['add_reviewer'] = "新增研討會審查人";
-$lang['del_reviewer'] = "取消研討會審查人";
+$lang['add_reviewer'] = "新增 {user_login} 為研討會審查人";
+$lang['del_reviewer'] = "取消 {user_login} 為研討會審查人";
 
 $lang['remove_paper'] = '刪除稿件 <a target="_blank" href="submit/detail/{paper_id}">#{paper_id}</a>';
 $lang['update_confstyle'] = "更新研討會樣式";
+
+$lang['add_signup_type'] = "新增繳費分類 {type_name}";
+$lang['add_signup_price'] = "新增繳費項目";
+$lang['update_signup'] = "更新註冊資訊";
+$lang['update_signup_info'] = "更新研討會註冊資訊";
+$lang['update_signup_status'] = "更新註冊 #{signup_id} 狀態";

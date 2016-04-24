@@ -72,3 +72,9 @@ $lang['del_reviewer'] = "Cancel Conference Reviewer";
 
 $lang['remove_paper'] = "Remove Paper";
 $lang['update_confstyle'] = "Update Website Style";
+
+$lang['add_signup_type'] = "Add signup type {type_name}";
+$lang['add_signup_price'] = "Add signup price";
+$lang['update_signup'] = "Update signup";
+$lang['update_signup_info'] = "Update Conference signup information";
+$lang['update_signup_status'] = "Update #{signup_id} signup status";

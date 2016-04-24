@@ -88,7 +88,7 @@ $autoload['drivers'] = array('session');
 |	$autoload['helper'] = array('url', 'file');
 */
 
-$autoload['helper'] = array('url','form','html','cookie','utility','security','file','language');
+$autoload['helper'] = array('url','form','html','cookie','utility','security','file','language','directory','array','string');
 
 
 /*
@@ -138,14 +138,15 @@ $autoload['language'] = array();
 */
 
 $autoload['model'] = array(
-	'user_model'     => 'user',
-	'conf_model'     => 'conf',
-	'submit_model'   => 'submit',
-	'sysop_model'    => 'sysop',
-	'alert_model'    => 'alert',
-	'topic_model'    => 'topic',
-	'module_model'   => 'module',
-	'reviewer_model' => 'reviewer',
-	'exportdata_model' => 'exportdata'
+	'user_model'       => 'user',
+	'conf_model'       => 'conf',
+	'submit_model'     => 'submit',
+	'sysop_model'      => 'sysop',
+	'alert_model'      => 'alert',
+	'topic_model'      => 'topic',
+	'module_model'     => 'module',
+	'reviewer_model'   => 'reviewer',
+	'exportdata_model' => 'exportdata',
+	'signup_model'     => 'signup'
 );
 

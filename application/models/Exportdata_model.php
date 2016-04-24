@@ -82,4 +82,25 @@ class Exportdata_model extends CI_Model {
 		$this->zip->add_data($data);
 		$this->zip->download($filename.'.zip'); // error
     }
+
+    function signup($conf_id,$format,$filename){
+    	$this->data['signups'] = $this->conf->get_signups($conf_id);
+    	if( empty($filename) ){
+			$filename = "signuplist";
+		}
+		switch($format){
+			case "csv":
+				$this->output->set_content_type("csv");
+				$output = $this->load->view('exportdata/csv/signuplist',$this->data,true);
+				force_download($filename.".csv",$output);
+			break;
+			case "xls":
+				$output = $this->load->view('exportdata/xls/signuplist',$this->data,true);
+				$this->output->set_content_type("xls");
+				$this->output->set_header('Content-Disposition: attachment; filename="'.$filename.'.xls"');
+				$this->output->set_output($output);
+			break;
+		}
+    }
+
 }

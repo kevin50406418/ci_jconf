@@ -1,4 +1,96 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');?>
+<?php if( $paper->sub_status == 3 ){?>
+<div class="ui segment raised">
+	<div class="modal-header">
+		<h3 class="modal-title">審查期限</h3>
+	</div>
+	<div class="modal-body">
+		<?php echo form_open(get_url("topic",$conf_id,"detail",$paper->sub_id))?>
+		<table class="table table-bordered">
+			<thead>
+				<tr>
+					<th></th>
+					<th class="text-center">審查人</th>
+					<th class="text-center">審查狀態</th>
+					<th class="text-center">審查期限</th>
+				</tr>
+			</thead>
+			<tbody>
+			<?php foreach ($reviewers as $key => $reviewer) {?>
+				<tr>
+					<td class="text-center">
+						<input type="checkbox" value="<?php echo $reviewer->user_login?>" name="user_login[]"<?php if($reviewer->review_status){?> disabled<?php }?>>
+					</td>
+					<td><?php echo $reviewer->user_login?></td>
+					<td class="text-center">
+						<?php if( $reviewer->review_confirm == -1  ){?>
+						<span class="ui grey label">確認中</span>
+						<?php }else{?>
+						<?php echo $this->reviewer->review_status($reviewer->review_status)?>
+						<?php }?>
+					</td>
+					<td class="text-center">
+						<input type="text" value="<?php echo date("Y-m-d H:i",$reviewer->review_timeout)?>" class="form-control datetimepicker"<?php if($reviewer->review_status){?> disabled<?php }else{?> name="review_timeout[<?php echo $reviewer->user_login?>]"<?php }?>>
+					</td>
+				</tr>
+				<?php }?>
+			</tbody>
+		</table>
+		<div class="text-center">
+			<button class="ui button teal" type="submit" name="do" value="timeout">更新審查期限</button>
+			<!-- <button class="ui button red" type="button" name="do" value="cancel" disabled>取消審查人</button> -->
+		</div>
+		<?php echo form_close()?>
+	</div>
+</div>
+<div class="ui segment raised">
+	<div class="modal-header">
+		<h3 class="modal-title">主編審查</h3>
+	</div>
+	<div class="modal-body">
+		<?php echo validation_errors('<div class="ui message red">', '</div>');?>
+		<?php echo form_open(get_url("topic",$conf_id,"detail",$paper->sub_id))?>
+		<?php echo form_hidden('do', 'topic');?>
+		<div class="form-horizontal">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">審查狀態 <span class="text-danger">*</span></label>
+				<div class="col-sm-10">
+					<div class="col-sm-3">
+						<label class="radio-inline" for="status_4">
+							<input name="status" type="radio" value="4" id="status_4">
+							<?php echo $this->submit->sub_status(4,true,true,"huge")?>
+						</label>
+					</div>
+					<div class="col-sm-3">
+						<label class="radio-inline" for="status_0">
+							<input name="status" type="radio" value="0" id="status_0">
+							<?php echo $this->submit->sub_status(0,true,true,"huge")?>
+						</label>
+					</div>
+					<div class="col-sm-3">
+						<label class="radio-inline" for="status_2">
+							<input name="status" type="radio" value="2" id="status_2">
+							<?php echo $this->submit->sub_status(2,true,true,"huge")?>
+						</label>
+					</div>
+					<div class="col-sm-3">
+						<label class="radio-inline" for="status__2">
+							<input name="status" type="radio" value="-2" id="status__2">
+							<?php echo $this->submit->sub_status(-2,true,true,"huge")?>
+						</label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-10">
+					<button type="submit" class="ui button blue">送出</button>
+				</div>
+			</div>
+		</div>
+		<?php echo form_close()?>
+	</div>
+</div>
+<?php }?>
 <div class="ui segment raised">
 <div class="tabbable-panel">
 	<div class="tabbable-line">
@@ -9,23 +101,25 @@
 			<?php if( $paper->sub_status >= 3 || $paper->sub_status == -2 || $paper->sub_status == 0){?><li> <a href="#tab_review" data-toggle="tab"> 審查資料 </a> </li><?php }?>
 			<?php if( $paper->sub_status < 3 && $paper->sub_status >= -1){?>
 			<?php echo form_open(get_url("topic",$conf_id,"operating",$paper->sub_id),array("class"=>"pull-right","id"=>"paper_act"))?>
-				操作：
 				<div class="btn-group" role="group">
-					<button id="remove" type="submit" name="do" value="remove" class="btn btn-default">接受撤搞</button>
-					<button id="reject" type="submit" name="do" value="reject" class="btn btn-danger">直接拒絕</button>
+					<!-- <button id="remove" type="submit" name="do" value="remove" class="btn btn-default">接受撤搞</button> -->
+					<button id="reject" type="submit" name="do" value="reject" class="ui button red">直接拒絕</button>
 				</div>
 			<?php echo form_close()?>
 			<script>
 				$(function() { 
-					$("#remove").click(function(){
-						return confirm("確定是否接受徹搞\n注意：操作後無法恢復");
-					});
+					// $("#remove").click(function(){
+					// 	return confirm("確定是否接受徹搞\n注意：操作後無法恢復");
+					// });
 					$("#reject").click(function(){
 						return confirm("確定是否直接拒絕\n注意：操作後無法恢復");
 					});
 				});
 			</script>
 			<?php }?>
+			<a href="<?php echo get_url("topic",$conf_id)?>" class="ui button teal pull-right">稿件列表</a>
+			<a href="<?php echo get_url("topic",$conf_id,"edit",$paper->sub_id)?>" class="ui button blue pull-right">編輯</a>
+			<a href="<?php echo get_url("topic",$conf_id,"email",$paper->sub_id)?>" class="ui button orange pull-right">連絡通訊作者</a>
 		</ul>
 		<div class="tab-content">
 			<div class="tab-pane active container-fluid" id="tab_info">
@@ -51,10 +145,12 @@
 							<?php echo $this->submit->sub_status($paper->sub_status,true,true)?>
 						</td>
 					</tr>
+					<?php if( $paper->sub_review > 0){?>
 					<tr>
 						<th>送審時間</th>
 						<td><?php echo date("Y-m-d H:i:s",$paper->sub_review)?></td>
 					</tr>
+					<?php }?>
 					<tr>
 						<th>語言</th>
 						<td><?php echo langabbr2str($paper->sub_lang)?></td>
@@ -67,6 +163,31 @@
 						<th>計畫編號</th>
 						<td><?php echo $paper->sub_sponsor?></td>
 					</tr>
+				</table>
+				<table class="table table-bordered table-hover">
+					<thead>
+						<tr>
+							<th class="text-center col-md-10">項目</th>
+							<th class="text-center col-md-2">選項</th>
+						</tr>
+					</thead>
+					<?php foreach ($agrees as $key => $agree) {?>
+					<tr>
+						<td>
+							<?php echo $agree->agree_content?> <span class="text-danger">*</span>
+						</td>
+						<td class="text-center">
+							<label class="radio-inline">
+								<input disabled type="radio" value="1"<?php if( element($agree->agree_token, $agree_value ) == 1){?> checked<?php }?>>
+								<?php echo $agree->agree_true?>
+							</label>
+							<label class="radio-inline">
+								<input disabled type="radio" value="0"<?php if( element($agree->agree_token, $agree_value ) == 0){?> checked<?php }?>>
+								<?php echo $agree->agree_false?>
+							</label>
+						</td>
+					</tr>
+					<?php }?>
 				</table>
 			</div>
 			<div class="tab-pane container-fluid" id="tab_author">
@@ -193,7 +314,6 @@
 							<?php echo $reviewer->review_comment?>
 						</td>
 					</tr>
-					
 					<?php }?>
 				</table>
 				<?php if($cnt != count($reviewers)){?>
@@ -216,37 +336,23 @@ $(function() {
 	if (lastTab) {
 		$('[href="'+lastTab+'"]').tab('show');
 	}
+    $('.datetimepicker').datetimepicker({
+    	format: 'YYYY/MM/DD hh:mm',
+    	minDate: '<?php echo $schedule["submit"]["start"]?>',
+    	maxDate: '<?php echo $schedule["hold"]["start"]?>',
+    	sideBySide: true,
+    	locale: "zh-tw",
+        icons: {
+            time: "fa fa-clock-o",
+            date: "fa fa-calendar",
+            up: "fa fa-arrow-up",
+            down: "fa fa-arrow-down",
+            previous: "fa fa-chevron-left",
+            next: "fa fa-chevron-right",
+            today: "fa fa-screenshot",
+            clear: "fa fa-trash",
+            close: "fa fa-remov"
+        }
+    });
 });
 </script>
-<?php if( $paper->sub_status == 3 ){?>
-<div class="ui segment raised">
-	<div class="modal-header">
-		<h3 class="modal-title">主編審查</h3>
-	</div>
-	<div class="modal-body">
-		<?php echo validation_errors('<div class="ui message red">', '</div>');?>
-		<?php echo form_open(get_url("topic",$conf_id,"detail",$paper->sub_id))?>
-		<?php echo form_hidden('do', 'topic');?>
-		<div class="form-horizontal">
-			<div class="form-group">
-				<label class="col-sm-2 control-label">審查狀態 <span class="text-danger">*</span></label>
-				<div class="col-sm-10">
-					<select class="form-control" name="status">
-						<option>請選擇</option>
-						<option value="-2">拒絕</option>
-						<option value="0">修改後審查</option>
-						<option value="2">大會待決</option>
-						<option value="4">接受</option>
-					</select>
-				</div>
-			</div>
-			<div class="form-group">
-				<div class="col-sm-offset-2 col-sm-10">
-					<button type="submit" class="ui button blue">送出</button>
-				</div>
-			</div>
-		</div>
-		<?php echo form_close()?>
-	</div>
-</div>
-<?php }?>

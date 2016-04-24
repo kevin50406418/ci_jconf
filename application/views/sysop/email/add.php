@@ -15,13 +15,13 @@
 		<tr>
 			<th>中文說明 <span class="text-danger">*</span></th>
 			<td>
-				<textarea name="email_desc[zhtw]" class="form-control tinymce"><?php echo set_value("email_desc[zhtw]")?></textarea>
+				<textarea name="email_desc[zhtw]" class="form-control ckeditor"><?php echo set_value("email_desc[zhtw]")?></textarea>
 			</td>
 		</tr>
 		<tr>
 			<th>英文說明 <span class="text-danger">*</span></th>
 			<td>
-				<textarea name="email_desc[eng]" class="form-control tinymce"><?php echo set_value("email_desc[eng]")?></textarea>
+				<textarea name="email_desc[eng]" class="form-control ckeditor"><?php echo set_value("email_desc[eng]")?></textarea>
 			</td>
 		</tr>
 		<tr>
@@ -33,7 +33,7 @@
 		<tr>
 			<th>中文信件內容 <span class="text-danger">*</span></th>
 			<td>
-				<textarea name="default_body[zhtw]" class="form-control tinymce" rows="10"><?php echo set_value("default_body[zhtw]")?></textarea>
+				<textarea name="default_body[zhtw]" class="form-control ckeditor" rows="10"><?php echo set_value("default_body[zhtw]")?></textarea>
 			</td>
 		</tr>
 		<tr>
@@ -45,7 +45,7 @@
 		<tr>
 			<th>英文信件內容 <span class="text-danger">*</span></th>
 			<td>
-				<textarea name="default_body[eng]" class="form-control tinymce" rows="10"><?php echo set_value("default_body[eng]")?></textarea>
+				<textarea name="default_body[eng]" class="form-control ckeditor" rows="10"><?php echo set_value("default_body[eng]")?></textarea>
 			</td>
 		</tr>
 	</table>

@@ -14,13 +14,15 @@
 			<a href="<?php echo get_url("dashboard",$conf_id,"email")?>" class="btn btn-lg btn-hover btn-olive col-md-2"><i class="fa fa-newspaper-o fa-4x"></i><br><?php echo lang('dashboard_email')?></a>
 			<a href="<?php echo get_url("dashboard",$conf_id,"submit")?>" class="btn btn-lg btn-hover btn-olive col-md-2"><i class="fa fa-list fa-4x"></i><br><?php echo lang('dashboard_submit')?></a>
 			<a href="<?php echo get_url("dashboard",$conf_id,"review")?>" class="btn btn-lg btn-hover btn-olive col-md-2"><i class="fa fa-commenting fa-4x"></i><br>審查表單</a>
+			<a href="<?php echo get_url("dashboard",$conf_id,"signup")?>" class="btn btn-lg btn-hover btn-olive col-md-2"><i class="fa fa-sign-in fa-4x"></i><br><?php echo lang('dashboard_signup')?></a>
+			<a href="<?php echo get_url("dashboard",$conf_id,"price")?>" class="btn btn-lg btn-hover btn-olive col-md-2"><i class="fa fa-shopping-cart fa-4x"></i><br>繳費資訊</a>
 			<?php if($conf_config['conf_most'] == 1 ){?><a href="<?php echo get_url("dashboard",$conf_id,"most")?>" class="btn btn-lg btn-hover btn-olive col-md-2"><i class="fa fa-university fa-4x"></i><br><?php echo lang('dashboard_most')?></a><?php }?>
+			<a href="<?php echo get_url("dashboard",$conf_id,"file")?>" class="btn btn-lg btn-hover btn-olive col-md-2"><i class="fa fa fa-files-o fa-4x"></i><br>檔案管理</a>
 			<a href="<?php echo get_url("dashboard",$conf_id,"export")?>" class="btn btn-lg btn-hover btn-olive col-md-2"><i class="fa fa-download fa-4x"></i><br><?php echo lang('dashboard_export')?></a>
 			<a href="<?php echo get_url("dashboard",$conf_id,"logs")?>" class="btn btn-lg btn-hover btn-olive col-md-2"><i class="fa fa-shield fa-4x"></i><br><?php echo lang('dashboard_logs')?></a>
-			<?php if( ENVIRONMENT == "development" ){?>
-			<a href="<?php echo get_url("dashboard",$conf_id,"register")?>" class="btn btn-lg btn-hover btn-olive col-md-2"><i class="fa fa-sign-in fa-4x"></i><br><?php echo lang('dashboard_signup')?></a>
 			<a href="<?php echo get_url("dashboard",$conf_id,"report")?>" class="btn btn-lg btn-hover btn-olive col-md-2"><i class="fa fa-line-chart fa-4x"></i><br><?php echo lang('dashboard_report')?></a>
-			<a href="<?php echo get_url("dashboard",$conf_id,"menu")?>" class="btn btn-lg btn-hover btn-olive col-md-2"><i class="fa fa-bars fa-4x"></i><br>網頁選單</a>
+			<?php if( ENVIRONMENT == "development" ){?>
+			<a href="<?php echo get_url("dashboard",$conf_id,"menu")?>" class="btn btn-lg btn-hover btn-olive col-md-2"><i class="fa fa-bars fa-4x"></i><br>網頁選單</a><!-- 2.0.0 will add-->
 			<?php }?>
 		</div>
 	</div>
